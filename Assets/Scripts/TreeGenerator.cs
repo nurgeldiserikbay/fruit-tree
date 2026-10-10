@@ -63,40 +63,83 @@ namespace FruitTree
             var fruitAnchors = new List<Vector3>();
             var brown = new Color(.86f, .81f, .74f);
             var branchColor = new Color(.9f, .81f, .72f);
-            wood.Branch(Vector3.zero, new Vector3(0, 1.75f, 0), .39f, .29f, brown);
-            wood.Branch(new Vector3(0, 1.75f, 0), new Vector3(0, 3.7f, 0), .29f, .07f, brown);
+            // A slight bend in the trunk and irregularly-spaced limbs avoid the
+            // artificial radial symmetry of the first prototype.
+            Vector3 trunkBase = Vector3.zero;
+            Vector3 trunkLow = new Vector3(.055f, 1.22f, -.025f);
+            Vector3 trunkMid = new Vector3(-.04f, 2.53f, .06f);
+            Vector3 trunkTop = new Vector3(.04f, 4.02f, -.025f);
+            wood.Branch(trunkBase, trunkLow, .43f, .33f, brown);
+            wood.Branch(trunkLow, trunkMid, .33f, .22f, brown);
+            wood.Branch(trunkMid, trunkTop, .22f, .035f, brown);
 
-            for (int ring = 0; ring < 5; ring++)
+            const float goldenAngle = 2.39996323f;
+            const int majorBranches = 19;
+            for (int i = 0; i < majorBranches; i++)
             {
-                int count = ring == 4 ? 4 : 7;
-                float h = 1.55f + ring * .43f;
-                for (int b = 0; b < count; b++)
+                float elevation = i / (float)(majorBranches - 1);
+                float height = Mathf.Lerp(1.36f, 3.55f, elevation) + Between(-.13f, .13f);
+                float angle = goldenAngle * i + Between(-.18f, .18f);
+                Vector3 radial = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle));
+                Vector3 sideways = new Vector3(-radial.z, 0f, radial.x);
+                float length = (2.65f - elevation * 1.2f) * Between(.88f, 1.12f);
+                Vector3 origin = new Vector3(Between(-.065f,.065f), height, Between(-.065f,.065f));
+
+                Vector3 previous = origin;
+                for (int section = 1; section <= 3; section++)
                 {
-                    float angle = (b + ring * .37f) * Mathf.PI * 2f / count + Between(-.16f, .16f);
-                    Vector3 direction = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle));
-                    Vector3 from = new Vector3(0, h, 0);
-                    float length = 2.5f - ring * .39f + Between(-.15f, .15f);
-                    Vector3 mid = from + direction * length * .55f + Vector3.up * .24f;
-                    Vector3 tip = from + direction * length + Vector3.up * (.38f + ring * .12f);
-                    wood.Branch(from, mid, .17f - ring * .018f, .10f - ring * .01f, branchColor);
-                    wood.Branch(mid, tip, .10f - ring * .01f, .017f, branchColor);
-                    for (int cluster = 0; cluster < 3; cluster++)
+                    float fraction = section / 3f;
+                    Vector3 point = origin + radial * (length * fraction) +
+                        sideways * (Mathf.Sin(fraction * Mathf.PI) * Between(-.16f, .16f)) +
+                        Vector3.up * (.12f * fraction + .48f * fraction * fraction);
+                    float baseRadius = Mathf.Lerp(.14f, .095f, elevation);
+                    wood.Branch(previous, point, Mathf.Lerp(baseRadius, .022f, (section - 1) / 3f),
+                        Mathf.Lerp(baseRadius, .022f, fraction), branchColor);
+                    previous = point;
+                }
+
+                // Each limb carries several smaller twigs with two leaf clusters.
+                // All wood/leaves are merged into just two renderer objects.
+                for (int twigIndex = 0; twigIndex < 5; twigIndex++)
+                {
+                    float fraction = .32f + twigIndex * .14f;
+                    float sideSign = twigIndex % 2 == 0 ? 1f : -1f;
+                    Vector3 start = origin + radial * (length * fraction) +
+                        Vector3.up * (.12f * fraction + .48f * fraction * fraction);
+                    Vector3 twigDirection = (radial * .65f +
+                        sideways * sideSign * Between(.28f, .7f) +
+                        Vector3.up * Between(.18f,.58f)).normalized;
+                    float twigLength = Between(.44f, .77f) * (1f - elevation * .18f);
+                    Vector3 end = start + twigDirection * twigLength;
+                    wood.Branch(start, end, .039f, .008f, branchColor);
+
+                    for (int clusterIndex = 0; clusterIndex < 2; clusterIndex++)
                     {
-                        Vector3 center = Vector3.Lerp(mid, tip, .3f + cluster * .31f);
-                        center += new Vector3(Between(-.24f,.24f), Between(-.1f,.3f), Between(-.24f,.24f));
-                        var twig = center + new Vector3(Between(-.24f,.24f), Between(.25f,.4f), Between(-.24f,.24f));
-                        wood.Branch(center, twig, .032f, .007f, branchColor);
-                        fruitAnchors.Add(center + new Vector3(Between(-.18f,.18f), -.15f, Between(-.18f,.18f)));
-                        for (int j = 0; j < leavesPerCluster; j++)
+                        float along = clusterIndex == 0 ? .57f : .94f;
+                        Vector3 center = Vector3.Lerp(start, end, along);
+                        fruitAnchors.Add(center + Vector3.down * .1f);
+                        for (int leafIndex = 0; leafIndex < leavesPerCluster; leafIndex++)
                         {
-                            Vector3 offset = new Vector3(Between(-.39f,.39f), Between(-.3f,.36f), Between(-.39f,.39f));
-                            Vector3 leafDirection = new Vector3(Between(-1,1), Between(-.3f, .9f), Between(-1,1)).normalized;
-                            float colorShift = Between(-.07f, .07f);
-                            Color leafColor = new Color(.34f + colorShift, .57f + Between(-.06f,.09f), .20f + colorShift);
-                            foliage.Leaf(center + offset, leafDirection, Between(.16f,.29f), Between(.11f,.17f), leafColor);
+                            Vector3 offset = new Vector3(Between(-.39f,.39f),
+                                Between(-.31f,.36f), Between(-.39f,.39f));
+                            Vector3 direction = (offset +
+                                new Vector3(Between(-.3f,.3f), .21f, Between(-.3f,.3f))).normalized;
+                            float tint = Between(-.065f,.065f);
+                            Color leafColor = new Color(.32f + tint,
+                                .56f + Between(-.065f,.095f), .18f + tint);
+                            foliage.Leaf(center + offset * .75f, direction,
+                                Between(.17f,.29f), Between(.11f,.17f), leafColor);
                         }
                     }
                 }
+            }
+            // Prevent multiple fruits overlapping a single leaf cluster.
+            for (int i = fruitAnchors.Count - 1; i > 0; i--)
+            {
+                int index = random.Next(i + 1);
+                Vector3 swap = fruitAnchors[i];
+                fruitAnchors[i] = fruitAnchors[index];
+                fruitAnchors[index] = swap;
             }
             var barkMaterial = Track(VertexMaterial("Wood", Color.white));
             if (barkMaterial.HasProperty("_MainTex")) barkMaterial.SetTexture("_MainTex", Track(BarkTexture.Create()));
@@ -109,11 +152,11 @@ namespace FruitTree
             Material stemMaterial = Track(LitMaterial("Stem", new Color(.28f,.19f,.095f), .12f));
             for (int i = 0; i < appleCount; i++)
             {
-                Vector3 at = fruitAnchors[random.Next(fruitAnchors.Count)] + new Vector3(Between(-.12f,.12f), Between(-.12f,.02f), Between(-.12f,.12f));
+                Vector3 at = fruitAnchors[i * fruitAnchors.Count / appleCount] + new Vector3(Between(-.12f,.12f), Between(-.12f,.02f), Between(-.12f,.12f));
                 // Keep most apples near the outer crown so the picking game stays readable.
                 // A smaller group remains deeper in the leaves for exploration.
                 Vector3 outward = new Vector3(at.x, 0f, at.z).normalized;
-                at += outward * (i % 4 == 0 ? .08f : .33f);
+                at += outward * (i % 4 == 0 ? .04f : .18f);
                 var fruit = MakeMeshObject("Apple " + (i + 1), appleMesh, appleMaterial);
                 fruit.transform.localPosition = at;
                 fruit.transform.localRotation = Quaternion.Euler(Between(-10,10), Between(0,360), Between(-10,10));
