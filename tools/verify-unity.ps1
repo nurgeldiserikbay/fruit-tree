@@ -41,6 +41,8 @@ function Assert-TestResults {
     Write-Host "Tests passed: $total total / $failed failures"
 }
 
+Invoke-Unity -Arguments @('-executeMethod', 'FruitTree.Editor.ValidateProject.Run') -LogName 'scene-validation.log'
+
 Invoke-Unity -Arguments @('-runTests', '-testPlatform', 'EditMode',
     '-testResults', (Join-Path $logs 'editmode-results.xml')) -LogName 'editmode.log'
 Assert-TestResults 'editmode-results.xml'

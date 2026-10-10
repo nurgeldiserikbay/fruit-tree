@@ -5,7 +5,7 @@
 2. Clone `https://github.com/nurgeldiserikbay/fruit-tree.git`.
 3. In Unity Hub choose Add project from disk and select the root directory.
 4. Wait for package import and C# script compilation. On first import the editor script automatically creates `Assets/Scenes/Main.unity`.
-5. If the scene was not generated: choose **Fruit Tree > Generate Playable Scene**. Open `Assets/Scenes/Main.unity`, then press Play.
+5. If the scene was not generated: choose **Fruit Tree > Generate Playable Scene**. Next choose **Fruit Tree > Validate Project** to check saved scene references, then press Play.
 6. Mouse: drag to orbit, wheel to zoom, click an apple to pick. Android: drag, pinch to zoom, tap.
 7. To create an Android build: File > Build Profiles > Android > Switch Platform, then **Fruit Tree > Build Android APK**. Build And Run requires device debugging enabled.
 8. To install the APK on device: `adb install -r FruitTree.apk` (or use Build And Run).
