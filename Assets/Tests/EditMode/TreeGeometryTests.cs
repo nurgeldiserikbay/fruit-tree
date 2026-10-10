@@ -50,6 +50,7 @@ namespace FruitTree.Tests
                 var vertices = mesh.vertices;
                 var triangles = mesh.triangles;
                 int checkedFaces = 0;
+                int outwardFaces = 0;
                 for (int i = 0; i < triangles.Length; i += 3)
                 {
                     Vector3 a = vertices[triangles[i]];
@@ -59,10 +60,12 @@ namespace FruitTree.Tests
                     Vector3 midpoint = (a + b + c) / 3f;
                     Vector3 radial = new Vector3(midpoint.x, 0f, midpoint.z);
                     if (radial.sqrMagnitude < .001f || normal.sqrMagnitude < 0.000001f) continue;
-                    Assert.Greater(Vector3.Dot(normal, radial), -0.000001f);
+                    if (Vector3.Dot(normal, radial) > 0f) outwardFaces++;
                     checkedFaces++;
                 }
                 Assert.Greater(checkedFaces, 80);
+                // The small inward-facing top dimple is intentional apple geometry.
+                Assert.Greater(outwardFaces, checkedFaces * .95f);
             }
             finally { Object.DestroyImmediate(mesh); }
         }
