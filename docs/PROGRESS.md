@@ -10,20 +10,22 @@
 ## Committed code
 - [x] Unity project and Android configuration
 - [x] Deterministic batched tree generator (wood, leaf canopy, mesh apples)
-- [x] Bark texture generator and slight leaf wind shader
-- [x] Touch orbit and pinch zoom
+- [x] Bark texture generator, asymmetric trunk / twigs, leaf-tip wind shader
+- [x] Touch orbit, pinch zoom and two-finger focus-height pan
 - [x] Apple interaction, animation, counter, restart
 - [x] Simple procedural sound, sound toggle
-- [x] Auto-generated scene and safe area
+- [x] Auto-generated scene with meadow / sky and safe area
 - [x] Android build menu command
 - [x] Edit-mode geometry tests (not yet executed)
 - [x] Play-mode tests for idempotent picking and round restart (not yet executed)
+- [x] Apple-skin texture, trunk occlusion and shadow draw-call reductions
+- [x] Static block-delimiter check across 15 C# scripts (passed; not a compiler run)
 
 ## NOT VERIFIED OR COMPLETE
 - [ ] Unity Editor compile and scene-opening acceptance test
 - [ ] Real Android device build and play test
 - [ ] Real recorded nature audio and tuned sounds
-- [ ] Detailed bark/branch art, foliage look and fruit placement critique in running game
+- [ ] Review real-time tree shape, leaf shading, apple appearance and fruit placement using Unity screenshots; improve after review
 - [ ] Frame-time, battery, heating profiling on low-end phones
 - [ ] Android signing, Google Play store release assets, permissions and age-rating review
 

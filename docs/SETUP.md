@@ -7,15 +7,18 @@
 4. Wait for package import and C# script compilation. On first import the editor script automatically creates `Assets/Scenes/Main.unity`.
 5. If the scene was not generated: choose **Fruit Tree > Generate Playable Scene**. Open `Assets/Scenes/Main.unity`, then press Play.
 6. Mouse: drag to orbit, wheel to zoom, click an apple to pick. Android: drag, pinch to zoom, tap.
-7. To create an Android build: File > Build Profiles > Android > Switch Platform > Build. Build And Run requires device debugging enabled.
+7. To create an Android build: File > Build Profiles > Android > Switch Platform, then **Fruit Tree > Build Android APK**. Build And Run requires device debugging enabled.
 8. To install the APK on device: `adb install -r FruitTree.apk` (or use Build And Run).
 
 ## Project constraints
 - One tree only, with 30 apples (serialized count can be changed in inspector).
-- A batched mesh for leaves and another for branches. Unique pickable apple meshes.
+- One batched mesh for leaves and another for branches. Unique pickable apple objects sharing one mesh.
+- Procedural grassy ground and gradient sky. Most apples placed toward the crown exterior.
+- Two-finger vertical drag pans inspection focus toward upper/lower branches. In Editor, Shift+right-drag pans focus.
 - No timer, account, backend, ads, in-app purchases, park exploration or external assets.
 - Portrait orientation, device safe-area-aware HUD, offline operation.
 - Generated ambient audio is a technical placeholder and will need replacement with a licensed natural recording.
+- Generated visuals are procedural prototypes. They may need substantial art iteration to match promotional reference quality.
 - Initial Unity scene is created by the editor and is not tracked until saved from the editor.
 
 ## IMPORTANT

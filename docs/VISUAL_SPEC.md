@@ -19,7 +19,7 @@ Relaxing, carefully composed, semi-realistic 3D orchard tree; not photorealistic
 ## Game feel
 - Swipe horizontally: continuous 360-degree camera orbit, no snapping or screen jumps.
 - Vertical swipe: adjust camera elevation within comfortable limits.
-- Pinch: smoothly inspect branches without near-plane clipping.
+- Pinch: inspect branches; two-finger slide raises / lowers the focus. Verify clipping behavior on device.
 - Tap a ripe apple: counted exactly once, immediate visual and sound response.
 - No timer, energy, lives, ads, in-app purchases or distracting prompts.
 

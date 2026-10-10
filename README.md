@@ -5,12 +5,12 @@ A relaxing, Android-first 3D fruit-picking game: one semi-realistic tree, freely
 **Current status:** Unity 6 C# prototype in development. Not yet built or tested with the Unity Editor or on a phone. See [setup and limitations](docs/SETUP.md).
 
 ## Implemented in code
-- Seeded procedural tree geometry with tapering branches and batched leaves.
-- Rounded apple meshes, stem geometry, harvest animation.
+- Asymmetric procedural tree with a slightly curved trunk, tapered branching twigs and batched leaves.
+- Rounded apple meshes with procedural skin texture, stem geometry, harvest animation and wood occlusion.
 - 360-degree touch orbit and pinch zoom, mouse support for development.
 - Safe-area HUD, restart, fruit progress.
-- Simple synthesized ambience and harvest feedback, sound toggle.
-- Unity Editor scene generator and Android portrait config.
+- Simple synthesized ambience and harvest feedback, sound toggle (placeholder audio).
+- Procedural meadow and soft gradient sky, Unity Editor scene generator and Android portrait config.
 
 ## Start
 Install Unity 6 6000.0.32f1, open this directory in Unity Hub, let it compile and generate the first scene, then press Play. [Full instructions](docs/SETUP.md).
