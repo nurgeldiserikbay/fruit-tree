@@ -113,6 +113,20 @@ namespace FruitTree.Tests
         }
 
         [Test]
+        public void AppleSkinTextureFitsMobileBudget()
+        {
+            Texture2D skin = AppleSkinTexture.Create();
+            try
+            {
+                Assert.AreEqual(128, skin.width);
+                Assert.AreEqual(128, skin.height);
+                Assert.AreEqual(TextureFormat.RGB24, skin.format);
+                Assert.Greater(skin.mipmapCount, 1);
+            }
+            finally { Object.DestroyImmediate(skin); }
+        }
+
+        [Test]
         public void BarkTextureIsSmallAndOpaque()
         {
             Texture2D bark = BarkTexture.Create();

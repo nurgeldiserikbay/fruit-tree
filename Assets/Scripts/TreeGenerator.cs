@@ -148,7 +148,9 @@ namespace FruitTree
             if (leafMaterial.HasProperty("_Wind")) leafMaterial.SetFloat("_Wind", .045f);
             MakeMeshObject("Merged Leaves", Track(foliage.Build("Leaves")), leafMaterial);
             Mesh appleMesh = Track(ProceduralMesh.Apple());
-            Material appleMaterial = Track(LitMaterial("Apple Red", new Color(.74f,.075f,.045f), .45f));
+            Material appleMaterial = Track(LitMaterial("Apple Red", Color.white, .38f));
+            if (appleMaterial.HasProperty("_MainTex"))
+                appleMaterial.SetTexture("_MainTex", Track(AppleSkinTexture.Create()));
             Material stemMaterial = Track(LitMaterial("Stem", new Color(.28f,.19f,.095f), .12f));
             for (int i = 0; i < appleCount; i++)
             {
@@ -187,7 +189,15 @@ namespace FruitTree
             var go = new GameObject(label);
             go.transform.SetParent(transform, false);
             go.AddComponent<MeshFilter>().sharedMesh = mesh;
-            go.AddComponent<MeshRenderer>().sharedMaterial = material;
+            var renderer = go.AddComponent<MeshRenderer>();
+            renderer.sharedMaterial = material;
+            if (label == "Merged Wood")
+            {
+                go.AddComponent<MeshCollider>().sharedMesh = mesh;
+            }
+            // Avoid dozens of dynamic shadow-casting meshes on constrained phones.
+            if (label == "Merged Leaves" || label.StartsWith("Apple "))
+                renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             return go;
         }
 
