@@ -16,6 +16,26 @@ namespace FruitTree
         public int HarvestedCount { get; private set; }
         public int TotalApples => appleCount;
         private System.Random random;
+        private readonly List<UnityEngine.Object> runtimeResources = new List<UnityEngine.Object>();
+
+        private T Track<T>(T resource) where T : UnityEngine.Object
+        {
+            runtimeResources.Add(resource);
+            return resource;
+        }
+
+        private void ReleaseResources()
+        {
+            foreach (var resource in runtimeResources)
+            {
+                if (resource == null) continue;
+                if (Application.isPlaying) Destroy(resource);
+                else DestroyImmediate(resource);
+            }
+            runtimeResources.Clear();
+        }
+
+        private void OnDestroy() { ReleaseResources(); }
 
         private void Awake()
         {
@@ -33,7 +53,10 @@ namespace FruitTree
                 else DestroyImmediate(child);
             }
             apples.Clear();
+            ReleaseResources();
             HarvestedCount = 0;
+            if (Application.isPlaying && SystemInfo.systemMemorySize > 0 && SystemInfo.systemMemorySize < 3000)
+                leavesPerCluster = Mathf.Min(leavesPerCluster, 8);
             random = new System.Random(seed);
             var wood = new ProceduralMesh();
             var foliage = new ProceduralMesh();
@@ -75,15 +98,15 @@ namespace FruitTree
                     }
                 }
             }
-            var barkMaterial = VertexMaterial("Wood", Color.white);
-            if (barkMaterial.HasProperty("_MainTex")) barkMaterial.SetTexture("_MainTex", BarkTexture.Create());
-            MakeMeshObject("Merged Wood", wood.Build("Wood"), barkMaterial);
-            var leafMaterial = VertexMaterial("Leaves", Color.white);
+            var barkMaterial = Track(VertexMaterial("Wood", Color.white));
+            if (barkMaterial.HasProperty("_MainTex")) barkMaterial.SetTexture("_MainTex", Track(BarkTexture.Create()));
+            MakeMeshObject("Merged Wood", Track(wood.Build("Wood")), barkMaterial);
+            var leafMaterial = Track(VertexMaterial("Leaves", Color.white));
             if (leafMaterial.HasProperty("_Wind")) leafMaterial.SetFloat("_Wind", .045f);
-            MakeMeshObject("Merged Leaves", foliage.Build("Leaves"), leafMaterial);
-            Mesh appleMesh = ProceduralMesh.Apple();
-            Material appleMaterial = LitMaterial("Apple Red", new Color(.74f,.075f,.045f), .45f);
-            Material stemMaterial = LitMaterial("Stem", new Color(.28f,.19f,.095f), .12f);
+            MakeMeshObject("Merged Leaves", Track(foliage.Build("Leaves")), leafMaterial);
+            Mesh appleMesh = Track(ProceduralMesh.Apple());
+            Material appleMaterial = Track(LitMaterial("Apple Red", new Color(.74f,.075f,.045f), .45f));
+            Material stemMaterial = Track(LitMaterial("Stem", new Color(.28f,.19f,.095f), .12f));
             for (int i = 0; i < appleCount; i++)
             {
                 Vector3 at = fruitAnchors[random.Next(fruitAnchors.Count)] + new Vector3(Between(-.12f,.12f), Between(-.12f,.02f), Between(-.12f,.12f));
