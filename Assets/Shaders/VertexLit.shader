@@ -2,6 +2,7 @@ Shader "FruitTree/VertexLit"
 {
     Properties
     {
+        _MainTex ("Texture", 2D) = "white" {}
         _Color ("Tint", Color) = (1,1,1,1)
         _Wind ("Wind Amount", Range(0,0.1)) = 0
     }
@@ -20,8 +21,21 @@ Shader "FruitTree/VertexLit"
             #include "Lighting.cginc"
             fixed4 _Color;
             float _Wind;
-            struct appdata { float4 vertex: POSITION; float3 normal: NORMAL; fixed4 color: COLOR; };
-            struct v2f { float4 pos: SV_POSITION; fixed4 color: COLOR; float3 normal: TEXCOORD0; };
+            sampler2D _MainTex;
+            struct appdata
+            {
+                float4 vertex: POSITION;
+                float3 normal: NORMAL;
+                float4 color: COLOR;
+                float2 uv: TEXCOORD0;
+            };
+            struct v2f
+            {
+                float4 pos: SV_POSITION;
+                fixed4 color: COLOR;
+                float3 normal: TEXCOORD0;
+                float2 uv: TEXCOORD1;
+            };
             v2f vert(appdata v)
             {
                 v2f o;
@@ -32,6 +46,7 @@ Shader "FruitTree/VertexLit"
                 o.pos = UnityObjectToClipPos(float4(local,1));
                 o.normal = UnityObjectToWorldNormal(v.normal);
                 o.color = v.color * _Color;
+                o.uv = v.uv;
                 return o;
             }
             fixed4 frag(v2f i) : SV_Target
@@ -39,7 +54,8 @@ Shader "FruitTree/VertexLit"
                 float3 n = normalize(i.normal);
                 float diffuse = saturate(dot(n, normalize(_WorldSpaceLightPos0.xyz)));
                 float light = .48 + .52 * diffuse;
-                return fixed4(i.color.rgb * light, 1);
+                fixed4 tex = tex2D(_MainTex, i.uv);
+                return fixed4(tex.rgb * i.color.rgb * light, 1);
             }
             ENDCG
         }

@@ -75,7 +75,9 @@ namespace FruitTree
                     }
                 }
             }
-            MakeMeshObject("Merged Wood", wood.Build("Wood"), VertexMaterial("Wood", Color.white));
+            var barkMaterial = VertexMaterial("Wood", Color.white);
+            if (barkMaterial.HasProperty("_MainTex")) barkMaterial.SetTexture("_MainTex", BarkTexture.Create());
+            MakeMeshObject("Merged Wood", wood.Build("Wood"), barkMaterial);
             var leafMaterial = VertexMaterial("Leaves", Color.white);
             if (leafMaterial.HasProperty("_Wind")) leafMaterial.SetFloat("_Wind", .045f);
             MakeMeshObject("Merged Leaves", foliage.Build("Leaves"), leafMaterial);
