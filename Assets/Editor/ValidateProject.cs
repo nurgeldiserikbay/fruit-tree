@@ -73,6 +73,8 @@ namespace FruitTree.Editor
                 throw new InvalidOperationException("Fruit Tree validation failed:\n" +
                     string.Join("\n", errors));
 
+            FruitReachabilityAudit.Run();
+
             Debug.Log("Fruit Tree scene validated. Camera, tree, menu, buttons, " +
                 "audio, shaders and build settings have valid serialized references.");
         }

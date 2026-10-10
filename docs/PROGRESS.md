@@ -21,6 +21,7 @@
 - [x] Continuous curved trunk/major-branch geometry and geometry unit test (not yet executed)
 - [x] Safe Unity Resources folder creation through AssetDatabase
 - [x] Editor scene validation command to check camera, menu, audio, shaders and Android build settings (not yet executed)
+- [x] 360-degree fruit reachability sampling audit (reports warnings; not yet executed)
 - [x] Android build menu command
 - [x] Development-only FPS and frame-time logging for eventual device QA (not yet measured)
 - [x] Edit-mode geometry tests (not yet executed)
