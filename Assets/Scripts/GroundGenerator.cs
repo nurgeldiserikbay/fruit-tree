@@ -15,6 +15,7 @@ namespace FruitTree
             var material = new Material(shader) { name = "Meadow" };
             var grassMaterial = new Material(shader) { name = "Grass Blades" };
             if (grassMaterial.HasProperty("_Wind")) grassMaterial.SetFloat("_Wind", .018f);
+            if (grassMaterial.HasProperty("_Cull")) grassMaterial.SetFloat("_Cull", 0f);
             generated.Add(material);
             generated.Add(grassMaterial);
             Create("Meadow Terrain", CreateTerrainMesh(), material);

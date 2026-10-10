@@ -5,12 +5,13 @@ Shader "FruitTree/VertexLit"
         _MainTex ("Texture", 2D) = "white" {}
         _Color ("Tint", Color) = (1,1,1,1)
         _Wind ("Wind Amount", Range(0,0.1)) = 0
+        _Cull ("Cull Back Faces", Float) = 2
     }
     SubShader
     {
         Tags { "RenderType"="Opaque" "Queue"="Geometry" }
         LOD 120
-        Cull Off
+        Cull [_Cull]
         Pass
         {
             Tags { "LightMode"="ForwardBase" }

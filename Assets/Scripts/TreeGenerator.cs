@@ -146,6 +146,7 @@ namespace FruitTree
             MakeMeshObject("Merged Wood", Track(wood.Build("Wood")), barkMaterial);
             var leafMaterial = Track(VertexMaterial("Leaves", Color.white));
             if (leafMaterial.HasProperty("_Wind")) leafMaterial.SetFloat("_Wind", .045f);
+            if (leafMaterial.HasProperty("_Cull")) leafMaterial.SetFloat("_Cull", 0f);
             MakeMeshObject("Merged Leaves", Track(foliage.Build("Leaves")), leafMaterial);
             Mesh appleMesh = Track(ProceduralMesh.Apple());
             Material appleMaterial = Track(LitMaterial("Apple Red", Color.white, .38f));

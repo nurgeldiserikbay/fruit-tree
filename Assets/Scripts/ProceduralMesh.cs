@@ -70,11 +70,7 @@ namespace FruitTree
             Tri(first+1, first+3, first+2);
             Tri(first+2, first+3, first+4);
             Tri(first+3, first+5, first+4);
-            // Reverse faces as leaf cards must be visible from both sides.
-            Tri(first+2, first+1, first);
-            Tri(first+2, first+3, first+1);
-            Tri(first+4, first+3, first+2);
-            Tri(first+4, first+5, first+3);
+            // Keep a single set of triangles. The leaf material disables culling.
         }
 
         public void Tri(int a, int b, int c)

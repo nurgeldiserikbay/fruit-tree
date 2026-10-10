@@ -164,6 +164,20 @@ namespace FruitTree.Tests
         }
 
         [Test]
+        public void LeafGeometryDoesNotDuplicateReverseFaces()
+        {
+            var builder = new ProceduralMesh();
+            builder.Leaf(Vector3.zero, Vector3.up, .25f, .13f, Color.green);
+            Mesh leaf = builder.Build("leaf");
+            try
+            {
+                Assert.AreEqual(6, leaf.vertexCount);
+                Assert.AreEqual(12, leaf.triangles.Length);
+            }
+            finally { Object.DestroyImmediate(leaf); }
+        }
+
+        [Test]
         public void GroundMeshesAreReasonablySmall()
         {
             var terrain = GroundGenerator.CreateTerrainMesh();
