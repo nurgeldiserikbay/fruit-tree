@@ -7,6 +7,7 @@ namespace FruitTree
     public sealed class OrchardAudio : MonoBehaviour
     {
         public TreeGenerator tree;
+        public UnityEngine.UI.Text soundStatusText;
         private AudioSource ambience, effects;
         private AudioClip collect;
         private bool muted;
@@ -31,6 +32,7 @@ namespace FruitTree
         {
             if (tree != null) tree.HarvestChanged += OnHarvest;
             ambience.Play();
+            UpdateStatusText();
         }
 
         private void OnDestroy()
@@ -52,6 +54,11 @@ namespace FruitTree
             PlayerPrefs.SetInt("FruitTree.Muted", muted ? 1 : 0);
             PlayerPrefs.Save();
             ApplyVolume();
+            UpdateStatusText();
+        }
+        private void UpdateStatusText()
+        {
+            if (soundStatusText != null) soundStatusText.text = muted ? "SOUND OFF" : "SOUND ON";
         }
         private void ApplyVolume()
         {

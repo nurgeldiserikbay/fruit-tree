@@ -147,6 +147,7 @@ namespace FruitTree.Editor
                 new Color(.98f,.94f,.84f,.91f));
             var audio = MakeButton("Sound", safe.transform, "SOUND", new Vector2(.73f,.885f), new Vector2(.96f,.955f),
                 new Color(.98f,.94f,.84f,.91f));
+            sound.soundStatusText = audio.GetComponentInChildren<Text>();
             UnityEventTools.AddPersistentListener(restart.onClick, hud.Restart);
             UnityEventTools.AddPersistentListener(audio.onClick, sound.ToggleSound);
 
