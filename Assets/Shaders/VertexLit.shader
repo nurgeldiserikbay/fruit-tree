@@ -42,7 +42,8 @@ Shader "FruitTree/VertexLit"
                 float3 local = v.vertex.xyz;
                 float gust = sin(_Time.y * 1.1 + local.x * 3.7 + local.z * 2.6) * 0.6 +
                              sin(_Time.y * 1.9 + local.y * 3.3) * 0.4;
-                local.xz += gust * _Wind;
+                // Hold stems still while leaf tips gently bend in the breeze.
+                local.xz += gust * _Wind * saturate(v.uv.y);
                 o.pos = UnityObjectToClipPos(float4(local,1));
                 o.normal = UnityObjectToWorldNormal(v.normal);
                 o.color = v.color * _Color;

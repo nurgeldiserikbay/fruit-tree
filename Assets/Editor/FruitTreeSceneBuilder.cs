@@ -34,6 +34,7 @@ namespace FruitTree.Editor
 
             EnsureShaderIsInBuild();
             new GameObject("Quiet Meadow").AddComponent<GroundGenerator>();
+            CreateSky();
             var cameraObject = new GameObject("Main Camera");
             cameraObject.tag = "MainCamera";
             var camera = cameraObject.AddComponent<Camera>();
@@ -90,6 +91,17 @@ namespace FruitTree.Editor
                 return;
             }
             AssetDatabase.CreateAsset(new Material(shader) { name = "VertexLit Reference" }, materialPath);
+        }
+
+        private static void CreateSky()
+        {
+            var shader = Shader.Find("FruitTree/SoftSky");
+            if (shader == null) return;
+            var sky = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            sky.name = "Soft Sky";
+            sky.transform.localScale = Vector3.one * 100f;
+            sky.GetComponent<Renderer>().sharedMaterial = new Material(shader);
+            Object.DestroyImmediate(sky.GetComponent<Collider>());
         }
 
         private static void CreateInterface(TreeGenerator tree, OrchardAudio sound)

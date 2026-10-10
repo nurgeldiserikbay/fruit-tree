@@ -89,6 +89,7 @@ namespace FruitTree
             const int bladeCount = 480;
             var vertices = new List<Vector3>(bladeCount * 3);
             var colors = new List<Color>(bladeCount * 3);
+            var uv = new List<Vector2>(bladeCount * 3);
             var triangles = new List<int>(bladeCount * 3);
             for (int i = 0; i < bladeCount; i++)
             {
@@ -113,6 +114,9 @@ namespace FruitTree
                 colors.Add(green * .85f);
                 colors.Add(green * .85f);
                 colors.Add(green * 1.15f);
+                uv.Add(Vector2.zero);
+                uv.Add(Vector2.right);
+                uv.Add(Vector2.up);
                 triangles.Add(first);
                 triangles.Add(first + 1);
                 triangles.Add(first + 2);
@@ -120,6 +124,7 @@ namespace FruitTree
             var mesh = new Mesh { name = "Merged Wild Grass" };
             mesh.SetVertices(vertices);
             mesh.SetColors(colors);
+            mesh.SetUVs(0, uv);
             mesh.SetTriangles(triangles, 0);
             mesh.RecalculateNormals();
             mesh.RecalculateBounds();

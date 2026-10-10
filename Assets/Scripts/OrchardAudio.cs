@@ -38,6 +38,8 @@ namespace FruitTree
         private void OnDestroy()
         {
             if (tree != null) tree.HarvestChanged -= OnHarvest;
+            if (collect != null) Destroy(collect);
+            if (ambience != null && ambience.clip != null) Destroy(ambience.clip);
         }
 
         private int lastHarvested;
