@@ -17,6 +17,13 @@ namespace FruitTree
         public int TotalApples => appleCount;
         private System.Random random;
 
+        private void Awake()
+        {
+            // The scene intentionally keeps procedural mesh objects out of serialized scene data.
+            // Build them reliably on launch so Android and Editor display the same content.
+            if (Application.isPlaying && apples.Count == 0) Generate();
+        }
+
         public void Generate()
         {
             for (int i = transform.childCount - 1; i >= 0; i--)
@@ -68,8 +75,10 @@ namespace FruitTree
                     }
                 }
             }
-            MakeMeshObject("Merged Wood", wood.Build("Wood"), VertexMaterial("Wood", brown));
-            MakeMeshObject("Merged Leaves", foliage.Build("Leaves"), VertexMaterial("Leaves", Color.white));
+            MakeMeshObject("Merged Wood", wood.Build("Wood"), VertexMaterial("Wood", Color.white));
+            var leafMaterial = VertexMaterial("Leaves", Color.white);
+            if (leafMaterial.HasProperty("_Wind")) leafMaterial.SetFloat("_Wind", .045f);
+            MakeMeshObject("Merged Leaves", foliage.Build("Leaves"), leafMaterial);
             Mesh appleMesh = ProceduralMesh.Apple();
             Material appleMaterial = LitMaterial("Apple Red", new Color(.74f,.075f,.045f), .45f);
             Material stemMaterial = LitMaterial("Stem", new Color(.28f,.19f,.095f), .12f);
