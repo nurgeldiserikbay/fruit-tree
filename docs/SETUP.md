@@ -12,6 +12,7 @@
 
 ## Project constraints
 - One tree only, with 30 apples (serialized count can be changed in inspector).
+- Gameplay HUD: count and pause. In pause menu: resume, restart, sound on/off. Android Back button toggles pause.
 - One batched mesh for leaves and another for branches. Unique pickable apple objects sharing one mesh.
 - Procedural grassy ground and gradient sky. Most apples placed toward the crown exterior.
 - Two-finger vertical drag pans inspection focus toward upper/lower branches. In Editor, Shift+right-drag pans focus.
@@ -19,6 +20,7 @@
 - Portrait orientation, device safe-area-aware HUD, offline operation.
 - Generated ambient audio is a technical placeholder and will need replacement with a licensed natural recording.
 - Generated visuals are procedural prototypes. They may need substantial art iteration to match promotional reference quality.
+- The Unity editor creates the first scene automatically on first import; source files and stable metadata are committed, but the generated scene is not versioned yet.
 - Initial Unity scene is created by the editor and is not tracked until saved from the editor.
 
 ## IMPORTANT

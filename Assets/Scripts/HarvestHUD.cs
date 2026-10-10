@@ -33,7 +33,7 @@ namespace FruitTree
                 int best = Mathf.Max(PlayerPrefs.GetInt("FruitTree.Best", 0), picked);
                 PlayerPrefs.SetInt("FruitTree.Best", best);
                 PlayerPrefs.Save();
-                if (messageText != null) messageText.text = "All apples collected!  Tap Restart.";
+                if (messageText != null) messageText.text = "All apples collected! Pause > Restart";
             }
             else if (picked > 0 && messageText != null && messageText.text.StartsWith("Drag"))
                 messageText.text = "Look between the branches";

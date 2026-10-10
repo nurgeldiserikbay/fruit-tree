@@ -81,7 +81,8 @@ namespace FruitTree.Editor
         private static void EnsureShaderIsInBuild()
         {
             // Explicit material references prevent shader stripping in Android builds.
-            System.IO.Directory.CreateDirectory("Assets/Resources");
+            if (!AssetDatabase.IsValidFolder("Assets/Resources"))
+                AssetDatabase.CreateFolder("Assets", "Resources");
             EnsureMaterial("VertexLitReference", "FruitTree/VertexLit");
             EnsureMaterial("SoftSkyReference", "FruitTree/SoftSky");
         }
