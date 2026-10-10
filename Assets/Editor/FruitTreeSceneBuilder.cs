@@ -32,6 +32,7 @@ namespace FruitTree.Editor
             var root = new GameObject("Apple Tree");
             root.AddComponent<TreeGenerator>();
 
+            EnsureShaderIsInBuild();
             CreateGround();
             var cameraObject = new GameObject("Main Camera");
             cameraObject.tag = "MainCamera";
@@ -72,6 +73,23 @@ namespace FruitTree.Editor
             EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene("Assets/Scenes/Main.unity", true) };
             AssetDatabase.SaveAssets();
             Debug.Log("Fruit Tree scene generated! Press Play to build a 3D tree and pick apples.");
+        }
+
+
+        private static void EnsureShaderIsInBuild()
+        {
+            // A runtime Shader.Find-only reference can be stripped in Android builds.
+            // Saving a reference under Resources guarantees that the shader is packed.
+            const string materialPath = "Assets/Resources/VertexLitReference.mat";
+            System.IO.Directory.CreateDirectory("Assets/Resources");
+            if (AssetDatabase.LoadAssetAtPath<Material>(materialPath) != null) return;
+            var shader = Shader.Find("FruitTree/VertexLit");
+            if (shader == null)
+            {
+                Debug.LogWarning("FruitTree/VertexLit not imported yet; scene will use Standard fallback.");
+                return;
+            }
+            AssetDatabase.CreateAsset(new Material(shader) { name = "VertexLit Reference" }, materialPath);
         }
 
         private static void CreateGround()
