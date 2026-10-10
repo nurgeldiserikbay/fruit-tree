@@ -42,8 +42,8 @@ namespace FruitTree
             for (int s = 0; s < sides; s++)
             {
                 int a = first + s, b = a + 1, c = first + sides + 1 + s, d = c + 1;
-                Tri(a, c, b);
-                Tri(b, c, d);
+                Tri(a, b, c);
+                Tri(b, d, c);
             }
         }
 
@@ -121,8 +121,8 @@ namespace FruitTree
                 for (int x = 0; x < longitude; x++)
                 {
                     int a = y * (longitude + 1) + x, b = a + longitude + 1;
-                    tris.Add(a); tris.Add(a+1); tris.Add(b);
-                    tris.Add(a+1); tris.Add(b+1); tris.Add(b);
+                    tris.Add(a); tris.Add(b); tris.Add(a+1);
+                    tris.Add(a+1); tris.Add(b); tris.Add(b+1);
                 }
             mesh.SetVertices(verts);
             mesh.SetUVs(0, uvs);

@@ -40,6 +40,56 @@ namespace FruitTree.Tests
             }
         }
 
+
+        [Test]
+        public void AppleNormalsFaceOutward()
+        {
+            Mesh mesh = ProceduralMesh.Apple();
+            try
+            {
+                var vertices = mesh.vertices;
+                var triangles = mesh.triangles;
+                int checkedFaces = 0;
+                for (int i = 0; i < triangles.Length; i += 3)
+                {
+                    Vector3 a = vertices[triangles[i]];
+                    Vector3 b = vertices[triangles[i + 1]];
+                    Vector3 c = vertices[triangles[i + 2]];
+                    Vector3 normal = Vector3.Cross(b - a, c - a);
+                    Vector3 midpoint = (a + b + c) / 3f;
+                    Vector3 radial = new Vector3(midpoint.x, 0f, midpoint.z);
+                    if (radial.sqrMagnitude < .001f || normal.sqrMagnitude < 0.000001f) continue;
+                    Assert.Greater(Vector3.Dot(normal, radial), -0.000001f);
+                    checkedFaces++;
+                }
+                Assert.Greater(checkedFaces, 80);
+            }
+            finally { Object.DestroyImmediate(mesh); }
+        }
+
+        [Test]
+        public void BranchGeometryPointsOutward()
+        {
+            var builder = new ProceduralMesh();
+            builder.Branch(Vector3.zero, Vector3.up, .2f, .1f, Color.white);
+            Mesh mesh = builder.Build("branch-test");
+            try
+            {
+                var vertices = mesh.vertices;
+                var triangles = mesh.triangles;
+                for (int i = 0; i < triangles.Length; i += 3)
+                {
+                    Vector3 a = vertices[triangles[i]];
+                    Vector3 b = vertices[triangles[i + 1]];
+                    Vector3 c = vertices[triangles[i + 2]];
+                    Vector3 normal = Vector3.Cross(b - a, c - a);
+                    Vector3 midpoint = (a + b + c) / 3f;
+                    Assert.Greater(Vector3.Dot(normal, new Vector3(midpoint.x, 0, midpoint.z)), 0f);
+                }
+            }
+            finally { Object.DestroyImmediate(mesh); }
+        }
+
         [Test]
         public void BarkTextureIsSmallAndOpaque()
         {
