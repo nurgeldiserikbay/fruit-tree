@@ -63,5 +63,22 @@ namespace FruitTree.Tests
             Assert.That(Vector3.Distance(apple.transform.localScale, size), Is.LessThan(.001f));
             Object.Destroy(root);
         }
+
+        [UnityTest]
+        public IEnumerator PickingAfterRestartIsCountedExactlyOnce()
+        {
+            var root = new GameObject("Replay Test");
+            var tree = root.AddComponent<TreeGenerator>();
+            if (tree.Apples.Count == 0) tree.Generate();
+            Apple apple = tree.Apples[0];
+            apple.Pick();
+            yield return null;
+            tree.ResetHarvest();
+            apple.Pick();
+            apple.Pick();
+            Assert.AreEqual(1, tree.HarvestedCount);
+            Assert.IsTrue(apple.IsHarvested);
+            Object.Destroy(root);
+        }
     }
 }

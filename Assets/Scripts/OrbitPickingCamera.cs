@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 namespace FruitTree
 {
@@ -15,9 +16,11 @@ namespace FruitTree
         private float wantedYaw, wantedPitch, wantedDistance, wantedFocusHeight;
         private Vector2 pointerDown, lastPointer;
         private int activeFinger = -1;
+        private bool pointerOnUI;
         private bool tracking, moved, pinching;
         private Camera viewCamera;
         private float tapThreshold;
+        private readonly List<RaycastResult> uiHits = new List<RaycastResult>(8);
 
         private void Awake()
         {
@@ -116,7 +119,8 @@ namespace FruitTree
 
         private void Begin(Vector2 position)
         {
-            tracking = !OverUI(position, activeFinger);
+            pointerOnUI = OverUI(position, activeFinger);
+            tracking = !pointerOnUI;
             moved = false;
             pointerDown = lastPointer = position;
         }
@@ -135,16 +139,20 @@ namespace FruitTree
 
         private void End(Vector2 position, int fingerId)
         {
-            if (!moved && Vector2.Distance(pointerDown, position) <= tapThreshold && !OverUI(position, fingerId))
+            if (!moved && !pointerOnUI && Vector2.Distance(pointerDown, position) <= tapThreshold && !OverUI(position, fingerId))
                 TryPick(position);
             tracking = false;
         }
 
         private bool OverUI(Vector2 position, int fingerId)
         {
+            // Explicit hit testing is reliable on the touch-end frame, even when
+            // EventSystem's cached finger state has already been removed.
             if (EventSystem.current == null) return false;
-            if (fingerId >= 0) return EventSystem.current.IsPointerOverGameObject(fingerId);
-            return EventSystem.current.IsPointerOverGameObject();
+            var data = new PointerEventData(EventSystem.current) { position = position };
+            uiHits.Clear();
+            EventSystem.current.RaycastAll(data, uiHits);
+            return uiHits.Count > 0;
         }
 
         private void TryPick(Vector2 point)
