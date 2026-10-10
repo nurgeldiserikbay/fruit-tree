@@ -31,6 +31,34 @@ namespace FruitTree
             tapThreshold = Mathf.Max(18f, Screen.dpi > 0 ? Screen.dpi * .13f : 18f);
         }
 
+        private void Start()
+        {
+            FitTreeInPortrait();
+        }
+
+        /// <summary>Frames the entire tree at launch regardless of mobile aspect ratio.</summary>
+        public void FitTreeInPortrait()
+        {
+            if (target == null) return;
+            if (viewCamera == null) viewCamera = GetComponent<Camera>();
+            Renderer[] renderers = target.GetComponentsInChildren<Renderer>();
+            if (renderers.Length == 0) return;
+            Bounds bounds = renderers[0].bounds;
+            for (int i = 1; i < renderers.Length; i++)
+                bounds.Encapsulate(renderers[i].bounds);
+            float aspect = Mathf.Max(.35f, viewCamera.aspect);
+            float verticalTan = Mathf.Tan(viewCamera.fieldOfView * Mathf.Deg2Rad * .5f);
+            float horizontalTan = verticalTan * aspect;
+            float radial = Mathf.Max(bounds.extents.x, bounds.extents.z);
+            float framedDistance = Mathf.Max(radial / horizontalTan, bounds.extents.y / verticalTan);
+            // Margins leave room for a gentle wind sway and avoid cut branches.
+            framedDistance = Mathf.Clamp(framedDistance * 1.12f + .5f, 7f, 18f);
+            wantedFocusHeight = Mathf.Clamp(bounds.center.y, 1.4f, 4.1f);
+            focusHeight = wantedFocusHeight;
+            wantedDistance = framedDistance;
+            distance = framedDistance;
+        }
+
         private void Update()
         {
             if (target == null || Time.timeScale == 0) return;
@@ -73,7 +101,7 @@ namespace FruitTree
                 float newGap = Vector2.Distance(a.position, b.position);
                 if (pinching)
                 {
-                    wantedDistance = Mathf.Clamp(wantedDistance - (newGap - oldGap) * .009f, 3.1f, 11.5f);
+                    wantedDistance = Mathf.Clamp(wantedDistance - (newGap - oldGap) * .009f, 2.8f, 18f);
                     // A two-finger vertical slide can inspect upper or lower branches.
                     float verticalSlide = (a.deltaPosition.y + b.deltaPosition.y) * .5f;
                     wantedFocusHeight = Mathf.Clamp(wantedFocusHeight - verticalSlide * .005f, 1.4f, 4.1f);
@@ -112,7 +140,7 @@ namespace FruitTree
             if (Input.GetMouseButton(0) && tracking) Move(pos);
             if (Input.GetMouseButtonUp(0) && tracking) End(pos, -1);
             if (Input.mouseScrollDelta.y != 0)
-                wantedDistance = Mathf.Clamp(wantedDistance - Input.mouseScrollDelta.y * .5f, 3.1f, 11.5f);
+                wantedDistance = Mathf.Clamp(wantedDistance - Input.mouseScrollDelta.y * .5f, 2.8f, 18f);
             if (Input.GetKey(KeyCode.LeftShift) && Input.GetMouseButton(1))
                 wantedFocusHeight = Mathf.Clamp(wantedFocusHeight + Input.GetAxis("Mouse Y") * .18f, 1.4f, 4.1f);
         }

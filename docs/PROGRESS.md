@@ -11,7 +11,7 @@
 - [x] Unity project and Android configuration
 - [x] Deterministic batched tree generator (wood, leaf canopy, mesh apples)
 - [x] Bark texture generator, asymmetric trunk / twigs, leaf-tip wind shader
-- [x] Touch orbit, pinch zoom and two-finger focus-height pan
+- [x] Touch orbit, pinch zoom, two-finger focus-height pan, aspect-ratio-based automatic framing
 - [x] Apple interaction, animation, counter, allocation-free round reset (meshes and materials retained)
 - [x] Simple procedural sound, sound toggle
 - [x] Auto-generated scene with meadow / sky and safe area

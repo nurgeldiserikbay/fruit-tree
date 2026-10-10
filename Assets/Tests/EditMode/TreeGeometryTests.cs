@@ -137,6 +137,32 @@ namespace FruitTree.Tests
             finally { Object.DestroyImmediate(root); }
         }
 
+
+        [Test]
+        public void PortraitCameraAutomaticallyFramesGeneratedTree()
+        {
+            var root = new GameObject("Camera Fit Test");
+            var camera = new GameObject("Test Camera");
+            try
+            {
+                var generator = root.AddComponent<TreeGenerator>();
+                if (generator.Apples.Count == 0) generator.Generate();
+                var lens = camera.AddComponent<Camera>();
+                lens.fieldOfView = 47f;
+                var orbit = camera.AddComponent<OrbitPickingCamera>();
+                orbit.target = root.transform;
+                orbit.FitTreeInPortrait();
+                Assert.Greater(orbit.distance, 5f);
+                Assert.LessOrEqual(orbit.distance, 18f);
+                Assert.That(orbit.focusHeight, Is.InRange(1.4f, 4.1f));
+            }
+            finally
+            {
+                Object.DestroyImmediate(camera);
+                Object.DestroyImmediate(root);
+            }
+        }
+
         [Test]
         public void GroundMeshesAreReasonablySmall()
         {

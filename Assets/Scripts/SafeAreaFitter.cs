@@ -11,6 +11,7 @@ namespace FruitTree
         private void Awake() { rect = GetComponent<RectTransform>(); }
         private void LateUpdate()
         {
+            if (Screen.width <= 0 || Screen.height <= 0) return;
             Rect safe = Screen.safeArea;
             var size = new Vector2Int(Screen.width, Screen.height);
             if (safe == lastSafeArea && size == lastSize) return;
