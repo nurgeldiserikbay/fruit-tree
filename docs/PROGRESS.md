@@ -14,7 +14,7 @@
 - [x] Eliminate duplicate reverse leaf faces; material-controlled front/back culling
 - [x] Touch orbit, pinch zoom, two-finger focus-height pan, aspect-ratio-based automatic framing
 - [x] Apple interaction, animation, counter, allocation-free round reset (meshes and materials retained)
-- [x] Simple procedural sound, sound toggle
+- [x] Softer procedural wind/birds and fruit pluck, optional replacement audio clips, persisted sound toggle
 - [x] Auto-generated scene with meadow / sky and safe area
 - [x] Android build menu command
 - [x] Edit-mode geometry tests (not yet executed)

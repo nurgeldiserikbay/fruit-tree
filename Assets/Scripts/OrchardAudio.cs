@@ -7,10 +7,15 @@ namespace FruitTree
     public sealed class OrchardAudio : MonoBehaviour
     {
         public TreeGenerator tree;
+        [Header("Optional replacement recordings (licensed audio only)")]
+        public AudioClip ambientRecording;
+        public AudioClip pickRecording;
         public UnityEngine.UI.Text soundStatusText;
         private AudioSource ambience, effects;
         private AudioClip collect;
         private bool muted;
+        private bool ownsAmbientClip;
+        private bool ownsPickClip;
         private void Awake()
         {
             ambience = gameObject.AddComponent<AudioSource>();
@@ -22,8 +27,10 @@ namespace FruitTree
             effects.playOnAwake = false;
             effects.spatialBlend = 0;
             effects.volume = .4f;
-            ambience.clip = CreateAmbient();
-            collect = CreateCollect();
+            ownsAmbientClip = ambientRecording == null;
+            ownsPickClip = pickRecording == null;
+            ambience.clip = ownsAmbientClip ? CreateAmbient() : ambientRecording;
+            collect = ownsPickClip ? CreateCollect() : pickRecording;
             muted = PlayerPrefs.GetInt("FruitTree.Muted", 0) == 1;
             ApplyVolume();
         }
@@ -38,8 +45,8 @@ namespace FruitTree
         private void OnDestroy()
         {
             if (tree != null) tree.HarvestChanged -= OnHarvest;
-            if (collect != null) Destroy(collect);
-            if (ambience != null && ambience.clip != null) Destroy(ambience.clip);
+            if (ownsPickClip && collect != null) Destroy(collect);
+            if (ownsAmbientClip && ambience != null && ambience.clip != null) Destroy(ambience.clip);
         }
 
         private int lastHarvested;
@@ -70,19 +77,26 @@ namespace FruitTree
 
         private static AudioClip CreateCollect()
         {
+            // A short dry twig snap and soft resonant fruit pluck, deliberately
+            // avoiding the arcade-like electronic "coin" sound.
             const int sampleRate = 22050;
-            const float duration = .28f;
+            const float duration = .23f;
             float[] data = new float[(int)(sampleRate * duration)];
             var random = new System.Random(71);
+            float lowNoise = 0f;
             for (int i = 0; i < data.Length; i++)
             {
                 float t = i / (float)sampleRate;
-                float envelope = Mathf.Pow(1f - t / duration, 2f);
-                float chirp = Mathf.Sin(2f * Mathf.PI * (690f * t - 280f * t * t));
-                float tap = ((float)random.NextDouble() * 2f - 1f) * Mathf.Exp(-t * 45f);
-                data[i] = envelope * (.25f * chirp + .12f * tap);
+                lowNoise += .1f * ((float)random.NextDouble() * 2f - 1f - lowNoise);
+                float snap = lowNoise * Mathf.Exp(-t * 72f) * .4f;
+                float lowPop = Mathf.Sin(2f * Mathf.PI * (230f * t - 120f * t * t)) *
+                    Mathf.Exp(-t * 24f) * .23f;
+                float faintResonance = Mathf.Sin(2f * Mathf.PI * 140f * t) *
+                    Mathf.Exp(-t * 27f) * .055f;
+                float fade = Mathf.Min(1f, t * 300f, (duration - t) * 50f);
+                data[i] = (snap + lowPop + faintResonance) * Mathf.Clamp01(fade);
             }
-            return MakeClip("Soft apple pop", sampleRate, data);
+            return MakeClip("Soft fruit pluck", sampleRate, data);
         }
 
         private static AudioClip CreateAmbient()
