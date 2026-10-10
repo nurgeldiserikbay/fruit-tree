@@ -37,6 +37,13 @@ namespace FruitTree
             AudioListener.pause = paused;
         }
 
+        private void OnApplicationPause(bool appPaused)
+        {
+            // A call, notification, or app switch should not let the picking round
+            // continue silently in the background.
+            if (appPaused && !IsPaused) SetPaused(true);
+        }
+
         private void OnDisable()
         {
             if (!IsPaused) return;

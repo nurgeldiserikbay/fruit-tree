@@ -81,6 +81,41 @@ namespace FruitTree.Tests
             Object.Destroy(root);
         }
         [UnityTest]
+        public IEnumerator PauseMenuRestartRestoresHarvestedApple()
+        {
+            var root = new GameObject("Pause Restart Test");
+            var treeObject = new GameObject("Tree");
+            var menu = new GameObject("Menu");
+            treeObject.transform.SetParent(root.transform);
+            menu.transform.SetParent(root.transform);
+            menu.SetActive(false);
+            var tree = treeObject.AddComponent<TreeGenerator>();
+            if (tree.Apples.Count == 0) tree.Generate();
+            var hud = root.AddComponent<HarvestHUD>();
+            hud.tree = tree;
+            var pause = root.AddComponent<PauseController>();
+            pause.panel = menu;
+            pause.hud = hud;
+            try
+            {
+                tree.Apples[0].Pick();
+                Assert.AreEqual(1, tree.HarvestedCount);
+                pause.Toggle();
+                pause.Restart();
+                Assert.AreEqual(0, tree.HarvestedCount);
+                Assert.IsFalse(pause.IsPaused);
+                Assert.AreEqual(1f, Time.timeScale);
+                Assert.IsTrue(tree.Apples[0].gameObject.activeSelf);
+            }
+            finally
+            {
+                pause.Resume();
+                Object.Destroy(root);
+            }
+            yield return null;
+        }
+
+        [UnityTest]
         public IEnumerator PauseAndResumeRestoreGameTime()
         {
             var root = new GameObject("Pause Test");

@@ -17,6 +17,7 @@
 - [x] Softer procedural wind/birds and fruit pluck, optional replacement audio clips, persisted sound toggle
 - [x] Auto-generated scene with meadow / sky and safe area
 - [x] Minimal pause overlay, Android back button, restart and sound controls
+- [x] Automatically pause when the Android app moves to the background
 - [x] Continuous curved trunk/major-branch geometry and geometry unit test (not yet executed)
 - [x] Safe Unity Resources folder creation through AssetDatabase
 - [x] Editor scene validation command to check camera, menu, audio, shaders and Android build settings (not yet executed)
