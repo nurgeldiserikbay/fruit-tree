@@ -17,6 +17,7 @@
 - [x] Softer procedural wind/birds and fruit pluck, optional replacement audio clips, persisted sound toggle
 - [x] Auto-generated scene with meadow / sky and safe area
 - [x] Android build menu command
+- [x] Development-only FPS and frame-time logging for eventual device QA (not yet measured)
 - [x] Edit-mode geometry tests (not yet executed)
 - [x] Play-mode tests for idempotent picking, stable round reset and interrupted animation (not yet executed)
 - [x] Apple-skin texture, trunk occlusion and shadow draw-call reductions

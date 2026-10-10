@@ -32,3 +32,10 @@ Unity Editor, Android devices and Unity's own C# assemblies are not available to
 - Do the HUD and labels avoid camera notches on popular Android sizes?
 - Is frame time stable at 30 FPS on low-end Android and 60 FPS on mid-range Android?
 - Is the package identifier correct for your publisher before release?
+
+## Android performance diagnostics (later QA)
+- Use a **Development Build** so the `DevelopmentPerformanceMonitor` logs five-second FPS and frame-time samples without adding UI.
+- With Android debugging enabled, use `adb logcat -s Unity:D Unity:W` or Unity's Android Logcat window to inspect `[FruitTree] fps=...` messages.
+- Compare Android portrait displays with different aspect ratios and RAM/GPU levels; check visual clipping and touch correctness as well as FPS.
+- Record heat, battery and stability manually for a minimum 10-minute session; the simple FPS logger is not a GPU profiler.
+- The component's sampling code is excluded from release builds with Unity conditional compilation.

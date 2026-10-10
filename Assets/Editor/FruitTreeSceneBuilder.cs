@@ -28,6 +28,7 @@ namespace FruitTree.Editor
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             var app = new GameObject("Fruit Tree Game");
             app.AddComponent<MobileBootstrap>();
+            app.AddComponent<DevelopmentPerformanceMonitor>();
 
             var root = new GameObject("Apple Tree");
             root.AddComponent<TreeGenerator>();
