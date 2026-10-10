@@ -20,6 +20,7 @@
 - [x] Play-mode tests for idempotent picking, stable round reset and interrupted animation (not yet executed)
 - [x] Apple-skin texture, trunk occlusion and shadow draw-call reductions
 - [x] Static block-delimiter check across 15 C# scripts (passed; not a compiler run)
+- [x] Prevent non-finite apple vertices at the top pole; regression test authored (not executed)
 
 ## NOT VERIFIED OR COMPLETE
 - [ ] Unity Editor compile and scene-opening acceptance test

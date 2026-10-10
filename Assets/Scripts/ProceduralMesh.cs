@@ -107,7 +107,10 @@ namespace FruitTree
             {
                 float t = y / (float)latitude;
                 float a = t * Mathf.PI;
-                float radius = Mathf.Pow(Mathf.Sin(a), .72f) * (.17f + .045f * t);
+                // Floating-point Sin(PI) can be slightly negative; fractional powers
+                // of negative values would produce NaN vertices on the top pole.
+                float sine = Mathf.Max(0f, Mathf.Sin(a));
+                float radius = Mathf.Pow(sine, .72f) * (.17f + .045f * t);
                 for (int x = 0; x <= longitude; x++)
                 {
                     float theta = x * Mathf.PI * 2f / longitude;

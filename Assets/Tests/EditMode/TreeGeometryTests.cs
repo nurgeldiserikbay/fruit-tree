@@ -16,6 +16,9 @@ namespace FruitTree.Tests
                 Assert.IsFalse(float.IsNaN(vertex.x));
                 Assert.IsFalse(float.IsNaN(vertex.y));
                 Assert.IsFalse(float.IsNaN(vertex.z));
+                Assert.IsFalse(float.IsInfinity(vertex.x));
+                Assert.IsFalse(float.IsInfinity(vertex.y));
+                Assert.IsFalse(float.IsInfinity(vertex.z));
             }
             Object.DestroyImmediate(mesh);
         }
@@ -40,6 +43,26 @@ namespace FruitTree.Tests
             }
         }
 
+
+
+        [Test]
+        public void AppleTopPoleContainsFiniteValues()
+        {
+            var mesh = ProceduralMesh.Apple();
+            try
+            {
+                Vector3[] vertices = mesh.vertices;
+                for (int i = vertices.Length - 21; i < vertices.Length; i++)
+                {
+                    Assert.IsFalse(float.IsNaN(vertices[i].x));
+                    Assert.IsFalse(float.IsNaN(vertices[i].y));
+                    Assert.IsFalse(float.IsNaN(vertices[i].z));
+                    Assert.IsFalse(float.IsInfinity(vertices[i].x));
+                    Assert.That(vertices[i].y, Is.InRange(.1f, .3f));
+                }
+            }
+            finally { Object.DestroyImmediate(mesh); }
+        }
 
         [Test]
         public void AppleNormalsFaceOutward()
