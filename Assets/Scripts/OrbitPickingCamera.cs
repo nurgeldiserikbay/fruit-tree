@@ -10,8 +10,9 @@ namespace FruitTree
         [Range(3.1f, 12f)] public float distance = 8.4f;
         public float yaw = 20f;
         public float pitch = 13f;
+        public float focusHeight = 2.65f;
         public float sensitivity = .2f;
-        private float wantedYaw, wantedPitch, wantedDistance;
+        private float wantedYaw, wantedPitch, wantedDistance, wantedFocusHeight;
         private Vector2 pointerDown, lastPointer;
         private int activeFinger = -1;
         private bool tracking, moved, pinching;
@@ -23,6 +24,7 @@ namespace FruitTree
             viewCamera = GetComponent<Camera>();
             viewCamera.nearClipPlane = .06f;
             wantedYaw = yaw; wantedPitch = pitch; wantedDistance = distance;
+            wantedFocusHeight = focusHeight;
             tapThreshold = Mathf.Max(18f, Screen.dpi > 0 ? Screen.dpi * .13f : 18f);
         }
 
@@ -30,16 +32,29 @@ namespace FruitTree
         {
             if (target == null || Time.timeScale == 0) return;
             if (Input.touchCount > 0) TouchInput();
-            else MouseInput();
+            else if (Application.isMobilePlatform)
+            {
+                // If both fingers are lifted simultaneously we still leave pinch mode.
+                pinching = false;
+                tracking = false;
+                activeFinger = -1;
+            }
+            else
+            {
+                pinching = false;
+                MouseInput();
+            }
             yaw = Mathf.LerpAngle(yaw, wantedYaw, 1f - Mathf.Exp(-14f * Time.unscaledDeltaTime));
             pitch = Mathf.Lerp(pitch, wantedPitch, 1f - Mathf.Exp(-14f * Time.unscaledDeltaTime));
             distance = Mathf.Lerp(distance, wantedDistance, 1f - Mathf.Exp(-12f * Time.unscaledDeltaTime));
+            focusHeight = Mathf.Lerp(focusHeight, wantedFocusHeight,
+                1f - Mathf.Exp(-10f * Time.unscaledDeltaTime));
         }
 
         private void LateUpdate()
         {
             if (target == null) return;
-            Vector3 focus = target.position + Vector3.up * 2.65f;
+            Vector3 focus = target.position + Vector3.up * focusHeight;
             Quaternion rot = Quaternion.Euler(pitch, yaw, 0f);
             transform.position = focus + rot * (Vector3.back * distance);
             transform.rotation = Quaternion.LookRotation(focus - transform.position, Vector3.up);
@@ -53,7 +68,13 @@ namespace FruitTree
                 var b = Input.GetTouch(1);
                 float oldGap = Vector2.Distance(a.position - a.deltaPosition, b.position - b.deltaPosition);
                 float newGap = Vector2.Distance(a.position, b.position);
-                if (pinching) wantedDistance = Mathf.Clamp(wantedDistance - (newGap - oldGap) * .009f, 3.1f, 11.5f);
+                if (pinching)
+                {
+                    wantedDistance = Mathf.Clamp(wantedDistance - (newGap - oldGap) * .009f, 3.1f, 11.5f);
+                    // A two-finger vertical slide can inspect upper or lower branches.
+                    float verticalSlide = (a.deltaPosition.y + b.deltaPosition.y) * .5f;
+                    wantedFocusHeight = Mathf.Clamp(wantedFocusHeight - verticalSlide * .005f, 1.4f, 4.1f);
+                }
                 pinching = true;
                 tracking = false;
                 return;
@@ -89,6 +110,8 @@ namespace FruitTree
             if (Input.GetMouseButtonUp(0) && tracking) End(pos, -1);
             if (Input.mouseScrollDelta.y != 0)
                 wantedDistance = Mathf.Clamp(wantedDistance - Input.mouseScrollDelta.y * .5f, 3.1f, 11.5f);
+            if (Input.GetKey(KeyCode.LeftShift) && Input.GetMouseButton(1))
+                wantedFocusHeight = Mathf.Clamp(wantedFocusHeight + Input.GetAxis("Mouse Y") * .18f, 1.4f, 4.1f);
         }
 
         private void Begin(Vector2 position)
