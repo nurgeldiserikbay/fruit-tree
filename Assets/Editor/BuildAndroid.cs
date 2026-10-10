@@ -13,9 +13,9 @@ namespace FruitTree.Editor
         public static void Run()
         {
             const string scene = "Assets/Scenes/Main.unity";
-            if (!File.Exists(scene))
+            if (AssetDatabase.LoadAssetAtPath<SceneAsset>(scene) == null)
                 FruitTreeSceneBuilder.Generate();
-            if (!File.Exists(scene))
+            if (AssetDatabase.LoadAssetAtPath<SceneAsset>(scene) == null)
                 throw new FileNotFoundException("Fruit Tree scene is missing", scene);
 
             if (!BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.Android, BuildTarget.Android))
@@ -29,11 +29,15 @@ namespace FruitTree.Editor
             // Do not quietly produce an APK from a broken or incompletely imported scene.
             ValidateProject.Run();
 
-            Directory.CreateDirectory("Builds");
+            string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
+            string outputDirectory = Path.Combine(projectRoot, "Builds");
+            Directory.CreateDirectory(outputDirectory);
+            // AAB builds are a separate release flow; this menu command produces APK only.
+            EditorUserBuildSettings.buildAppBundle = false;
             var options = new BuildPlayerOptions
             {
                 scenes = new[] { scene },
-                locationPathName = "Builds/FruitTree.apk",
+                locationPathName = Path.Combine(outputDirectory, "FruitTree.apk"),
                 target = BuildTarget.Android,
                 options = BuildOptions.None
             };
