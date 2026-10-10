@@ -79,28 +79,37 @@ namespace FruitTree.Editor
 
         private static void EnsureShaderIsInBuild()
         {
-            // A runtime Shader.Find-only reference can be stripped in Android builds.
-            // Saving a reference under Resources guarantees that the shader is packed.
-            const string materialPath = "Assets/Resources/VertexLitReference.mat";
+            // Explicit material references prevent shader stripping in Android builds.
             System.IO.Directory.CreateDirectory("Assets/Resources");
-            if (AssetDatabase.LoadAssetAtPath<Material>(materialPath) != null) return;
-            var shader = Shader.Find("FruitTree/VertexLit");
+            EnsureMaterial("VertexLitReference", "FruitTree/VertexLit");
+            EnsureMaterial("SoftSkyReference", "FruitTree/SoftSky");
+        }
+
+        private static void EnsureMaterial(string materialName, string shaderName)
+        {
+            string path = "Assets/Resources/" + materialName + ".mat";
+            if (AssetDatabase.LoadAssetAtPath<Material>(path) != null) return;
+            var shader = Shader.Find(shaderName);
             if (shader == null)
             {
-                Debug.LogWarning("FruitTree/VertexLit not imported yet; scene will use Standard fallback.");
+                Debug.LogWarning("Unable to find shader: " + shaderName);
                 return;
             }
-            AssetDatabase.CreateAsset(new Material(shader) { name = "VertexLit Reference" }, materialPath);
+            AssetDatabase.CreateAsset(new Material(shader) { name = materialName }, path);
         }
 
         private static void CreateSky()
         {
-            var shader = Shader.Find("FruitTree/SoftSky");
-            if (shader == null) return;
+            var material = AssetDatabase.LoadAssetAtPath<Material>(
+                "Assets/Resources/SoftSkyReference.mat");
+            if (material == null) return;
             var sky = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             sky.name = "Soft Sky";
             sky.transform.localScale = Vector3.one * 100f;
-            sky.GetComponent<Renderer>().sharedMaterial = new Material(shader);
+            var renderer = sky.GetComponent<Renderer>();
+            renderer.sharedMaterial = material;
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            renderer.receiveShadows = false;
             Object.DestroyImmediate(sky.GetComponent<Collider>());
         }
 
