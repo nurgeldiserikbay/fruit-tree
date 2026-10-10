@@ -144,14 +144,38 @@ namespace FruitTree.Editor
                 new Color(.22f,.30f,.20f), new Vector2(.11f,.07f), new Vector2(.89f,.14f));
             var hud = canvasObject.AddComponent<HarvestHUD>();
             hud.tree = tree; hud.countText = count; hud.messageText = hint;
-            var restart = MakeButton("Restart", safe.transform, "RESTART", new Vector2(.04f,.885f), new Vector2(.28f,.955f),
-                new Color(.98f,.94f,.84f,.91f));
-            var audio = MakeButton("Sound", safe.transform, "SOUND", new Vector2(.73f,.885f), new Vector2(.96f,.955f),
-                new Color(.98f,.94f,.84f,.91f));
-            sound.soundStatusText = audio.GetComponentInChildren<Text>();
-            UnityEventTools.AddPersistentListener(restart.onClick, hud.Restart);
-            UnityEventTools.AddPersistentListener(audio.onClick, sound.ToggleSound);
+            // Keep the gameplay clean. Only the small pause button is visible.
+            // Restart and sound are accessible through the pause menu.
+            var pauseButton = MakeButton("Pause", safe.transform, "II",
+                new Vector2(.82f, .89f), new Vector2(.96f, .966f),
+                new Color(.98f, .94f, .84f, .91f));
 
+            var menu = new GameObject("Pause Menu", typeof(RectTransform),
+                typeof(CanvasRenderer), typeof(Image));
+            menu.transform.SetParent(safe.transform, false);
+            Anchor(menu.GetComponent<RectTransform>(), Vector2.zero, Vector2.one);
+            menu.GetComponent<Image>().color = new Color(.12f, .17f, .13f, .76f);
+            var pauseController = canvasObject.AddComponent<PauseController>();
+            pauseController.panel = menu;
+            pauseController.hud = hud;
+
+            MakeLabel("Paused Title", menu.transform, "PAUSED", 70, Color.white,
+                new Vector2(.17f, .64f), new Vector2(.83f, .74f));
+            var resume = MakeButton("Resume", menu.transform, "CONTINUE",
+                new Vector2(.23f, .51f), new Vector2(.77f, .59f),
+                new Color(.97f, .97f, .89f, 1f));
+            var restart = MakeButton("Restart", menu.transform, "RESTART",
+                new Vector2(.23f, .40f), new Vector2(.77f, .48f),
+                new Color(.97f, .97f, .89f, 1f));
+            var audio = MakeButton("Sound", menu.transform, "SOUND ON",
+                new Vector2(.23f, .29f), new Vector2(.77f, .37f),
+                new Color(.97f, .97f, .89f, 1f));
+            sound.soundStatusText = audio.GetComponentInChildren<Text>();
+            UnityEventTools.AddPersistentListener(pauseButton.onClick, pauseController.Toggle);
+            UnityEventTools.AddPersistentListener(resume.onClick, pauseController.Resume);
+            UnityEventTools.AddPersistentListener(restart.onClick, pauseController.Restart);
+            UnityEventTools.AddPersistentListener(audio.onClick, sound.ToggleSound);
+            menu.SetActive(false);
         }
 
         private static Text MakeLabel(string name, Transform parent, string label, int size, Color color,

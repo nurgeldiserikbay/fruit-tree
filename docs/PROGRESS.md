@@ -16,6 +16,7 @@
 - [x] Apple interaction, animation, counter, allocation-free round reset (meshes and materials retained)
 - [x] Softer procedural wind/birds and fruit pluck, optional replacement audio clips, persisted sound toggle
 - [x] Auto-generated scene with meadow / sky and safe area
+- [x] Minimal pause overlay, Android back button, restart and sound controls
 - [x] Android build menu command
 - [x] Development-only FPS and frame-time logging for eventual device QA (not yet measured)
 - [x] Edit-mode geometry tests (not yet executed)

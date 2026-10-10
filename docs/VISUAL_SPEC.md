@@ -6,7 +6,7 @@ Relaxing, carefully composed, semi-realistic 3D orchard tree; not photorealistic
 ## Composition
 - Portrait 9:16 through 9:20. Tree occupies ~70-85% of playable frame height while zoomed out, with trunk and ground visible.
 - Background must be low contrast: light sky gradient, simple grassy clearing; no pathways, fences, houses, extra trees or props.
-- The HUD is just apple progress plus small Restart and Sound buttons; it cannot obscure the tree crown.
+- During play, the HUD shows just apple progress and a small Pause control. Restart and Sound are inside a translucent pause overlay, not blocking the tree crown.
 - Sunlight warm but not overexposed. Ground shadow soft. No bloom or heavy blur.
 
 ## The tree

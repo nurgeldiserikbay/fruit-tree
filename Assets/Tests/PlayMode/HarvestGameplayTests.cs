@@ -80,5 +80,33 @@ namespace FruitTree.Tests
             Assert.IsTrue(apple.IsHarvested);
             Object.Destroy(root);
         }
+        [UnityTest]
+        public IEnumerator PauseAndResumeRestoreGameTime()
+        {
+            var root = new GameObject("Pause Test");
+            var menu = new GameObject("Pause Menu");
+            menu.transform.SetParent(root.transform);
+            menu.SetActive(false);
+            var pause = root.AddComponent<PauseController>();
+            pause.panel = menu;
+            try
+            {
+                pause.Toggle();
+                Assert.IsTrue(pause.IsPaused);
+                Assert.IsTrue(menu.activeSelf);
+                Assert.AreEqual(0f, Time.timeScale);
+                pause.Resume();
+                Assert.IsFalse(pause.IsPaused);
+                Assert.IsFalse(menu.activeSelf);
+                Assert.AreEqual(1f, Time.timeScale);
+            }
+            finally
+            {
+                pause.Resume();
+                Object.Destroy(root);
+            }
+            yield return null;
+        }
+
     }
 }
