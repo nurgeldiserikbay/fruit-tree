@@ -41,6 +41,7 @@ namespace FruitTree
         private int lastHarvested;
         private void OnHarvest(int current, int total)
         {
+            if (current == 0) { lastHarvested = 0; return; }
             if (current > lastHarvested && !muted) effects.PlayOneShot(collect);
             lastHarvested = current;
         }
