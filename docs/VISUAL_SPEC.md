@@ -14,7 +14,7 @@ Relaxing, carefully composed, semi-realistic 3D orchard tree; not photorealistic
 - Leaves have varied angles and shades; canopy retains gaps through which to inspect apples.
 - A few leaves sway in the wind (very small displacement). Apples stay visually attached to twigs.
 - Most fruit reachable from an outside orbit, some partially hidden among leaves.
-- Apples should have recognizable lobed red form, stems, and restrained glossy highlights.
+- Apples should have recognizable lobed red form, restrained glossy highlights and stems that actually connect each apple to its twig from all camera angles.
 
 ## Game feel
 - Swipe horizontally: continuous 360-degree camera orbit, no snapping or screen jumps.

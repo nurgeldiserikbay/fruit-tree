@@ -116,6 +116,27 @@ namespace FruitTree.Tests
             finally { Object.DestroyImmediate(mesh); }
         }
 
+
+        [Test]
+        public void EachAppleHasAVisibleStemAttachedToItsParent()
+        {
+            var root = new GameObject("Tree Stems Test");
+            try
+            {
+                var tree = root.AddComponent<TreeGenerator>();
+                if (tree.Apples.Count == 0) tree.Generate();
+                foreach (Apple apple in tree.Apples)
+                {
+                    Transform stem = apple.transform.Find("Stem");
+                    Assert.IsNotNull(stem);
+                    Assert.Greater(stem.localScale.y, 0.02f);
+                    Assert.IsTrue(stem.gameObject.activeSelf);
+                    Assert.IsTrue(stem.IsChildOf(apple.transform));
+                }
+            }
+            finally { Object.DestroyImmediate(root); }
+        }
+
         [Test]
         public void GroundMeshesAreReasonablySmall()
         {

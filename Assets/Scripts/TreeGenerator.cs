@@ -117,7 +117,7 @@ namespace FruitTree
                     {
                         float along = clusterIndex == 0 ? .57f : .94f;
                         Vector3 center = Vector3.Lerp(start, end, along);
-                        fruitAnchors.Add(center + Vector3.down * .1f);
+                        fruitAnchors.Add(center);
                         for (int leafIndex = 0; leafIndex < leavesPerCluster; leafIndex++)
                         {
                             Vector3 offset = new Vector3(Between(-.39f,.39f),
@@ -154,23 +154,32 @@ namespace FruitTree
             Material stemMaterial = Track(LitMaterial("Stem", new Color(.28f,.19f,.095f), .12f));
             for (int i = 0; i < appleCount; i++)
             {
-                Vector3 at = fruitAnchors[i * fruitAnchors.Count / appleCount] + new Vector3(Between(-.12f,.12f), Between(-.12f,.02f), Between(-.12f,.12f));
-                // Keep most apples near the outer crown so the picking game stays readable.
-                // A smaller group remains deeper in the leaves for exploration.
-                Vector3 outward = new Vector3(at.x, 0f, at.z).normalized;
-                at += outward * (i % 4 == 0 ? .04f : .18f);
+                Vector3 attachment = fruitAnchors[i * fruitAnchors.Count / appleCount];
+                Vector3 outward = new Vector3(attachment.x, 0f, attachment.z).normalized;
+                // A slight hanging drop gives every fruit a visible attachment to a twig.
+                // Keep a few deeper in the crown, and most near its reachable surface.
+                Vector3 at = attachment + Vector3.down * Between(.24f, .32f) +
+                    outward * (i % 4 == 0 ? .035f : .14f) +
+                    new Vector3(Between(-.07f, .07f), 0f, Between(-.07f, .07f));
                 var fruit = MakeMeshObject("Apple " + (i + 1), appleMesh, appleMaterial);
                 fruit.transform.localPosition = at;
-                fruit.transform.localRotation = Quaternion.Euler(Between(-10,10), Between(0,360), Between(-10,10));
+                fruit.transform.localRotation = Quaternion.Euler(Between(-10, 10), Between(0, 360), Between(-10, 10));
                 fruit.AddComponent<SphereCollider>().radius = .22f;
                 var component = fruit.AddComponent<Apple>();
                 component.Harvested += OnHarvest;
                 apples.Add(component);
+
                 var stem = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
                 stem.name = "Stem";
                 stem.transform.SetParent(fruit.transform, false);
-                stem.transform.localPosition = new Vector3(0, .20f, 0);
-                stem.transform.localScale = new Vector3(.012f, .09f, .012f);
+                // Attach the end of the stem to the exact twig anchor, rather than
+                // letting apples appear to float when viewed from behind.
+                Vector3 top = fruit.transform.TransformPoint(new Vector3(0f, .175f, 0f));
+                Vector3 twig = transform.TransformPoint(attachment);
+                Vector3 axis = twig - top;
+                stem.transform.position = (top + twig) * .5f;
+                stem.transform.rotation = Quaternion.FromToRotation(Vector3.up, axis.normalized);
+                stem.transform.localScale = new Vector3(.012f, axis.magnitude * .5f, .012f);
                 stem.GetComponent<Renderer>().sharedMaterial = stemMaterial;
                 if (Application.isPlaying) Destroy(stem.GetComponent<Collider>());
                 else DestroyImmediate(stem.GetComponent<Collider>());
