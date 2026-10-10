@@ -17,6 +17,7 @@
 - [x] Auto-generated scene and safe area
 - [x] Android build menu command
 - [x] Edit-mode geometry tests (not yet executed)
+- [x] Play-mode tests for idempotent picking and round restart (not yet executed)
 
 ## NOT VERIFIED OR COMPLETE
 - [ ] Unity Editor compile and scene-opening acceptance test
