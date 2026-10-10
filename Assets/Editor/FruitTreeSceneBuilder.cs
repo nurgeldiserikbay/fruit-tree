@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.SceneManagement;
+using UnityEditor.Build;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -64,7 +65,7 @@ namespace FruitTree.Editor
             PlayerSettings.productName = "Fruit Tree";
             PlayerSettings.companyName = "Fruit Tree Studio";
             PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, "com.fruittree.game");
-            EditorUserBuildSettings.androidBuildSubtarget = MobileTextureSubtarget.ETC2;
+            // Default Android texture compression is selected from Build Profiles.
             System.IO.Directory.CreateDirectory("Assets/Scenes");
             EditorSceneManager.SaveScene(scene, "Assets/Scenes/Main.unity");
             EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene("Assets/Scenes/Main.unity", true) };
