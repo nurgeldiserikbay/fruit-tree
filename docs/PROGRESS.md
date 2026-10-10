@@ -22,6 +22,8 @@
 - [x] Safe Unity Resources folder creation through AssetDatabase
 - [x] Editor scene validation command to check camera, menu, audio, shaders and Android build settings (not yet executed)
 - [x] 360-degree fruit reachability sampling audit (reports warnings; not yet executed)
+- [x] First-import shader import ordering hardened; asset-database scene checks
+- [x] Android build fails early on unsupported platform and invalid scene; output anchored at project root
 - [x] Android build menu command
 - [x] Development-only FPS and frame-time logging for eventual device QA (not yet measured)
 - [x] Edit-mode geometry tests (not yet executed)

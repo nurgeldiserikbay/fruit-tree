@@ -7,7 +7,7 @@
 4. Wait for package import and C# script compilation. On first import the editor script automatically creates `Assets/Scenes/Main.unity`.
 5. If the scene was not generated: choose **Fruit Tree > Generate Playable Scene**. Next choose **Fruit Tree > Validate Project** to check saved scene references, then press Play.
 6. Mouse: drag to orbit, wheel to zoom, click an apple to pick. Android: drag, pinch to zoom, tap.
-7. To create an Android build: File > Build Profiles > Android > Switch Platform, then **Fruit Tree > Build Android APK**. Build And Run requires device debugging enabled.
+7. To create an Android APK: File > Build Profiles > Android > Switch Platform, then **Fruit Tree > Build Android APK**. The APK is written to `Builds/FruitTree.apk` in the repository root. Build And Run requires device debugging enabled.
 8. To install the APK on device: `adb install -r FruitTree.apk` (or use Build And Run).
 
 ## Project constraints
@@ -41,3 +41,8 @@ Unity Editor, Android devices and Unity's own C# assemblies are not available to
 - Compare Android portrait displays with different aspect ratios and RAM/GPU levels; check visual clipping and touch correctness as well as FPS.
 - Record heat, battery and stability manually for a minimum 10-minute session; the simple FPS logger is not a GPU profiler.
 - The component's sampling code is excluded from release builds with Unity conditional compilation.
+
+## Fruit visibility audit
+- Run **Fruit Tree > Audit Fruit Reachability** (or **Fruit Tree > Validate Project**). It creates a temporary procedural tree far from the gameplay area and samples line-of-sight raycasts from 48 orbit angles and four heights.
+- The audit warns about apples that could not be selected from any sampled angle. Such warnings require visual review and repositioning of the affected fruit before release.
+- This is a *sampling diagnostic*, not a guarantee that every fruit is easy to spot, nor a substitute for an actual play session.

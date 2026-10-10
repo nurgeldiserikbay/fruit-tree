@@ -14,7 +14,6 @@ namespace FruitTree.Editor
         [MenuItem("Fruit Tree/Audit Fruit Reachability")]
         public static void Run()
         {
-            var currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
             var treeObject = new GameObject("Temporary Reachability Test");
             treeObject.transform.position = new Vector3(1000f, 0f, 1000f);
             try

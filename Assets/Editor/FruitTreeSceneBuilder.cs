@@ -22,7 +22,7 @@ namespace FruitTree.Editor
                     EditorApplication.delayCall += SchedulePendingScene;
                     return;
                 }
-                if (!System.IO.File.Exists("Assets/Scenes/Main.unity")) Generate();
+                if (AssetDatabase.LoadAssetAtPath<SceneAsset>("Assets/Scenes/Main.unity") == null) Generate();
             };
         }
 

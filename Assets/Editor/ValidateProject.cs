@@ -20,7 +20,8 @@ namespace FruitTree.Editor
         public static void Run()
         {
             const string path = "Assets/Scenes/Main.unity";
-            if (!File.Exists(path)) FruitTreeSceneBuilder.Generate();
+            if (AssetDatabase.LoadAssetAtPath<SceneAsset>(path) == null)
+                FruitTreeSceneBuilder.Generate();
             var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
             var errors = new List<string>();
 
