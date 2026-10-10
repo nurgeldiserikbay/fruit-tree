@@ -2,6 +2,7 @@
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEditor.Build;
+using UnityEditor.Events;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -124,10 +125,12 @@ namespace FruitTree.Editor
                 new Color(.22f,.30f,.20f), new Vector2(.11f,.07f), new Vector2(.89f,.14f));
             var hud = canvasObject.AddComponent<HarvestHUD>();
             hud.tree = tree; hud.countText = count; hud.messageText = hint;
-            MakeButton("Restart", safe.transform, "RESTART", new Vector2(.04f,.885f), new Vector2(.28f,.955f),
-                new Color(.98f,.94f,.84f,.91f)).onClick.AddListener(hud.Restart);
-            MakeButton("Sound", safe.transform, "SOUND", new Vector2(.73f,.885f), new Vector2(.96f,.955f),
-                new Color(.98f,.94f,.84f,.91f)).onClick.AddListener(sound.ToggleSound);
+            var restart = MakeButton("Restart", safe.transform, "RESTART", new Vector2(.04f,.885f), new Vector2(.28f,.955f),
+                new Color(.98f,.94f,.84f,.91f));
+            var audio = MakeButton("Sound", safe.transform, "SOUND", new Vector2(.73f,.885f), new Vector2(.96f,.955f));
+            UnityEventTools.AddPersistentListener(restart.onClick, hud.Restart);
+            UnityEventTools.AddPersistentListener(audio.onClick, sound.ToggleSound);
+
         }
 
         private static Text MakeLabel(string name, Transform parent, string label, int size, Color color,
