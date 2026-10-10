@@ -127,7 +127,8 @@ namespace FruitTree.Editor
             hud.tree = tree; hud.countText = count; hud.messageText = hint;
             var restart = MakeButton("Restart", safe.transform, "RESTART", new Vector2(.04f,.885f), new Vector2(.28f,.955f),
                 new Color(.98f,.94f,.84f,.91f));
-            var audio = MakeButton("Sound", safe.transform, "SOUND", new Vector2(.73f,.885f), new Vector2(.96f,.955f));
+            var audio = MakeButton("Sound", safe.transform, "SOUND", new Vector2(.73f,.885f), new Vector2(.96f,.955f),
+                new Color(.98f,.94f,.84f,.91f));
             UnityEventTools.AddPersistentListener(restart.onClick, hud.Restart);
             UnityEventTools.AddPersistentListener(audio.onClick, sound.ToggleSound);
 
