@@ -19,6 +19,9 @@
 - [x] Edit-mode geometry tests (not yet executed)
 - [x] Play-mode tests for idempotent picking, stable round reset and interrupted animation (not yet executed)
 - [x] Apple-skin texture, trunk occlusion and shadow draw-call reductions
+- [x] Stem-to-twig attachment for every fruit (Unity test authored; not yet executed)
+- [x] Explicit touch-position UI hit testing
+- [x] Local Windows Unity test runner / optional APK script (not yet executed)
 - [x] Static block-delimiter check across 15 C# scripts (passed; not a compiler run)
 - [x] Prevent non-finite apple vertices at the top pole; regression test authored (not executed)
 

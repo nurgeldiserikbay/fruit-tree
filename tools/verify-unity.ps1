@@ -26,10 +26,27 @@ if (-not (Test-Path $UnityEditor)) {
     throw "Unity Editor not found at: $UnityEditor"
 }
 
+function Assert-TestResults {
+    param([string] $FileName)
+    $file = Join-Path $logs $FileName
+    if (-not (Test-Path $file)) { throw "Unity did not write test results: $file" }
+    [xml] $report = Get-Content $file -Raw
+    $run = $report.SelectSingleNode('/test-run')
+    if ($null -eq $run) { throw "Unexpected Unity test report format: $file" }
+    $total = [int] $run.GetAttribute('total')
+    $failed = [int] $run.GetAttribute('failed')
+    if ($total -le 0 -or $failed -gt 0) {
+        throw "Unity test check failed: total=$total failed=$failed (see $file)"
+    }
+    Write-Host "Tests passed: $total total / $failed failures"
+}
+
 Invoke-Unity -Arguments @('-runTests', '-testPlatform', 'EditMode',
     '-testResults', (Join-Path $logs 'editmode-results.xml')) -LogName 'editmode.log'
+Assert-TestResults 'editmode-results.xml'
 Invoke-Unity -Arguments @('-runTests', '-testPlatform', 'PlayMode',
     '-testResults', (Join-Path $logs 'playmode-results.xml')) -LogName 'playmode.log'
+Assert-TestResults 'playmode-results.xml'
 
 if ($BuildApk) {
     Invoke-Unity -Arguments @('-buildTarget', 'Android',
