@@ -21,7 +21,8 @@ namespace FruitTree
         public void Restart()
         {
             Time.timeScale = 1;
-            tree.Generate();
+            if (tree == null) return;
+            tree.ResetHarvest();
             if (messageText != null) messageText.text = "Drag to rotate  -  Tap apples";
         }
         private void Refresh(int picked, int total)

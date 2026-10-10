@@ -12,12 +12,12 @@
 - [x] Deterministic batched tree generator (wood, leaf canopy, mesh apples)
 - [x] Bark texture generator, asymmetric trunk / twigs, leaf-tip wind shader
 - [x] Touch orbit, pinch zoom and two-finger focus-height pan
-- [x] Apple interaction, animation, counter, restart
+- [x] Apple interaction, animation, counter, allocation-free round reset (meshes and materials retained)
 - [x] Simple procedural sound, sound toggle
 - [x] Auto-generated scene with meadow / sky and safe area
 - [x] Android build menu command
 - [x] Edit-mode geometry tests (not yet executed)
-- [x] Play-mode tests for idempotent picking and round restart (not yet executed)
+- [x] Play-mode tests for idempotent picking, stable round reset and interrupted animation (not yet executed)
 - [x] Apple-skin texture, trunk occlusion and shadow draw-call reductions
 - [x] Static block-delimiter check across 15 C# scripts (passed; not a compiler run)
 

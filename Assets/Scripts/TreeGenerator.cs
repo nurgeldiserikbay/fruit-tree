@@ -178,6 +178,23 @@ namespace FruitTree
             HarvestChanged?.Invoke(0, appleCount);
         }
 
+        /// <summary>
+        /// Start a new picking round without recreating meshes or materials.
+        /// This avoids garbage collection spikes on Android and keeps the scene stable.
+        /// </summary>
+        public void ResetHarvest()
+        {
+            if (apples.Count == 0)
+            {
+                Generate();
+                return;
+            }
+            foreach (var apple in apples)
+                if (apple != null) apple.ResetApple();
+            HarvestedCount = 0;
+            HarvestChanged?.Invoke(HarvestedCount, appleCount);
+        }
+
         private void OnHarvest(Apple apple)
         {
             HarvestedCount++;

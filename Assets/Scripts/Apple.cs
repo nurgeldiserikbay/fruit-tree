@@ -9,6 +9,27 @@ namespace FruitTree
     {
         public event Action<Apple> Harvested;
         public bool IsHarvested { get; private set; }
+        private Vector3 originalPosition;
+        private Vector3 originalScale;
+        private Quaternion originalRotation;
+
+        private void Awake()
+        {
+            originalPosition = transform.localPosition;
+            originalScale = transform.localScale;
+            originalRotation = transform.localRotation;
+        }
+
+        public void ResetApple()
+        {
+            StopAllCoroutines();
+            transform.localPosition = originalPosition;
+            transform.localRotation = originalRotation;
+            transform.localScale = originalScale;
+            gameObject.SetActive(true);
+            GetComponent<Collider>().enabled = true;
+            IsHarvested = false;
+        }
 
         public void Pick()
         {
