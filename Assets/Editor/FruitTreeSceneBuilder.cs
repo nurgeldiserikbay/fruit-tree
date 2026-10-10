@@ -17,9 +17,23 @@ namespace FruitTree.Editor
         {
             EditorApplication.delayCall += () =>
             {
-                if (Application.isPlaying || EditorApplication.isCompiling) return;
+                if (Application.isPlaying || EditorApplication.isCompiling || EditorApplication.isUpdating)
+                {
+                    EditorApplication.delayCall += SchedulePendingScene;
+                    return;
+                }
                 if (!System.IO.File.Exists("Assets/Scenes/Main.unity")) Generate();
             };
+        }
+
+        private static void SchedulePendingScene()
+        {
+            if (Application.isPlaying || EditorApplication.isCompiling || EditorApplication.isUpdating)
+            {
+                EditorApplication.delayCall += SchedulePendingScene;
+                return;
+            }
+            if (!System.IO.File.Exists("Assets/Scenes/Main.unity")) Generate();
         }
 
         [MenuItem("Fruit Tree/Generate Playable Scene")]
@@ -91,12 +105,18 @@ namespace FruitTree.Editor
         {
             string path = "Assets/Resources/" + materialName + ".mat";
             if (AssetDatabase.LoadAssetAtPath<Material>(path) != null) return;
-            var shader = Shader.Find(shaderName);
+            string shaderPath = shaderName == "FruitTree/VertexLit" ?
+                "Assets/Shaders/VertexLit.shader" : "Assets/Shaders/SoftSky.shader";
+            // Resolve by file location first: it also works when a shader has not
+            // yet been registered by Shader.Find during a fresh Unity import.
+            var shader = AssetDatabase.LoadAssetAtPath<Shader>(shaderPath);
             if (shader == null)
             {
-                Debug.LogWarning("Unable to find shader: " + shaderName);
-                return;
+                AssetDatabase.ImportAsset(shaderPath, ImportAssetOptions.ForceSynchronousImport);
+                shader = AssetDatabase.LoadAssetAtPath<Shader>(shaderPath);
             }
+            if (shader == null)
+                throw new System.InvalidOperationException("Fruit Tree shader import failed: " + shaderPath);
             AssetDatabase.CreateAsset(new Material(shader) { name = materialName }, path);
         }
 
