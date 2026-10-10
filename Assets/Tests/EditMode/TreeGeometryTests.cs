@@ -94,6 +94,24 @@ namespace FruitTree.Tests
         }
 
         [Test]
+        public void CurvedBranchUsesSharedRingsAndFiniteVertices()
+        {
+            var meshBuilder = new ProceduralMesh();
+            meshBuilder.BranchCurve(
+                new[] { Vector3.zero, Vector3.up, new Vector3(.3f, 2f, 0f) },
+                new[] { .3f, .2f, .04f }, Color.white);
+            Mesh mesh = meshBuilder.Build("curved-branch");
+            try
+            {
+                Assert.AreEqual(27, mesh.vertexCount);
+                Assert.AreEqual(96, mesh.triangles.Length);
+                foreach (Vector3 point in mesh.vertices)
+                    Assert.IsFalse(float.IsNaN(point.x) || float.IsNaN(point.y) || float.IsNaN(point.z));
+            }
+            finally { Object.DestroyImmediate(mesh); }
+        }
+
+        [Test]
         public void BranchGeometryPointsOutward()
         {
             var builder = new ProceduralMesh();

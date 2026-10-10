@@ -69,9 +69,9 @@ namespace FruitTree
             Vector3 trunkLow = new Vector3(.055f, 1.22f, -.025f);
             Vector3 trunkMid = new Vector3(-.04f, 2.53f, .06f);
             Vector3 trunkTop = new Vector3(.04f, 4.02f, -.025f);
-            wood.Branch(trunkBase, trunkLow, .43f, .33f, brown);
-            wood.Branch(trunkLow, trunkMid, .33f, .22f, brown);
-            wood.Branch(trunkMid, trunkTop, .22f, .035f, brown);
+            wood.BranchCurve(
+                new[] { trunkBase, trunkLow, trunkMid, trunkTop },
+                new[] { .43f, .33f, .22f, .035f }, brown);
 
             const float goldenAngle = 2.39996323f;
             const int majorBranches = 19;
@@ -85,18 +85,21 @@ namespace FruitTree
                 float length = (2.65f - elevation * 1.2f) * Between(.88f, 1.12f);
                 Vector3 origin = new Vector3(Between(-.065f,.065f), height, Between(-.065f,.065f));
 
-                Vector3 previous = origin;
+                var limbPoints = new Vector3[4];
+                var limbRadii = new float[4];
+                limbPoints[0] = origin;
+                float baseRadius = Mathf.Lerp(.14f, .095f, elevation);
+                limbRadii[0] = baseRadius;
+                float bend = Between(-.16f, .16f);
                 for (int section = 1; section <= 3; section++)
                 {
                     float fraction = section / 3f;
-                    Vector3 point = origin + radial * (length * fraction) +
-                        sideways * (Mathf.Sin(fraction * Mathf.PI) * Between(-.16f, .16f)) +
+                    limbPoints[section] = origin + radial * (length * fraction) +
+                        sideways * (Mathf.Sin(fraction * Mathf.PI) * bend) +
                         Vector3.up * (.12f * fraction + .48f * fraction * fraction);
-                    float baseRadius = Mathf.Lerp(.14f, .095f, elevation);
-                    wood.Branch(previous, point, Mathf.Lerp(baseRadius, .022f, (section - 1) / 3f),
-                        Mathf.Lerp(baseRadius, .022f, fraction), branchColor);
-                    previous = point;
+                    limbRadii[section] = Mathf.Lerp(baseRadius, .022f, fraction);
                 }
+                wood.BranchCurve(limbPoints, limbRadii, branchColor);
 
                 // Each limb carries several smaller twigs with two leaf clusters.
                 // All wood/leaves are merged into just two renderer objects.

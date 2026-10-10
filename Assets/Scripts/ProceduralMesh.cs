@@ -47,6 +47,54 @@ namespace FruitTree
             }
         }
 
+        /// <summary>
+        /// Creates a continuous tapered tube along a limb or curved trunk.
+        /// Shared rings and smooth normals eliminate hard cylinder joints.
+        /// </summary>
+        public void BranchCurve(Vector3[] points, float[] radii, Color baseColor)
+        {
+            if (points == null || radii == null || points.Length != radii.Length || points.Length < 2)
+                throw new System.ArgumentException("BranchCurve requires matching path and radius arrays.");
+            const int sides = 8;
+            int first = positions.Count;
+            float distanceAlong = 0f;
+            for (int i = 0; i < points.Length; i++)
+            {
+                Vector3 tangent = i == 0 ? points[1] - points[0] :
+                    i == points.Length - 1 ? points[i] - points[i - 1] :
+                    points[i + 1] - points[i - 1];
+                if (tangent.sqrMagnitude < .000001f)
+                    throw new System.ArgumentException("Branch path points must not overlap.");
+                tangent.Normalize();
+                Vector3 reference = Mathf.Abs(Vector3.Dot(tangent, Vector3.up)) > .93f ?
+                    Vector3.forward : Vector3.up;
+                Vector3 right = Vector3.Cross(tangent, reference).normalized;
+                Vector3 forward = Vector3.Cross(tangent, right).normalized;
+                if (i > 0) distanceAlong += Vector3.Distance(points[i], points[i - 1]);
+                float radius = Mathf.Max(.003f, radii[i]);
+                for (int side = 0; side <= sides; side++)
+                {
+                    float angle = side * Mathf.PI * 2f / sides;
+                    Vector3 normal = right * Mathf.Cos(angle) + forward * Mathf.Sin(angle);
+                    Color shade = baseColor * (.92f + .08f * Mathf.Cos(angle * 2f));
+                    Vertex(points[i] + normal * radius, normal, shade,
+                        new Vector2(side / (float)sides, distanceAlong * .45f));
+                }
+            }
+            for (int ring = 0; ring < points.Length - 1; ring++)
+            {
+                for (int side = 0; side < sides; side++)
+                {
+                    int a = first + ring * (sides + 1) + side;
+                    int b = a + 1;
+                    int c = a + sides + 1;
+                    int d = c + 1;
+                    Tri(a, b, c);
+                    Tri(b, d, c);
+                }
+            }
+        }
+
         public void Leaf(Vector3 center, Vector3 outward, float length, float width, Color color)
         {
             Vector3 axis = outward.normalized;
