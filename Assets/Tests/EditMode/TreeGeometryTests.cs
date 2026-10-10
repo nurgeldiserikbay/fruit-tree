@@ -94,6 +94,25 @@ namespace FruitTree.Tests
         }
 
         [Test]
+        public void GroundMeshesAreReasonablySmall()
+        {
+            var terrain = GroundGenerator.CreateTerrainMesh();
+            var grass = GroundGenerator.CreateGrassMesh();
+            try
+            {
+                Assert.Less(terrain.vertexCount, 2000);
+                Assert.Less(grass.vertexCount, 2000);
+                Assert.Greater(terrain.triangles.Length, 1000);
+                Assert.Greater(grass.triangles.Length, 100);
+            }
+            finally
+            {
+                Object.DestroyImmediate(terrain);
+                Object.DestroyImmediate(grass);
+            }
+        }
+
+        [Test]
         public void BarkTextureIsSmallAndOpaque()
         {
             Texture2D bark = BarkTexture.Create();

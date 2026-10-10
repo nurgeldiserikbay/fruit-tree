@@ -33,7 +33,7 @@ namespace FruitTree.Editor
             root.AddComponent<TreeGenerator>();
 
             EnsureShaderIsInBuild();
-            CreateGround();
+            new GameObject("Quiet Meadow").AddComponent<GroundGenerator>();
             var cameraObject = new GameObject("Main Camera");
             cameraObject.tag = "MainCamera";
             var camera = cameraObject.AddComponent<Camera>();
@@ -90,27 +90,6 @@ namespace FruitTree.Editor
                 return;
             }
             AssetDatabase.CreateAsset(new Material(shader) { name = "VertexLit Reference" }, materialPath);
-        }
-
-        private static void CreateGround()
-        {
-            var ground = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            ground.name = "Grass Clearing";
-            ground.transform.position = new Vector3(0, -.12f, 0);
-            ground.transform.localScale = new Vector3(4.15f, .12f, 4.15f);
-            var material = new Material(Shader.Find("Standard"));
-            material.color = new Color(.30f, .49f, .24f);
-            ground.GetComponent<Renderer>().sharedMaterial = material;
-            Object.DestroyImmediate(ground.GetComponent<Collider>());
-
-            var soil = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            soil.name = "Earth at Roots";
-            soil.transform.position = new Vector3(0, .008f, 0);
-            soil.transform.localScale = new Vector3(.8f, .013f, .8f);
-            var soilMaterial = new Material(Shader.Find("Standard"));
-            soilMaterial.color = new Color(.39f, .31f, .21f);
-            soil.GetComponent<Renderer>().sharedMaterial = soilMaterial;
-            Object.DestroyImmediate(soil.GetComponent<Collider>());
         }
 
         private static void CreateInterface(TreeGenerator tree, OrchardAudio sound)
