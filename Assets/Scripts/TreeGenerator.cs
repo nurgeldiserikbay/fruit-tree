@@ -61,8 +61,8 @@ namespace FruitTree
             var wood = new ProceduralMesh();
             var foliage = new ProceduralMesh();
             var fruitAnchors = new List<Vector3>();
-            var brown = new Color(.34f, .23f, .135f);
-            var branchColor = new Color(.39f, .26f, .14f);
+            var brown = new Color(.86f, .81f, .74f);
+            var branchColor = new Color(.9f, .81f, .72f);
             wood.Branch(Vector3.zero, new Vector3(0, 1.75f, 0), .39f, .29f, brown);
             wood.Branch(new Vector3(0, 1.75f, 0), new Vector3(0, 3.7f, 0), .29f, .07f, brown);
 
@@ -92,7 +92,7 @@ namespace FruitTree
                             Vector3 offset = new Vector3(Between(-.39f,.39f), Between(-.3f,.36f), Between(-.39f,.39f));
                             Vector3 leafDirection = new Vector3(Between(-1,1), Between(-.3f, .9f), Between(-1,1)).normalized;
                             float colorShift = Between(-.07f, .07f);
-                            Color leafColor = new Color(.26f + colorShift, .44f + Between(-.06f,.09f), .16f + colorShift);
+                            Color leafColor = new Color(.34f + colorShift, .57f + Between(-.06f,.09f), .20f + colorShift);
                             foliage.Leaf(center + offset, leafDirection, Between(.16f,.29f), Between(.11f,.17f), leafColor);
                         }
                     }
@@ -110,6 +110,10 @@ namespace FruitTree
             for (int i = 0; i < appleCount; i++)
             {
                 Vector3 at = fruitAnchors[random.Next(fruitAnchors.Count)] + new Vector3(Between(-.12f,.12f), Between(-.12f,.02f), Between(-.12f,.12f));
+                // Keep most apples near the outer crown so the picking game stays readable.
+                // A smaller group remains deeper in the leaves for exploration.
+                Vector3 outward = new Vector3(at.x, 0f, at.z).normalized;
+                at += outward * (i % 4 == 0 ? .08f : .33f);
                 var fruit = MakeMeshObject("Apple " + (i + 1), appleMesh, appleMaterial);
                 fruit.transform.localPosition = at;
                 fruit.transform.localRotation = Quaternion.Euler(Between(-10,10), Between(0,360), Between(-10,10));
