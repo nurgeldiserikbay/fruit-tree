@@ -179,41 +179,46 @@ namespace FruitTree.Editor
             safe.transform.SetParent(canvasObject.transform, false);
             safe.AddComponent<SafeAreaFitter>();
 
+            var gameLayer = new GameObject("Gameplay Controls", typeof(RectTransform));
+            gameLayer.transform.SetParent(safe.transform, false);
+            Anchor(gameLayer.GetComponent<RectTransform>(), Vector2.zero, Vector2.one);
+            var gameRoot = gameLayer.transform;
+
             var panel = new GameObject("Counter Background", typeof(RectTransform),
                 typeof(CanvasRenderer), typeof(RoundedPanel));
-            panel.transform.SetParent(safe.transform, false);
+            panel.transform.SetParent(gameRoot, false);
             Anchor(panel.GetComponent<RectTransform>(),
                 new Vector2(.355f, .903f), new Vector2(.645f, .966f));
             var counterFace = panel.GetComponent<RoundedPanel>();
             counterFace.color = new Color(.99f, .97f, .87f, .94f);
             counterFace.CornerRadius = 48f;
             counterFace.raycastTarget = false;
-            var count = MakeLabel("Apple Counter", safe.transform, "0 / 30", 56,
+            var count = MakeLabel("Apple Counter", gameRoot, "0 / 30", 56,
                 new Color(.21f, .32f, .19f),
                 new Vector2(.355f, .903f), new Vector2(.645f, .966f));
 
             var hintBackground = new GameObject("Hint Background", typeof(RectTransform),
                 typeof(CanvasRenderer), typeof(RoundedPanel));
-            hintBackground.transform.SetParent(safe.transform, false);
+            hintBackground.transform.SetParent(gameRoot, false);
             Anchor(hintBackground.GetComponent<RectTransform>(),
                 new Vector2(.15f, .048f), new Vector2(.85f, .12f));
             var hintFace = hintBackground.GetComponent<RoundedPanel>();
             hintFace.color = new Color(.14f, .28f, .19f, .75f);
             hintFace.CornerRadius = 40f;
             hintFace.raycastTarget = false;
-            var hint = MakeLabel("Control Hint", safe.transform, "Drag to rotate  -  Tap apples", 40,
+            var hint = MakeLabel("Control Hint", gameRoot, "Drag to rotate  -  Tap apples", 40,
                 new Color(.99f, .99f, .95f),
                 new Vector2(.17f, .055f), new Vector2(.83f, .114f));
             var hud = canvasObject.AddComponent<HarvestHUD>();
             hud.tree = tree; hud.countText = count; hud.messageText = hint;
             hud.OrchardMode = true;
             orchard.hud = hud;
-            orchard.treeLabel = MakeLabel("Current Tree Name", safe.transform,
+            orchard.treeLabel = MakeLabel("Current Tree Name", gameRoot,
                 "APPLE TREE", 31, new Color(.21f, .32f, .19f),
                 new Vector2(.24f, .856f), new Vector2(.76f, .898f));
             // Keep the gameplay clean. Only the small pause button is visible.
             // Restart and sound are accessible through the pause menu.
-            var pauseButton = MakeButton("Pause", safe.transform, "II",
+            var pauseButton = MakeButton("Pause", gameRoot, "II",
                 new Vector2(.864f, .9f), new Vector2(.954f, .966f),
                 new Color(.98f, .94f, .84f, .91f));
 
@@ -223,19 +228,26 @@ namespace FruitTree.Editor
             Anchor(menu.GetComponent<RectTransform>(), Vector2.zero, Vector2.one);
             menu.GetComponent<Image>().color = new Color(.12f, .17f, .13f, .76f);
             var pauseController = canvasObject.AddComponent<PauseController>();
+            var screenFlow = canvasObject.AddComponent<FruitTreeScreenFlow>();
+            screenFlow.pause = pauseController;
+            screenFlow.orchard = orchard;
+            screenFlow.orbitCamera = orchard.orbitCamera;
+            screenFlow.sound = sound;
+            screenFlow.gameplayControls = gameLayer;
+            pauseController.screenFlow = screenFlow;
             pauseController.panel = menu;
             pauseController.hud = hud;
 
             MakeLabel("Paused Title", menu.transform, "PAUSED", 70, Color.white,
-                new Vector2(.17f, .64f), new Vector2(.83f, .74f));
+                new Vector2(.17f, .78f), new Vector2(.83f, .87f));
             var resume = MakeButton("Resume", menu.transform, "CONTINUE",
-                new Vector2(.23f, .51f), new Vector2(.77f, .59f),
+                new Vector2(.23f, .66f), new Vector2(.77f, .735f),
                 new Color(.97f, .97f, .89f, 1f));
             var restart = MakeButton("Tree Collection", menu.transform, "TREES",
-                new Vector2(.23f, .40f), new Vector2(.77f, .48f),
+                new Vector2(.23f, .555f), new Vector2(.77f, .63f),
                 new Color(.97f, .97f, .89f, 1f));
             var audio = MakeButton("Sound", menu.transform, "SOUND ON",
-                new Vector2(.23f, .29f), new Vector2(.77f, .37f),
+                new Vector2(.23f, .345f), new Vector2(.77f, .42f),
                 new Color(.97f, .97f, .89f, 1f));
             sound.soundStatusText = audio.GetComponentInChildren<Text>();
             UnityEventTools.AddPersistentListener(pauseButton.onClick, pauseController.Toggle);
@@ -243,9 +255,20 @@ namespace FruitTree.Editor
             UnityEventTools.AddPersistentListener(restart.onClick, orchard.OpenTreeMenu);
             UnityEventTools.AddPersistentListener(audio.onClick, sound.ToggleSound);
 
+            var settingsInPause = MakeButton("Pause Settings", menu.transform,
+                "SETTINGS", new Vector2(.23f, .45f), new Vector2(.77f, .525f),
+                new Color(.97f, .97f, .89f, 1f));
+            var homeInPause = MakeButton("Pause Main Menu", menu.transform,
+                "MAIN MENU", new Vector2(.23f, .24f), new Vector2(.77f, .315f),
+                new Color(.97f, .97f, .89f, 1f));
+            UnityEventTools.AddPersistentListener(settingsInPause.onClick,
+                screenFlow.OpenSettingsFromPause);
+            UnityEventTools.AddPersistentListener(homeInPause.onClick,
+                screenFlow.ReturnHome);
+
             var parentButton = MakeButton("Parent Access", menu.transform,
-                "FOR PARENTS - HOLD", new Vector2(.18f, .17f),
-                new Vector2(.82f, .255f), new Color(.82f, .88f, .76f, 1f));
+                "FOR PARENTS - HOLD", new Vector2(.18f, .12f),
+                new Vector2(.82f, .195f), new Color(.82f, .88f, .76f, 1f));
             // Parent panel is the final sibling so it overlays ordinary pause controls.
             var parentPanel = new GameObject("Parent Options", typeof(RectTransform),
                 typeof(CanvasRenderer), typeof(Image));
@@ -321,7 +344,7 @@ namespace FruitTree.Editor
 
             // A calm completion shortcut, never displayed during ordinary harvesting.
             orchard.completionNextButton = MakeButton("Completion Next Tree",
-                safe.transform, "NEXT TREE", new Vector2(.31f, .14f),
+                gameRoot, "NEXT TREE", new Vector2(.31f, .14f),
                 new Vector2(.69f, .215f), new Color(.94f, .97f, .83f, .96f));
             UnityEventTools.AddPersistentListener(orchard.completionNextButton.onClick,
                 orchard.NextTree);
@@ -329,7 +352,109 @@ namespace FruitTree.Editor
             // Keep pause and parent overlays visually above the completion shortcut.
             orchard.completionNextButton.transform.SetSiblingIndex(menu.transform.GetSiblingIndex());
 
+            BuildFrontEnd(safe.transform, screenFlow);
+
             menu.SetActive(false);
+        }
+
+        private static GameObject MakeOverlay(string name, Transform parent, Color tint)
+        {
+            var overlay = new GameObject(name, typeof(RectTransform),
+                typeof(CanvasRenderer), typeof(Image));
+            overlay.transform.SetParent(parent, false);
+            Anchor(overlay.GetComponent<RectTransform>(), Vector2.zero, Vector2.one);
+            overlay.GetComponent<Image>().color = tint;
+            return overlay;
+        }
+
+        private static void BuildFrontEnd(Transform safe, FruitTreeScreenFlow flow)
+        {
+            var ivory = new Color(.97f, .965f, .89f, 1f);
+            var fern = new Color(.82f, .89f, .76f, 1f);
+            var white = new Color(.98f, .98f, .95f, 1f);
+            var dim = new Color(.09f, .19f, .13f, .78f);
+
+            var home = MakeOverlay("Home Screen", safe, new Color(.08f, .19f, .14f, .72f));
+            flow.homePanel = home;
+            MakeLabel("Game Logo", home.transform, "FRUIT TREE", 108, white,
+                new Vector2(.06f, .70f), new Vector2(.94f, .82f));
+            MakeLabel("Home Tagline", home.transform,
+                "A quiet moment among the trees", 36, white,
+                new Vector2(.08f, .63f), new Vector2(.92f, .69f));
+            var play = MakeButton("Home Play", home.transform, "CONTINUE",
+                new Vector2(.19f, .45f), new Vector2(.81f, .525f), ivory);
+            var collection = MakeButton("Home Collection", home.transform, "MY TREES",
+                new Vector2(.19f, .355f), new Vector2(.81f, .43f), ivory);
+            var settings = MakeButton("Home Settings", home.transform, "SETTINGS",
+                new Vector2(.19f, .26f), new Vector2(.81f, .335f), ivory);
+            var help = MakeButton("Home How To Play", home.transform, "HOW TO PLAY",
+                new Vector2(.19f, .165f), new Vector2(.81f, .24f), fern);
+            MakeLabel("Home Footer", home.transform,
+                "Relax. Explore. Collect.", 30, white,
+                new Vector2(.10f, .065f), new Vector2(.90f, .12f));
+            UnityEventTools.AddPersistentListener(play.onClick, flow.Play);
+            UnityEventTools.AddPersistentListener(collection.onClick,
+                flow.OpenCollectionFromHome);
+            UnityEventTools.AddPersistentListener(settings.onClick,
+                flow.OpenSettingsFromHome);
+            UnityEventTools.AddPersistentListener(help.onClick, flow.OpenHelp);
+
+            var options = MakeOverlay("Settings Screen", safe, dim);
+            flow.settingsPanel = options;
+            MakeLabel("Settings Title", options.transform, "SETTINGS", 78, white,
+                new Vector2(.12f, .74f), new Vector2(.88f, .84f));
+            var sound = MakeButton("Settings Sound", options.transform, "SOUND: ON",
+                new Vector2(.20f, .57f), new Vector2(.80f, .65f), ivory);
+            flow.audioButtonLabel = sound.GetComponentInChildren<Text>();
+            var policy = MakeButton("Settings Privacy", options.transform, "PRIVACY POLICY",
+                new Vector2(.20f, .46f), new Vector2(.80f, .54f), ivory);
+            var controls = MakeButton("Settings Controls", options.transform, "HOW TO PLAY",
+                new Vector2(.20f, .35f), new Vector2(.80f, .43f), ivory);
+            var back = MakeButton("Settings Back", options.transform, "BACK",
+                new Vector2(.27f, .20f), new Vector2(.73f, .28f), fern);
+            UnityEventTools.AddPersistentListener(sound.onClick, flow.ToggleSound);
+            UnityEventTools.AddPersistentListener(policy.onClick, flow.OpenPrivacy);
+            UnityEventTools.AddPersistentListener(controls.onClick, flow.OpenHelp);
+            UnityEventTools.AddPersistentListener(back.onClick, flow.CloseSettings);
+
+            var helpScreen = MakeOverlay("How To Play Screen", safe, dim);
+            flow.helpPanel = helpScreen;
+            MakeLabel("Help Title", helpScreen.transform, "HOW TO PLAY", 70, white,
+                new Vector2(.10f, .75f), new Vector2(.90f, .86f));
+            MakeLabel("Help Content", helpScreen.transform,
+                "Swipe to turn the tree\\n\\nPinch to zoom in or out\\n\\nTap fruit to collect it\\n\\nClear every fruit to unlock the next tree\\n\\nRebloom an old tree whenever you wish\\n\\nThere is no timer. Enjoy the moment.",
+                42, white, new Vector2(.10f, .28f), new Vector2(.90f, .73f));
+            var helpBack = MakeButton("Help Back", helpScreen.transform, "BACK",
+                new Vector2(.27f, .15f), new Vector2(.73f, .23f), fern);
+            UnityEventTools.AddPersistentListener(helpBack.onClick, flow.CloseHelp);
+
+            var privacy = MakeOverlay("Privacy Information Screen", safe, dim);
+            flow.privacyPanel = privacy;
+            MakeLabel("Privacy Heading", privacy.transform, "PRIVACY POLICY", 68, white,
+                new Vector2(.09f, .78f), new Vector2(.91f, .88f));
+            MakeLabel("Privacy Summary", privacy.transform,
+                "Fruit Tree stores your game progress locally on your device.\\n\\n" +
+                "The game has no account registration. Google Play may process purchases.\\n\\n" +
+                "No advertising SDK is enabled in this build.\\n\\n" +
+                "Read the full published policy for contact and retention details.",
+                39, white, new Vector2(.09f, .37f), new Vector2(.91f, .75f));
+            flow.privacyStatusLabel = MakeLabel("Privacy Status", privacy.transform,
+                "Online policy will be available before release.", 30, white,
+                new Vector2(.10f, .28f), new Vector2(.90f, .36f));
+            flow.openPublishedPrivacyButton = MakeButton("Open Privacy Website",
+                privacy.transform, "OPEN ONLINE POLICY",
+                new Vector2(.17f, .18f), new Vector2(.83f, .26f), ivory);
+            var privacyBack = MakeButton("Privacy Back", privacy.transform, "BACK",
+                new Vector2(.29f, .075f), new Vector2(.71f, .15f), fern);
+            UnityEventTools.AddPersistentListener(
+                flow.openPublishedPrivacyButton.onClick, flow.OpenPublicPrivacyUrl);
+            UnityEventTools.AddPersistentListener(privacyBack.onClick, flow.ClosePrivacy);
+            flow.openPublishedPrivacyButton.interactable = false;
+
+            options.SetActive(false);
+            helpScreen.SetActive(false);
+            privacy.SetActive(false);
+            home.SetActive(true);
         }
 
         private static Text MakeLabel(string name, Transform parent, string label, int size, Color color,
