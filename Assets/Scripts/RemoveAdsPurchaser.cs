@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+#if UNITY_ANDROID && !UNITY_EDITOR
+using System.Threading.Tasks;
+#endif
 using UnityEngine;
 using UnityEngine.Purchasing;
 using UnityEngine.UI;
@@ -26,7 +29,7 @@ namespace FruitTree
         private bool transactionActive;
         private bool shuttingDown;
 
-        private async void Start()
+        private void Start()
         {
             if (adsPolicy == null)
             {
@@ -38,6 +41,15 @@ namespace FruitTree
             RefreshControls();
 
 #if UNITY_ANDROID && !UNITY_EDITOR
+            _ = InitializeStoreAsync();
+#else
+            SetStatus("Google Play purchases work in Android test builds.");
+#endif
+        }
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+        private async Task InitializeStoreAsync()
+        {
             try
             {
                 controller = UnityIAPServices.StoreController();
@@ -64,10 +76,8 @@ namespace FruitTree
                 Debug.LogWarning("Unable to initialize Google Play IAP: " + exception.Message);
                 OnStoreUnavailable();
             }
-#else
-            SetStatus("Google Play purchases work in Android test builds.");
-#endif
         }
+#endif
 
         private void OnProductsFetched(List<Product> products)
         {
