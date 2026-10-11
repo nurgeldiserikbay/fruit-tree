@@ -11,6 +11,7 @@ namespace FruitTree
         public GameObject panel;
         public HarvestHUD hud;
         public GameObject parentPanel;
+        public GameObject treePanel;
         public bool IsPaused { get; private set; }
 
         private void Update()
@@ -34,6 +35,7 @@ namespace FruitTree
             if (panel == null) return;
             IsPaused = paused;
             if (!paused && parentPanel != null) parentPanel.SetActive(false);
+            if (!paused && treePanel != null) treePanel.SetActive(false);
             panel.SetActive(paused);
             Time.timeScale = paused ? 0f : 1f;
             AudioListener.pause = paused;

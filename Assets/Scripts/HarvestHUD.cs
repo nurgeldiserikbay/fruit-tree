@@ -8,6 +8,7 @@ namespace FruitTree
         public TreeGenerator tree;
         public Text countText;
         public Text messageText;
+        public bool OrchardMode { get; set; }
         private void Start()
         {
             if (tree == null) return;
@@ -33,7 +34,9 @@ namespace FruitTree
                 int best = Mathf.Max(PlayerPrefs.GetInt("FruitTree.Best", 0), picked);
                 PlayerPrefs.SetInt("FruitTree.Best", best);
                 PlayerPrefs.Save();
-                if (messageText != null) messageText.text = "All apples collected! Pause > Restart";
+                if (messageText != null) messageText.text = OrchardMode
+                    ? "Tree cleared! Next tree is ready."
+                    : "All apples collected! Pause > Restart";
             }
             else if (picked > 0 && messageText != null && messageText.text.StartsWith("Drag"))
                 messageText.text = "Look between the branches";

@@ -67,6 +67,8 @@ namespace FruitTree.Editor
 
             var root = new GameObject("Apple Tree");
             root.AddComponent<TreeGenerator>();
+            var orchard = app.AddComponent<OrchardGameController>();
+            orchard.tree = root.GetComponent<TreeGenerator>();
 
             EnsureShaderIsInBuild();
             new GameObject("Quiet Meadow").AddComponent<GroundGenerator>();
@@ -79,7 +81,9 @@ namespace FruitTree.Editor
             camera.fieldOfView = 47f;
             camera.allowHDR = false;
             cameraObject.AddComponent<AudioListener>();
-            cameraObject.AddComponent<OrbitPickingCamera>().target = root.transform;
+            var orbit = cameraObject.AddComponent<OrbitPickingCamera>();
+            orbit.target = root.transform;
+            orchard.orbitCamera = orbit;
 
             var sunObject = new GameObject("Warm Sun");
             var light = sunObject.AddComponent<Light>();
@@ -99,7 +103,7 @@ namespace FruitTree.Editor
 
             var sound = new GameObject("Orchard Sounds").AddComponent<OrchardAudio>();
             sound.tree = root.GetComponent<TreeGenerator>();
-            CreateInterface(root.GetComponent<TreeGenerator>(), sound, purchasing);
+            CreateInterface(root.GetComponent<TreeGenerator>(), sound, purchasing, orchard);
             PlayerSettings.defaultInterfaceOrientation = UIOrientation.Portrait;
             PlayerSettings.productName = "Fruit Tree";
             PlayerSettings.companyName = "Fruit Tree Studio";
@@ -156,7 +160,8 @@ namespace FruitTree.Editor
             Object.DestroyImmediate(sky.GetComponent<Collider>());
         }
 
-        private static void CreateInterface(TreeGenerator tree, OrchardAudio sound, RemoveAdsPurchaser purchasing)
+        private static void CreateInterface(TreeGenerator tree, OrchardAudio sound,
+            RemoveAdsPurchaser purchasing, OrchardGameController orchard)
         {
             var eventSystem = new GameObject("EventSystem");
             eventSystem.AddComponent<EventSystem>();
@@ -201,6 +206,11 @@ namespace FruitTree.Editor
                 new Vector2(.17f, .055f), new Vector2(.83f, .114f));
             var hud = canvasObject.AddComponent<HarvestHUD>();
             hud.tree = tree; hud.countText = count; hud.messageText = hint;
+            hud.OrchardMode = true;
+            orchard.hud = hud;
+            orchard.treeLabel = MakeLabel("Current Tree Name", safe.transform,
+                "APPLE TREE", 31, new Color(.21f, .32f, .19f),
+                new Vector2(.24f, .856f), new Vector2(.76f, .898f));
             // Keep the gameplay clean. Only the small pause button is visible.
             // Restart and sound are accessible through the pause menu.
             var pauseButton = MakeButton("Pause", safe.transform, "II",
@@ -221,7 +231,7 @@ namespace FruitTree.Editor
             var resume = MakeButton("Resume", menu.transform, "CONTINUE",
                 new Vector2(.23f, .51f), new Vector2(.77f, .59f),
                 new Color(.97f, .97f, .89f, 1f));
-            var restart = MakeButton("Restart", menu.transform, "RESTART",
+            var restart = MakeButton("Tree Collection", menu.transform, "TREES",
                 new Vector2(.23f, .40f), new Vector2(.77f, .48f),
                 new Color(.97f, .97f, .89f, 1f));
             var audio = MakeButton("Sound", menu.transform, "SOUND ON",
@@ -230,7 +240,7 @@ namespace FruitTree.Editor
             sound.soundStatusText = audio.GetComponentInChildren<Text>();
             UnityEventTools.AddPersistentListener(pauseButton.onClick, pauseController.Toggle);
             UnityEventTools.AddPersistentListener(resume.onClick, pauseController.Resume);
-            UnityEventTools.AddPersistentListener(restart.onClick, pauseController.Restart);
+            UnityEventTools.AddPersistentListener(restart.onClick, orchard.OpenTreeMenu);
             UnityEventTools.AddPersistentListener(audio.onClick, sound.ToggleSound);
 
             var parentButton = MakeButton("Parent Access", menu.transform,
@@ -277,6 +287,46 @@ namespace FruitTree.Editor
             buy.interactable = false; // Ad SDK not installed: never charge for zero ads.
             restore.interactable = false;
             parentPanel.SetActive(false);
+
+            // A dedicated collection overlay keeps the ordinary pause menu small.
+            var collection = new GameObject("Tree Collection", typeof(RectTransform),
+                typeof(CanvasRenderer), typeof(Image));
+            collection.transform.SetParent(menu.transform, false);
+            Anchor(collection.GetComponent<RectTransform>(), Vector2.zero, Vector2.one);
+            collection.GetComponent<Image>().color = new Color(.14f, .21f, .16f, .97f);
+            pauseController.treePanel = collection;
+            orchard.treeMenuPanel = collection;
+            MakeLabel("Collection Heading", collection.transform, "MY TREES",
+                66, Color.white, new Vector2(.15f, .73f), new Vector2(.85f, .83f));
+            orchard.collectionStatus = MakeLabel("Tree Progress", collection.transform,
+                "APPLE TREE", 38, new Color(.98f, .96f, .88f),
+                new Vector2(.10f, .52f), new Vector2(.90f, .70f));
+            orchard.previousButton = MakeButton("Previous Tree", collection.transform,
+                "PREVIOUS", new Vector2(.14f, .41f), new Vector2(.48f, .49f),
+                new Color(.96f, .97f, .88f, 1f));
+            orchard.nextButton = MakeButton("Next Tree", collection.transform,
+                "NEXT TREE", new Vector2(.52f, .41f), new Vector2(.86f, .49f),
+                new Color(.96f, .97f, .88f, 1f));
+            orchard.rebloomButton = MakeButton("Rebloom", collection.transform,
+                "REBLOOM", new Vector2(.22f, .29f), new Vector2(.78f, .37f),
+                new Color(.92f, .96f, .81f, 1f));
+            var collectionBack = MakeButton("Back to Pause", collection.transform,
+                "BACK", new Vector2(.29f, .17f), new Vector2(.71f, .25f),
+                new Color(.82f, .88f, .76f, 1f));
+            UnityEventTools.AddPersistentListener(orchard.previousButton.onClick, orchard.PreviousTree);
+            UnityEventTools.AddPersistentListener(orchard.nextButton.onClick, orchard.NextTree);
+            UnityEventTools.AddPersistentListener(orchard.rebloomButton.onClick, orchard.Rebloom);
+            UnityEventTools.AddPersistentListener(collectionBack.onClick, orchard.CloseTreeMenu);
+            collection.SetActive(false);
+
+            // A calm completion shortcut, never displayed during ordinary harvesting.
+            orchard.completionNextButton = MakeButton("Completion Next Tree",
+                safe.transform, "NEXT TREE", new Vector2(.31f, .14f),
+                new Vector2(.69f, .215f), new Color(.94f, .97f, .83f, .96f));
+            UnityEventTools.AddPersistentListener(orchard.completionNextButton.onClick,
+                orchard.NextTree);
+            orchard.completionNextButton.gameObject.SetActive(false);
+
             menu.SetActive(false);
         }
 

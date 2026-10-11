@@ -49,6 +49,13 @@ namespace FruitTree.Editor
                 purchasing.statusText == null || purchasing.priceText == null)
                 errors.Add("Backend-free IAP/ads policy references are missing");
 
+            var orchard = UnityEngine.Object.FindAnyObjectByType<OrchardGameController>();
+            if (orchard == null || orchard.tree != tree || orchard.hud != hud ||
+                orchard.treeMenuPanel == null || orchard.nextButton == null ||
+                orchard.previousButton == null || orchard.rebloomButton == null ||
+                orchard.completionNextButton == null)
+                errors.Add("Orchard progression controller or collection UI is missing");
+
             var soundObject = GameObject.Find("Orchard Sounds");
             var sound = soundObject != null ? soundObject.GetComponent<OrchardAudio>() : null;
             if (sound == null || sound.tree != tree || sound.soundStatusText == null)
@@ -57,8 +64,8 @@ namespace FruitTree.Editor
             if (hudObject != null)
             {
                 var buttons = hudObject.GetComponentsInChildren<Button>(true);
-                if (buttons.Length != 8)
-                    errors.Add("Expected 8 pause and parent-area buttons");
+                if (buttons.Length != 13)
+                    errors.Add("Expected 13 pause, parent, collection and next-tree buttons");
                 foreach (var button in buttons)
                 {
                     if (button.GetComponent<ParentHoldGate>() != null) continue;
