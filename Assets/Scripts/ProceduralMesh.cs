@@ -198,5 +198,39 @@ namespace FruitTree
             mesh.RecalculateBounds();
             return mesh;
         }
+
+        public static Mesh Pear()
+        {
+            var mesh = Apple();
+            mesh.name = "Soft Pear";
+            var vertices = mesh.vertices;
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                Vector3 v = vertices[i];
+                float t = Mathf.Clamp01((v.y + .18f) / .38f);
+                float width = Mathf.Lerp(1.32f, .67f, t);
+                vertices[i] = new Vector3(v.x * width, v.y * 1.48f, v.z * width);
+            }
+            mesh.vertices = vertices;
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            return mesh;
+        }
+
+        public static Mesh Cherry()
+        {
+            var mesh = Apple();
+            mesh.name = "Round Cherry";
+            var vertices = mesh.vertices;
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                Vector3 v = vertices[i];
+                vertices[i] = new Vector3(v.x * .96f, v.y * .9f, v.z * .96f);
+            }
+            mesh.vertices = vertices;
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            return mesh;
+        }
     }
 }

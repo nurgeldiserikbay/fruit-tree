@@ -9,6 +9,20 @@ namespace FruitTree
     {
         public event Action<Apple> Harvested;
         public bool IsHarvested { get; private set; }
+        public string StableFruitId { get; private set; }
+
+        public void Initialize(int index)
+        {
+            StableFruitId = "fruit_" + index.ToString("D4");
+        }
+
+        public void RestorePicked()
+        {
+            StopAllCoroutines();
+            IsHarvested = true;
+            GetComponent<Collider>().enabled = false;
+            gameObject.SetActive(false);
+        }
         private Vector3 originalPosition;
         private Vector3 originalScale;
         private Quaternion originalRotation;
