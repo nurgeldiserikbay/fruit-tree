@@ -1,5 +1,15 @@
 # Fruit Tree development state
 
+## Approved future direction (2026-10-11)
+
+- [x] GDD: clear every fruit on one tree before unlocking the next species; replay previously cleared trees via rebloom.
+- [x] Target architecture and staged migration document for multi-tree progression.
+- [ ] Multi-tree unlocking, local per-fruit saves, rebloom and tree selection — **not implemented yet**.
+- [ ] Launch catalog species — **not implemented yet**. First vertical slice targets Apple, Pear, Cherry.
+
+See [GAME_DESIGN.md](GAME_DESIGN.md), [ARCHITECTURE.md](ARCHITECTURE.md), [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md).
+
+
 ## Agreed scope
 - Android only, portrait.
 - One fruit tree in the center; no orchard walking.

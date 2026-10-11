@@ -1,6 +1,6 @@
 # Fruit Tree 🌳
 
-A relaxing, Android-first 3D fruit-picking game: one semi-realistic tree, freely orbit around it, zoom into the branches, tap ripe apples, listen to nature. No timers, accounts, or complex UI.
+A relaxing, Android-first 3D fruit-picking game. **Agreed future loop:** fully harvest one tree (100%), permanently unlock the next fruit-tree species, and freely rebloom previously cleared trees. No timers, accounts, or complex UI. The playable prototype currently has only one apple tree.
 
 **Current status:** Unity 6 C# prototype in development. Not yet built or tested with the Unity Editor or on a phone. See [setup and limitations](docs/SETUP.md).
 
@@ -15,6 +15,14 @@ A relaxing, Android-first 3D fruit-picking game: one semi-realistic tree, freely
 
 ## Start
 Install Unity 6 6000.6.5f1, open this directory in Unity Hub, let it compile and generate the first scene, then press Play. [Full instructions](docs/SETUP.md).
+
+## Game design and new progression architecture
+
+- [Approved GDD (Қазақша)](docs/GAME_DESIGN.md)
+- [Architecture and save model](docs/ARCHITECTURE.md)
+- [Implementation milestones](docs/IMPLEMENTATION_ROADMAP.md)
+
+The new multi-tree collection system is **planned, not yet playable**. Do not confuse the 30-apple prototype with the future 10-species release.
 
 ## Next priorities
 Unity compilation and real-device verification, better bark and foliage art, performance profiling and real licensed environmental recordings. Generated audio currently serves only as a functional placeholder.
