@@ -422,7 +422,7 @@ namespace FruitTree.Editor
             MakeLabel("Help Title", helpScreen.transform, "HOW TO PLAY", 70, white,
                 new Vector2(.10f, .75f), new Vector2(.90f, .86f));
             MakeLabel("Help Content", helpScreen.transform,
-                "Swipe to turn the tree\\n\\nPinch to zoom in or out\\n\\nTap fruit to collect it\\n\\nClear every fruit to unlock the next tree\\n\\nRebloom an old tree whenever you wish\\n\\nThere is no timer. Enjoy the moment.",
+                "Swipe to turn the tree\n\nPinch to zoom in or out\n\nTap fruit to collect it\n\nClear every fruit to unlock the next tree\n\nRebloom an old tree whenever you wish\n\nThere is no timer. Enjoy the moment.",
                 42, white, new Vector2(.10f, .28f), new Vector2(.90f, .73f));
             var helpBack = MakeButton("Help Back", helpScreen.transform, "BACK",
                 new Vector2(.27f, .15f), new Vector2(.73f, .23f), fern);
@@ -433,9 +433,9 @@ namespace FruitTree.Editor
             MakeLabel("Privacy Heading", privacy.transform, "PRIVACY POLICY", 68, white,
                 new Vector2(.09f, .78f), new Vector2(.91f, .88f));
             MakeLabel("Privacy Summary", privacy.transform,
-                "Fruit Tree stores your game progress locally on your device.\\n\\n" +
-                "The game has no account registration. Google Play may process purchases.\\n\\n" +
-                "No advertising SDK is enabled in this build.\\n\\n" +
+                "Fruit Tree stores your game progress locally on your device.\n\n" +
+                "The game has no account registration. Google Play may process purchases.\n\n" +
+                "No advertising SDK is enabled in this build.\n\n" +
                 "Read the full published policy for contact and retention details.",
                 39, white, new Vector2(.09f, .37f), new Vector2(.91f, .75f));
             flow.privacyStatusLabel = MakeLabel("Privacy Status", privacy.transform,
