@@ -7,12 +7,12 @@ Move from an already working 30-apple Unity prototype to a multi-species calming
 ### Milestone A — data and persistence foundations
 
 - [ ] Create stable TreeDefinition / TreeCatalog with three initial species.
-- [ ] Implement pure TreeRoundState and OrchardProgressionService with exactly-once full-clear logic.
+- [x] Implement pure TreeRoundState and OrchardProgressionService with exactly-once full-clear logic (Unity tests authored, not yet run).
 - [ ] Write save schema v1 and robust local persistence (atomic temp / backup / restore).
-- [ ] Tests: new save, 119/120 lock, 120/120 unlock, duplicate pick, round replay and app restart.
+- [x] Authored EditMode tests: new save, 119/120 lock, 120/120 unlock, duplicate pick, replay and save in-memory roundtrip (not yet executed in Unity).
 - [ ] Upgrade path from legacy 30-apple prototype without inventing historic progress.
 
-**Acceptance:** unit tests pass and existing Unity game continues running, even if new catalog is not yet presented.
+**Acceptance:** unit tests **must pass in Unity** and existing Unity game must keep running. Source and tests are committed; Unity run is still outstanding.
 
 ### Milestone B — playable three-tree vertical slice
 

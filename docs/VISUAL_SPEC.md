@@ -21,7 +21,7 @@ Relaxing, carefully composed, semi-realistic 3D orchard tree; not photorealistic
 - Vertical swipe: adjust camera elevation within comfortable limits.
 - Pinch: inspect branches; two-finger slide raises / lowers the focus. Verify clipping behavior on device.
 - Tap a ripe apple: counted exactly once, immediate visual and quiet woody pluck response. Sound should feel natural, not like an arcade coin.
-- No timer, energy, lives, ads, in-app purchases or distracting prompts.
+- No timer, energy, lives, forced ads, paid tree unlocks or distracting prompts. A separate optional parent-only non-consumable Remove Ads purchase may be available after compliant ad integration.
 
 ## Mobile testing targets (not verified)
 - 30 FPS with downgraded visuals on constrained Android devices; 60 FPS target on mid-range devices.
