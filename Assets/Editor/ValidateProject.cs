@@ -39,8 +39,15 @@ namespace FruitTree.Editor
                 errors.Add("Harvest HUD has missing references");
 
             var pause = hudObject != null ? hudObject.GetComponent<PauseController>() : null;
-            if (pause == null || pause.panel == null || pause.hud != hud)
+            if (pause == null || pause.panel == null || pause.parentPanel == null || pause.hud != hud)
                 errors.Add("Pause menu has missing references");
+
+            var purchasing = UnityEngine.Object.FindFirstObjectByType<RemoveAdsPurchaser>();
+            var adsPolicy = UnityEngine.Object.FindFirstObjectByType<AdsAccessPolicy>();
+            if (purchasing == null || adsPolicy == null || purchasing.adsPolicy != adsPolicy ||
+                purchasing.buyButton == null || purchasing.restoreButton == null ||
+                purchasing.statusText == null || purchasing.priceText == null)
+                errors.Add("Backend-free IAP/ads policy references are missing");
 
             var soundObject = GameObject.Find("Orchard Sounds");
             var sound = soundObject != null ? soundObject.GetComponent<OrchardAudio>() : null;
@@ -50,10 +57,11 @@ namespace FruitTree.Editor
             if (hudObject != null)
             {
                 var buttons = hudObject.GetComponentsInChildren<Button>(true);
-                if (buttons.Length != 4)
-                    errors.Add("Expected Pause, Continue, Restart and Sound buttons");
+                if (buttons.Length != 8)
+                    errors.Add("Expected 8 pause and parent-area buttons");
                 foreach (var button in buttons)
                 {
+                    if (button.GetComponent<ParentHoldGate>() != null) continue;
                     if (button.onClick.GetPersistentEventCount() < 1 ||
                         button.onClick.GetPersistentTarget(0) == null)
                         errors.Add("Button without a persistent callback: " + button.name);

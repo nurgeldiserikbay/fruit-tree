@@ -43,6 +43,9 @@ namespace FruitTree.Editor
             var app = new GameObject("Fruit Tree Game");
             app.AddComponent<MobileBootstrap>();
             app.AddComponent<DevelopmentPerformanceMonitor>();
+            var adsPolicy = app.AddComponent<AdsAccessPolicy>();
+            var purchasing = app.AddComponent<RemoveAdsPurchaser>();
+            purchasing.adsPolicy = adsPolicy;
 
             var root = new GameObject("Apple Tree");
             root.AddComponent<TreeGenerator>();
@@ -78,7 +81,7 @@ namespace FruitTree.Editor
 
             var sound = new GameObject("Orchard Sounds").AddComponent<OrchardAudio>();
             sound.tree = root.GetComponent<TreeGenerator>();
-            CreateInterface(root.GetComponent<TreeGenerator>(), sound);
+            CreateInterface(root.GetComponent<TreeGenerator>(), sound, purchasing);
             PlayerSettings.defaultInterfaceOrientation = UIOrientation.Portrait;
             PlayerSettings.productName = "Fruit Tree";
             PlayerSettings.companyName = "Fruit Tree Studio";
@@ -135,7 +138,7 @@ namespace FruitTree.Editor
             Object.DestroyImmediate(sky.GetComponent<Collider>());
         }
 
-        private static void CreateInterface(TreeGenerator tree, OrchardAudio sound)
+        private static void CreateInterface(TreeGenerator tree, OrchardAudio sound, RemoveAdsPurchaser purchasing)
         {
             var eventSystem = new GameObject("EventSystem");
             eventSystem.AddComponent<EventSystem>();
@@ -196,6 +199,51 @@ namespace FruitTree.Editor
             UnityEventTools.AddPersistentListener(resume.onClick, pauseController.Resume);
             UnityEventTools.AddPersistentListener(restart.onClick, pauseController.Restart);
             UnityEventTools.AddPersistentListener(audio.onClick, sound.ToggleSound);
+
+            var parentButton = MakeButton("Parent Access", menu.transform,
+                "FOR PARENTS - HOLD", new Vector2(.18f, .17f),
+                new Vector2(.82f, .255f), new Color(.82f, .88f, .76f, 1f));
+            // Parent panel is the final sibling so it overlays ordinary pause controls.
+            var parentPanel = new GameObject("Parent Options", typeof(RectTransform),
+                typeof(CanvasRenderer), typeof(Image));
+            parentPanel.transform.SetParent(menu.transform, false);
+            Anchor(parentPanel.GetComponent<RectTransform>(), Vector2.zero, Vector2.one);
+            parentPanel.GetComponent<Image>().color = new Color(.15f, .21f, .17f, .98f);
+            pauseController.parentPanel = parentPanel;
+
+            var gate = parentButton.gameObject.AddComponent<ParentHoldGate>();
+            gate.parentPanel = parentPanel;
+            gate.label = parentButton.GetComponentInChildren<Text>();
+
+            MakeLabel("Parent Heading", parentPanel.transform, "PARENT OPTIONS",
+                62, Color.white, new Vector2(.12f, .72f), new Vector2(.88f, .81f));
+            var statusText = MakeLabel("Store Message", parentPanel.transform,
+                "Checking Google Play...", 32, new Color(.94f, .96f, .90f),
+                new Vector2(.12f, .59f), new Vector2(.88f, .70f));
+            var price = MakeLabel("Localized Store Price", parentPanel.transform,
+                "Not available", 29, new Color(.98f, .94f, .72f),
+                new Vector2(.20f, .50f), new Vector2(.80f, .56f));
+            var buy = MakeButton("Remove Ads", parentPanel.transform,
+                "REMOVE ADS", new Vector2(.22f, .39f),
+                new Vector2(.78f, .47f), new Color(.96f, .96f, .88f, 1f));
+            var restore = MakeButton("Restore Purchases", parentPanel.transform,
+                "RESTORE PURCHASE", new Vector2(.22f, .28f),
+                new Vector2(.78f, .36f), new Color(.96f, .96f, .88f, 1f));
+            var close = MakeButton("Close Parent Options", parentPanel.transform,
+                "BACK", new Vector2(.30f, .14f),
+                new Vector2(.70f, .21f), new Color(.82f, .88f, .76f, 1f));
+            var parentController = canvasObject.AddComponent<ParentPurchasePanel>();
+            parentController.panel = parentPanel;
+            purchasing.buyButton = buy;
+            purchasing.restoreButton = restore;
+            purchasing.statusText = statusText;
+            purchasing.priceText = price;
+            UnityEventTools.AddPersistentListener(buy.onClick, purchasing.BuyRemoveAds);
+            UnityEventTools.AddPersistentListener(restore.onClick, purchasing.RestorePurchases);
+            UnityEventTools.AddPersistentListener(close.onClick, parentController.Close);
+            buy.interactable = false; // Ad SDK not installed: never charge for zero ads.
+            restore.interactable = false;
+            parentPanel.SetActive(false);
             menu.SetActive(false);
         }
 

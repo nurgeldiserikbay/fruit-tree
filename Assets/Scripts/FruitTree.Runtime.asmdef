@@ -2,7 +2,8 @@
   "name": "FruitTree.Runtime",
   "rootNamespace": "FruitTree",
   "references": [
-    "Unity.ugui"
+    "Unity.ugui",
+    "Unity.Purchasing"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
