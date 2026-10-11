@@ -55,3 +55,9 @@ Unity Editor, Android devices and Unity's own C# assemblies are not available to
 
 ## Monetization
 Backend-free remove-ads entitlement logic is implemented, but remains untested and the purchase control is disabled until a compliant ad provider is connected. See [MONETIZATION.md](MONETIZATION.md).
+
+## Refreshing the visual scene after the first Unity screenshot
+1. Save your work and stop Play mode. Pull the latest `main` branch (Git) and wait for Unity to recompile.
+2. From the Unity menu, select **Fruit Tree > Refresh Visuals (Back Up Scene)**. This saves modified open scenes (with confirmation), stores a timestamped backup under `Builds/SceneBackups/`, then recreates `Assets/Scenes/Main.unity` with the updated rounded UI. It **replaces** the existing generated scene, so do not use it if you have custom scene edits you want to retain without reviewing the backup.
+3. Open the regenerated `Assets/Scenes/Main.unity`, press Play, set the **Game** window's aspect to **9:16 portrait** (or a phone preset) rather than Free Aspect landscape, then send a new screenshot.
+4. The updated tree/ground geometry is generated at runtime. The menu refresh is chiefly required to replace serialized legacy UI rectangles.

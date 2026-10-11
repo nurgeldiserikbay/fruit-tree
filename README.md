@@ -11,7 +11,7 @@ A relaxing, Android-first 3D fruit-picking game: one semi-realistic tree, freely
 - Safe-area HUD, allocation-free fruit-round restart, fruit progress.
 - Parent-area Remove Ads purchase/restore wiring with Unity IAP 5; purchase disabled until a compliant ad provider is connected.
 - Simple synthesized ambience and harvest feedback, sound toggle (placeholder audio).
-- Procedural meadow and soft gradient sky, Unity Editor scene generator and Android portrait config.
+- Procedural meadow and soft gradient sky, custom rounded HUD, Unity Editor scene generator and Android portrait config.
 
 ## Start
 Install Unity 6 6000.6.5f1, open this directory in Unity Hub, let it compile and generate the first scene, then press Play. [Full instructions](docs/SETUP.md).

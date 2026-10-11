@@ -6,6 +6,7 @@ Shader "FruitTree/VertexLit"
         _Color ("Tint", Color) = (1,1,1,1)
         _Wind ("Wind Amount", Range(0,0.1)) = 0
         _Cull ("Cull Back Faces", Float) = 2
+        _AmbientLight ("Minimum Light", Range(0,1)) = 0.55
     }
     SubShader
     {
@@ -18,10 +19,12 @@ Shader "FruitTree/VertexLit"
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
+            #pragma multi_compile_fog
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
             fixed4 _Color;
             float _Wind;
+            float _AmbientLight;
             sampler2D _MainTex;
             struct appdata
             {
@@ -36,6 +39,7 @@ Shader "FruitTree/VertexLit"
                 fixed4 color: COLOR;
                 float3 normal: TEXCOORD0;
                 float2 uv: TEXCOORD1;
+                UNITY_FOG_COORDS(2)
             };
             v2f vert(appdata v)
             {
@@ -49,15 +53,18 @@ Shader "FruitTree/VertexLit"
                 o.normal = UnityObjectToWorldNormal(v.normal);
                 o.color = v.color * _Color;
                 o.uv = v.uv;
+                UNITY_TRANSFER_FOG(o, o.pos);
                 return o;
             }
             fixed4 frag(v2f i) : SV_Target
             {
                 float3 n = normalize(i.normal);
                 float diffuse = saturate(dot(n, normalize(_WorldSpaceLightPos0.xyz)));
-                float light = .48 + .52 * diffuse;
+                float light = _AmbientLight + (1.0 - _AmbientLight) * diffuse;
                 fixed4 tex = tex2D(_MainTex, i.uv);
-                return fixed4(tex.rgb * i.color.rgb * light, 1);
+                fixed4 pixel = fixed4(tex.rgb * i.color.rgb * light, 1);
+                UNITY_APPLY_FOG(i.fogCoord, pixel);
+                return pixel;
             }
             ENDCG
         }
