@@ -20,7 +20,8 @@
 - [x] Minimal pause overlay, Android back button, restart and sound controls
 - [x] Automatically pause when the Android app moves to the background
 - [x] Continuous curved trunk/major-branch geometry and geometry unit test (not yet executed)
-- [x] Screenshot-based foliage/meadow/fruit and rounded HUD visual iteration (not yet runtime-reviewed)
+- [x] Screenshot-based foliage/meadow/fruit and rounded HUD visual iteration (reviewed in Unity screenshots)
+- [x] Increased gameplay instructions and pause-menu button text sizes for portrait readability (awaiting Unity verification; camera controls left unchanged)
 - [x] Scene refresh command with local backup before rebuilding UI
 - [x] Safe Unity Resources folder creation through AssetDatabase
 - [x] Editor scene validation command to check camera, menu, audio, shaders and Android build settings (not yet executed)

@@ -183,7 +183,7 @@ namespace FruitTree.Editor
             counterFace.color = new Color(.99f, .97f, .87f, .94f);
             counterFace.CornerRadius = 48f;
             counterFace.raycastTarget = false;
-            var count = MakeLabel("Apple Counter", safe.transform, "0 / 30", 45,
+            var count = MakeLabel("Apple Counter", safe.transform, "0 / 30", 56,
                 new Color(.21f, .32f, .19f),
                 new Vector2(.355f, .903f), new Vector2(.645f, .966f));
 
@@ -196,7 +196,7 @@ namespace FruitTree.Editor
             hintFace.color = new Color(.14f, .28f, .19f, .75f);
             hintFace.CornerRadius = 40f;
             hintFace.raycastTarget = false;
-            var hint = MakeLabel("Control Hint", safe.transform, "Drag to rotate  -  Tap apples", 28,
+            var hint = MakeLabel("Control Hint", safe.transform, "Drag to rotate  -  Tap apples", 40,
                 new Color(.99f, .99f, .95f),
                 new Vector2(.17f, .055f), new Vector2(.83f, .114f));
             var hud = canvasObject.AddComponent<HarvestHUD>();
@@ -314,7 +314,7 @@ namespace FruitTree.Editor
             tint.highlightedColor = new Color(.94f, .96f, .88f);
             tint.pressedColor = new Color(.76f, .83f, .71f);
             button.colors = tint;
-            MakeLabel(name + " Label", go.transform, text, 25, new Color(.22f,.30f,.19f), Vector2.zero, Vector2.one);
+            MakeLabel(name + " Label", go.transform, text, 44, new Color(.22f,.30f,.19f), Vector2.zero, Vector2.one);
             return button;
         }
 
