@@ -6,7 +6,7 @@
 
 - [x] Source: Apple (120), Pear (140), Cherry (220) progression prototype.
 - [x] Source: local saved progress, 100%-clear tree unlock and rebloom.
-- [x] Source: main menu, CONTINUE, MY TREES, SETTINGS, HOW TO PLAY, Pause → Main Menu, privacy summary and link configuration.
+- [x] Source: main menu, CONTINUE, MY TREES, SETTINGS, HOW TO PLAY, Pause → Main Menu, privacy summary and link configuration (committed; awaiting first Unity scene refresh).
 - [ ] Build and play-test every button and Android Back behaviour in Unity 6000.6.5f1.
 - [ ] Finish at least 10 individually recognizable tree species (first-release content target).
 - [ ] Improve fruit meshes, proportions, branch attachment, foliage, terrain and atmospheric lighting.

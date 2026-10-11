@@ -2,7 +2,7 @@
 
 A relaxing, Android-first 3D fruit-picking game. **Agreed future loop:** fully harvest one tree (100%), permanently unlock the next fruit-tree species, and freely rebloom previously cleared trees. No timers, accounts, or complex UI. The generated Unity scene now supports an initial playable Apple (120) → Pear (140) → Cherry (220) progression with local saves, 100% unlock, and rebloom; this integration **still needs Unity acceptance testing**.
 
-**Current status:** Unity 6 C# prototype in development. Not yet built or tested with the Unity Editor or on a phone. See [setup and limitations](docs/SETUP.md).
+**Current status:** Unity 6 C# prototype in development. Unity Editor Game view has been tested by the user; latest home/settings/privacy code still requires compilation and playtesting. Android APK/AAB and phone testing remain outstanding. See [setup and limitations](docs/SETUP.md).
 
 ## Implemented in code
 - Asymmetric procedural tree with a slightly curved trunk, tapered branching twigs and batched leaves.
@@ -22,7 +22,7 @@ Install Unity 6 6000.6.5f1, open this directory in Unity Hub, let it compile and
 - [Architecture and save model](docs/ARCHITECTURE.md)
 - [Implementation milestones](docs/IMPLEMENTATION_ROADMAP.md)
 
-The new multi-tree collection system is **planned, not yet playable**. Do not confuse the 30-apple prototype with the future 10-species release.
+The first three-tree collection has been integrated into the playable Unity scene generator, but it and the newly added front-end screens still need end-to-end verification. The planned ten-species release is not complete.
 
 ## Next priorities
 Unity compilation and real-device verification, better bark and foliage art, performance profiling and real licensed environmental recordings. Generated audio currently serves only as a functional placeholder.
@@ -32,3 +32,14 @@ For later automated local verification, see [PowerShell verification script](too
 **Ads are not enabled:** this source includes a purchase entitlement pathway, not an advertising service. See [monetization policy and setup](docs/MONETIZATION.md).
 
 To update an existing Unity scene and see the new tree collection: [Three-tree playtest instructions](docs/PLAYTEST_THREE_TREES.md). Stop Play and choose **Fruit Tree > Refresh Visuals (Back Up Scene)** after pulling main.
+
+## App front-end / Google Play preparation
+
+The scene generator now creates **FRUIT TREE** home menu, **CONTINUE**, **MY TREES**, **SETTINGS**, **HOW TO PLAY**, **PRIVACY POLICY** and Pause → **MAIN MENU** navigation.
+
+- [First-open and refresh instructions](docs/SETUP.md)
+- [Google Docs-ready privacy-policy draft (requires real contact and published URL)](docs/PRIVACY_POLICY_GOOGLE_DOCS.md)
+- [Google Play release checklist](docs/PLAY_STORE_RELEASE.md)
+- [Store listing text draft](docs/STORE_LISTING_DRAFT.md)
+
+**The Privacy link is intentionally unavailable online until a real published Google Docs URL is configured.** See `Assets/Scripts/FruitTreePrivacyConfig.cs`. Do not publish an AAB to Google Play without this and the other release prerequisites.

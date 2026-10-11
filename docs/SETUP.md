@@ -61,3 +61,14 @@ Backend-free remove-ads entitlement logic is implemented, but remains untested a
 2. From the Unity menu, select **Fruit Tree > Refresh Visuals (Back Up Scene)**. This saves modified open scenes (with confirmation), stores a timestamped backup under `Builds/SceneBackups/`, then recreates `Assets/Scenes/Main.unity` with the updated rounded UI. It **replaces** the existing generated scene, so do not use it if you have custom scene edits you want to retain without reviewing the backup.
 3. Open the regenerated `Assets/Scenes/Main.unity`, press Play, set the **Game** window's aspect to **9:16 portrait** (or a phone preset) rather than Free Aspect landscape, then send a new screenshot.
 4. The updated tree/ground geometry is generated at runtime. The menu refresh is chiefly required to replace serialized legacy UI rectangles.
+
+## Main menu and Google Play privacy test (new)
+
+1. Stop Play, `git pull origin main`, wait until Unity finishes compiling.
+2. Select **Fruit Tree → Refresh Visuals (Back Up Scene)**. This is required once because the existing `Main.unity` has serialized old UI elements. Review scene backup in `Builds/SceneBackups`.
+3. In the Game tab, select **9:16 Portrait** and press Play. The first screen should be **FRUIT TREE**, not the apple counter.
+4. Check **CONTINUE** (resumes the saved tree), **MY TREES** (opens collection), **SETTINGS** (Sound + Privacy Policy), **HOW TO PLAY**, and Pause → **MAIN MENU**. Android Back should close the topmost panel before pausing the game.
+5. Settings → Privacy Policy opens an in-app privacy summary. The online button stays disabled **until** the owner publishes the real policy and updates `FruitTreePrivacyConfig.PublishedPolicyUrl`. Do not enter fake Docs links.
+6. After contact and data-safety review, use the steps in [PRIVACY_POLICY_GOOGLE_DOCS.md](PRIVACY_POLICY_GOOGLE_DOCS.md). Run **Fruit Tree → Validate Project** and all EditMode/PlayMode tests.
+
+The screen code is committed but was **not yet executed in Unity or on an Android phone** at authoring time.
