@@ -23,7 +23,6 @@ namespace FruitTree
         public Text privacyStatusLabel;
         public Button openPublishedPrivacyButton;
 
-        private bool settingsFromPause;
         public bool IsPlaying { get; private set; }
 
         private void Start()
@@ -50,6 +49,13 @@ namespace FruitTree
             if (orbitCamera != null) orbitCamera.enabled = true;
         }
 
+        public void OpenCollectionFromHome()
+        {
+            Play();
+            if (pause != null) pause.Toggle();
+            if (orchard != null) orchard.OpenTreeMenu();
+        }
+
         public void ReturnHome()
         {
             if (pause != null) pause.Resume();
@@ -63,13 +69,11 @@ namespace FruitTree
 
         public void OpenSettingsFromHome()
         {
-            settingsFromPause = false;
             OpenSettings();
         }
 
         public void OpenSettingsFromPause()
         {
-            settingsFromPause = true;
             OpenSettings();
         }
 

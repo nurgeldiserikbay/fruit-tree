@@ -12,13 +12,17 @@ namespace FruitTree
         public HarvestHUD hud;
         public GameObject parentPanel;
         public GameObject treePanel;
+        public FruitTreeScreenFlow screenFlow;
         public bool IsPaused { get; private set; }
 
         private void Update()
         {
             // Android back button maps to Escape in the legacy input system.
             if (Input.GetKeyDown(KeyCode.Escape))
-                Toggle();
+            {
+                if (screenFlow != null) screenFlow.HandleBackButton();
+                else Toggle();
+            }
         }
 
         public void Toggle() { SetPaused(!IsPaused); }
@@ -45,7 +49,8 @@ namespace FruitTree
         {
             // A call, notification, or app switch should not let the picking round
             // continue silently in the background.
-            if (appPaused && !IsPaused) SetPaused(true);
+            if (appPaused && !IsPaused && (screenFlow == null || screenFlow.IsPlaying))
+                SetPaused(true);
         }
 
         private void OnDisable()

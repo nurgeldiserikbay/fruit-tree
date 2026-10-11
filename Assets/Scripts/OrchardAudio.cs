@@ -13,6 +13,7 @@ namespace FruitTree
         public UnityEngine.UI.Text soundStatusText;
         private AudioSource ambience, effects;
         private AudioClip collect;
+        public bool IsMuted => muted;
         private bool muted;
         private bool ownsAmbientClip;
         private bool ownsPickClip;
