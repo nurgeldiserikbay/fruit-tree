@@ -6,8 +6,10 @@
 - [x] Target architecture and staged migration document for multi-tree progression.
 - [x] Non-breaking core: tree definitions, 100%-clear/unlock rules, rebloom, in-memory save DTO and progression EditMode tests (written, not run in Unity).
 - [ ] Disk persistence, stable prefab fruit IDs and connection to Unity gameplay — not implemented.
-- [ ] Multi-tree unlocking, local per-fruit saves, rebloom and tree selection — **not implemented yet**.
-- [ ] Launch catalog species — **not implemented yet**. First vertical slice targets Apple, Pear, Cherry.
+- [x] Three-tree playable controller, local per-fruit save repository, unlock on 100%, rebloom and tree selection integrated into generated scene (code committed; NOT YET Unity-tested).
+- [ ] Verify Unity compilation, actual 120/140/220 harvest, unlock/restore and device performance.
+- [x] First vertical slice species Apple, Pear, Cherry in procedural prototype form (not yet polished or play-tested).
+- [ ] Expand to ten individually authored fruit-tree species after the vertical slice passes.
 
 See [GAME_DESIGN.md](GAME_DESIGN.md), [ARCHITECTURE.md](ARCHITECTURE.md), [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md).
 

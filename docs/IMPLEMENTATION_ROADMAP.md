@@ -6,9 +6,9 @@ Move from an already working 30-apple Unity prototype to a multi-species calming
 
 ### Milestone A — data and persistence foundations
 
-- [ ] Create stable TreeDefinition / TreeCatalog with three initial species.
+- [x] First three species rules catalog built into controller (replace with ScriptableObject assets later).
 - [x] Implement pure TreeRoundState and OrchardProgressionService with exactly-once full-clear logic (Unity tests authored, not yet run).
-- [ ] Write save schema v1 and robust local persistence (atomic temp / backup / restore).
+- [x] Write save schema v1 and local persistence with temp + backup recovery (source committed, not verified on Android).
 - [x] Authored EditMode tests: new save, 119/120 lock, 120/120 unlock, duplicate pick, replay and save in-memory roundtrip (not yet executed in Unity).
 - [ ] Upgrade path from legacy 30-apple prototype without inventing historic progress.
 
@@ -16,11 +16,11 @@ Move from an already working 30-apple Unity prototype to a multi-species calming
 
 ### Milestone B — playable three-tree vertical slice
 
-- [ ] Give each fruit a stable identity, tracked in the new progression domain.
-- [ ] Wire OrchardGameController to the old camera, HUD and fruit-picking scripts.
-- [ ] Per-tree spawned fruit count: Apple ~120, Pear ~140, Cherry ~220 (balance targets).
-- [ ] Build lightweight TreeSelection and Completion views; only unlocked tree is selectable.
-- [ ] Implement saved clear state and replay/rebloom action.
+- [x] Give each fruit a stable identity, tracked in the new progression domain (code committed).
+- [x] Wire OrchardGameController to the old camera, HUD and fruit-picking scripts (Unity test pending).
+- [x] Per-tree spawned fruit count: Apple 120, Pear 140, Cherry 220 in code.
+- [x] Build Tree Collection and completion-next UI; only unlocked next tree selectable (pending actual Unity verification).
+- [x] Implement saved clear state and replay/rebloom action (code committed).
 - [ ] Test pick-complete-restart without bypassing levels; QA final reachable fruit.
 
 **Acceptance:** 3 unique trees with 100%-clear sequential unlocking and infinite voluntary replay. No regression in Pause, audio or touch controls.

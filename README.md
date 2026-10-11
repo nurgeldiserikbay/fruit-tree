@@ -1,6 +1,6 @@
 # Fruit Tree 🌳
 
-A relaxing, Android-first 3D fruit-picking game. **Agreed future loop:** fully harvest one tree (100%), permanently unlock the next fruit-tree species, and freely rebloom previously cleared trees. No timers, accounts, or complex UI. The playable prototype currently has only one apple tree.
+A relaxing, Android-first 3D fruit-picking game. **Agreed future loop:** fully harvest one tree (100%), permanently unlock the next fruit-tree species, and freely rebloom previously cleared trees. No timers, accounts, or complex UI. The generated Unity scene now supports an initial playable Apple (120) → Pear (140) → Cherry (220) progression with local saves, 100% unlock, and rebloom; this integration **still needs Unity acceptance testing**.
 
 **Current status:** Unity 6 C# prototype in development. Not yet built or tested with the Unity Editor or on a phone. See [setup and limitations](docs/SETUP.md).
 
@@ -30,3 +30,5 @@ Unity compilation and real-device verification, better bark and foliage art, per
 For later automated local verification, see [PowerShell verification script](tools/verify-unity.ps1). It runs EditMode/PlayMode tests and can optionally build an APK on a machine with Unity 6 and Android modules installed.
 
 **Ads are not enabled:** this source includes a purchase entitlement pathway, not an advertising service. See [monetization policy and setup](docs/MONETIZATION.md).
+
+To update an existing Unity scene and see the new tree collection: [Three-tree playtest instructions](docs/PLAYTEST_THREE_TREES.md). Stop Play and choose **Fruit Tree > Refresh Visuals (Back Up Scene)** after pulling main.
