@@ -42,8 +42,8 @@ namespace FruitTree.Editor
             if (pause == null || pause.panel == null || pause.parentPanel == null || pause.hud != hud)
                 errors.Add("Pause menu has missing references");
 
-            var purchasing = UnityEngine.Object.FindFirstObjectByType<RemoveAdsPurchaser>();
-            var adsPolicy = UnityEngine.Object.FindFirstObjectByType<AdsAccessPolicy>();
+            var purchasing = UnityEngine.Object.FindAnyObjectByType<RemoveAdsPurchaser>();
+            var adsPolicy = UnityEngine.Object.FindAnyObjectByType<AdsAccessPolicy>();
             if (purchasing == null || adsPolicy == null || purchasing.adsPolicy != adsPolicy ||
                 purchasing.buyButton == null || purchasing.restoreButton == null ||
                 purchasing.statusText == null || purchasing.priceText == null)
