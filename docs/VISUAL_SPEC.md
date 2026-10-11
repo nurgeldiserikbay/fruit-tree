@@ -30,3 +30,10 @@ Relaxing, carefully composed, semi-realistic 3D orchard tree; not photorealistic
 - Camera and tap tests on real devices required before declaring release-ready.
 
 **Art status:** the committed generator is a functional baseline. Runtime screenshot review and visual refinement in Unity are outstanding. Do not confuse the previously approved image mockup with a verified real-time Unity screenshot.
+
+## Iteration after first Unity screenshot (2026-10-11)
+- Widen the sharply pointed leaf cards into soft elliptical tapered silhouettes, improve upper crown coverage while retaining gaps around red fruit.
+- Reduce apple visual scale moderately but preserve usable tap colliders.
+- The first terrain terminated close to the tree and created a hard triangular skyline; extend meadow mesh well beyond the fog range.
+- Lower grass blade contrast and make ground color warmer/lighter.
+- Compare screenshots of the Game view at 9:16 portrait, not only the editor's Free Aspect landscape preview.

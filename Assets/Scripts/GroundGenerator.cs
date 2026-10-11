@@ -47,8 +47,8 @@ namespace FruitTree
 
         public static Mesh CreateTerrainMesh()
         {
-            const int divisions = 32;
-            const float size = 20f;
+            const int divisions = 64;
+            const float size = 70f;
             var vertices = new List<Vector3>((divisions + 1) * (divisions + 1));
             var colors = new List<Color>(vertices.Capacity);
             var uv = new List<Vector2>(vertices.Capacity);
@@ -61,9 +61,9 @@ namespace FruitTree
                     float distance = Mathf.Sqrt(px * px + pz * pz);
                     float outerBump = Mathf.Clamp01((distance - 1f) / 3f);
                     float noise = Mathf.PerlinNoise(px * .33f + 34f, pz * .33f + 12f);
-                    vertices.Add(new Vector3(px, -.055f + (noise - .5f) * .18f * outerBump, pz));
+                    vertices.Add(new Vector3(px, -.055f + (noise - .5f) * .13f * outerBump, pz));
                     float variation = Mathf.PerlinNoise(px * .47f + 91f, pz * .47f + 16f);
-                    colors.Add(new Color(.31f + variation * .065f, .49f + variation * .085f, .23f + variation * .03f));
+                    colors.Add(new Color(.40f + variation * .075f, .57f + variation * .085f, .29f + variation * .04f));
                     uv.Add(new Vector2(x / (float)divisions, z / (float)divisions));
                 }
             for (int z = 0; z < divisions; z++)
@@ -87,7 +87,7 @@ namespace FruitTree
         public static Mesh CreateGrassMesh()
         {
             var random = new System.Random(902);
-            const int bladeCount = 480;
+            const int bladeCount = 315;
             var vertices = new List<Vector3>(bladeCount * 3);
             var colors = new List<Color>(bladeCount * 3);
             var uv = new List<Vector2>(bladeCount * 3);
@@ -101,8 +101,8 @@ namespace FruitTree
                 float z = Mathf.Sin(angle) * radius;
                 float noise = Mathf.PerlinNoise(x * .33f + 34f, z * .33f + 12f);
                 float y = -.055f + (noise - .5f) * .18f * Mathf.Clamp01((radius - 1f) / 3f);
-                float height = .08f + .14f * (float)random.NextDouble();
-                float width = .03f + .025f * (float)random.NextDouble();
+                float height = .06f + .10f * (float)random.NextDouble();
+                float width = .04f + .03f * (float)random.NextDouble();
                 float rot = (float)random.NextDouble() * Mathf.PI * 2f;
                 Vector3 side = new Vector3(Mathf.Cos(rot), 0f, Mathf.Sin(rot)) * width;
                 Vector3 origin = new Vector3(x, y, z);
@@ -110,8 +110,8 @@ namespace FruitTree
                 vertices.Add(origin - side);
                 vertices.Add(origin + side);
                 vertices.Add(origin + new Vector3(side.z * 1.3f, height, -side.x * 1.3f));
-                var green = new Color(.22f + .1f * (float)random.NextDouble(),
-                    .43f + .16f * (float)random.NextDouble(), .14f);
+                var green = new Color(.29f + .09f * (float)random.NextDouble(),
+                    .52f + .14f * (float)random.NextDouble(), .20f);
                 colors.Add(green * .85f);
                 colors.Add(green * .85f);
                 colors.Add(green * 1.15f);

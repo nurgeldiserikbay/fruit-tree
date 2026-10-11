@@ -95,30 +95,50 @@ namespace FruitTree
             }
         }
 
+        /// <summary>
+        /// A broad, softly tapered leaf silhouette. Eight shared vertices and
+        /// six triangles are sufficient for a readable mobile-sized canopy.
+        /// UV.y gradually increases to bend only the leaf tip in the wind.
+        /// </summary>
         public void Leaf(Vector3 center, Vector3 outward, float length, float width, Color color)
         {
-            Vector3 axis = outward.normalized;
-            Vector3 side = Vector3.Cross(axis, Mathf.Abs(Vector3.Dot(axis, Vector3.up)) > .9f ? Vector3.forward : Vector3.up).normalized;
-            Vector3 camber = Vector3.Cross(axis, side).normalized * (width * .16f);
-            var points = new[] {
-                center, center + axis * (length * .24f) - side * width * .42f + camber,
-                center + axis * (length * .24f) + side * width * .42f + camber,
-                center + axis * (length * .67f) - side * width * .45f + camber,
-                center + axis * (length * .67f) + side * width * .45f + camber,
+            Vector3 axis = outward.sqrMagnitude < .0001f ? Vector3.up : outward.normalized;
+            Vector3 side = Vector3.Cross(axis, Mathf.Abs(Vector3.Dot(axis, Vector3.up)) > .9f
+                ? Vector3.forward : Vector3.up).normalized;
+            Vector3 camber = Vector3.Cross(axis, side).normalized * (width * .12f);
+            var positions = new[]
+            {
+                center,
+                center + axis * (length * .19f) - side * (width * .50f) + camber * .3f,
+                center + axis * (length * .19f) + side * (width * .50f) + camber * .3f,
+                center + axis * (length * .50f) - side * (width * .70f) + camber,
+                center + axis * (length * .50f) + side * (width * .70f) + camber,
+                center + axis * (length * .81f) - side * (width * .43f) + camber * .6f,
+                center + axis * (length * .81f) + side * (width * .43f) + camber * .6f,
                 center + axis * length
             };
-            Vector3 normal = Vector3.Cross(side, axis).normalized;
-            int first = positions.Count;
-            for (int i = 0; i < points.Length; i++)
+            var texcoords = new[]
             {
-                Color c = i == 0 ? color * .75f : (i == 5 ? color * 1.1f : color);
-                Vertex(points[i], normal, c, new Vector2(i % 2, i / 5f));
+                new Vector2(.5f, 0f),
+                new Vector2(0f, .19f), new Vector2(1f, .19f),
+                new Vector2(0f, .50f), new Vector2(1f, .50f),
+                new Vector2(.2f, .81f), new Vector2(.8f, .81f),
+                new Vector2(.5f, 1f)
+            };
+            Vector3 normal = Vector3.Cross(side, axis).normalized;
+            int first = this.positions.Count;
+            for (int i = 0; i < positions.Length; i++)
+            {
+                Color tint = (i == 0 ? color * .84f : i == 7 ? color * 1.08f : color);
+                Vertex(positions[i], normal, tint, texcoords[i]);
             }
             Tri(first, first+1, first+2);
             Tri(first+1, first+3, first+2);
             Tri(first+2, first+3, first+4);
             Tri(first+3, first+5, first+4);
-            // Keep a single set of triangles. The leaf material disables culling.
+            Tri(first+4, first+5, first+6);
+            Tri(first+5, first+7, first+6);
+            // One-sided mesh; the leaf material renders both sides.
         }
 
         public void Tri(int a, int b, int c)

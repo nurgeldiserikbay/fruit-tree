@@ -9,7 +9,7 @@ namespace FruitTree
     {
         [SerializeField] private int seed = 122;
         [SerializeField, Range(8, 60)] private int appleCount = 30;
-        [SerializeField, Range(4, 25)] private int leavesPerCluster = 13;
+        [SerializeField, Range(4, 25)] private int leavesPerCluster = 16;
         private readonly List<Apple> apples = new List<Apple>();
         public IReadOnlyList<Apple> Apples => apples;
         public event Action<int, int> HarvestChanged;
@@ -128,12 +128,35 @@ namespace FruitTree
                             Vector3 direction = (offset +
                                 new Vector3(Between(-.3f,.3f), .21f, Between(-.3f,.3f))).normalized;
                             float tint = Between(-.065f,.065f);
-                            Color leafColor = new Color(.32f + tint,
-                                .56f + Between(-.065f,.095f), .18f + tint);
+                            Color leafColor = new Color(.33f + tint,
+                                .59f + Between(-.065f,.09f), .19f + tint);
                             foliage.Leaf(center + offset * .75f, direction,
-                                Between(.17f,.29f), Between(.11f,.17f), leafColor);
+                                Between(.21f,.32f), Between(.16f,.22f), leafColor);
                         }
                     }
+                }
+            }
+            // Lightweight crown fillers close large artificial gaps above the
+            // highest limbs while keeping most apples readable from outside.
+            for (int cluster = 0; cluster < 24; cluster++)
+            {
+                float heightRatio = (cluster + .5f) / 24f;
+                float angle = cluster * goldenAngle;
+                float radius = Mathf.Lerp(1.6f, .55f, heightRatio) * Between(.75f, 1.1f);
+                Vector3 center = new Vector3(
+                    Mathf.Cos(angle) * radius,
+                    Mathf.Lerp(2.65f, 4.25f, heightRatio),
+                    Mathf.Sin(angle) * radius);
+                for (int leafIndex = 0; leafIndex < 9; leafIndex++)
+                {
+                    Vector3 offset = new Vector3(
+                        Between(-.32f,.32f), Between(-.24f,.23f), Between(-.32f,.32f));
+                    Vector3 direction = (offset + new Vector3(
+                        Between(-.4f,.4f), .23f, Between(-.4f,.4f))).normalized;
+                    float shade = Between(-.055f,.07f);
+                    foliage.Leaf(center + offset, direction,
+                        Between(.20f,.30f), Between(.15f,.21f),
+                        new Color(.34f + shade, .57f + shade, .21f + shade*.5f));
                 }
             }
             // Prevent multiple fruits overlapping a single leaf cluster.
@@ -167,8 +190,11 @@ namespace FruitTree
                     new Vector3(Between(-.07f, .07f), 0f, Between(-.07f, .07f));
                 var fruit = MakeMeshObject("Apple " + (i + 1), appleMesh, appleMaterial);
                 fruit.transform.localPosition = at;
+                // More believable apple-to-tree proportions than the first screenshot.
+                float fruitScale = Between(.79f, .9f);
+                fruit.transform.localScale = Vector3.one * fruitScale;
                 fruit.transform.localRotation = Quaternion.Euler(Between(-10, 10), Between(0, 360), Between(-10, 10));
-                fruit.AddComponent<SphereCollider>().radius = .22f;
+                fruit.AddComponent<SphereCollider>().radius = .25f;
                 var component = fruit.AddComponent<Apple>();
                 component.Harvested += OnHarvest;
                 apples.Add(component);

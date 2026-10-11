@@ -189,8 +189,8 @@ namespace FruitTree.Tests
             Mesh leaf = builder.Build("leaf");
             try
             {
-                Assert.AreEqual(6, leaf.vertexCount);
-                Assert.AreEqual(12, leaf.triangles.Length);
+                Assert.AreEqual(8, leaf.vertexCount);
+                Assert.AreEqual(18, leaf.triangles.Length);
             }
             finally { Object.DestroyImmediate(leaf); }
         }
@@ -251,7 +251,7 @@ namespace FruitTree.Tests
             var grass = GroundGenerator.CreateGrassMesh();
             try
             {
-                Assert.Less(terrain.vertexCount, 2000);
+                Assert.Less(terrain.vertexCount, 5000);
                 Assert.Less(grass.vertexCount, 2000);
                 Assert.Greater(terrain.triangles.Length, 1000);
                 Assert.Greater(grass.triangles.Length, 100);
