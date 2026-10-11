@@ -326,6 +326,8 @@ namespace FruitTree.Editor
             UnityEventTools.AddPersistentListener(orchard.completionNextButton.onClick,
                 orchard.NextTree);
             orchard.completionNextButton.gameObject.SetActive(false);
+            // Keep pause and parent overlays visually above the completion shortcut.
+            orchard.completionNextButton.transform.SetSiblingIndex(menu.transform.GetSiblingIndex());
 
             menu.SetActive(false);
         }
