@@ -15,7 +15,7 @@ namespace FruitTree
             return !string.IsNullOrWhiteSpace(value) &&
                 Uri.TryCreate(value, UriKind.Absolute, out var uri) &&
                 uri.Scheme == Uri.UriSchemeHttps &&
-                !uri.UserInfo.Contains("@") &&
+                string.IsNullOrEmpty(uri.UserInfo) &&
                 (uri.Host == "docs.google.com" && uri.AbsolutePath.Contains("/document/d/e/") &&
                  uri.AbsolutePath.Contains("/pub"));
         }
