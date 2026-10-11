@@ -24,6 +24,9 @@
 - [x] 360-degree fruit reachability sampling audit (reports warnings; not yet executed)
 - [x] First-import shader import ordering hardened; asset-database scene checks
 - [x] Android build fails early on unsupported platform and invalid scene; output anchored at project root
+- [x] Backendless Remove Ads non-consumable IAP v5 integration (source committed; not executed in Unity)
+- [x] Adult-access hold gate and pause-menu purchase/restore UI (disabled without ads SDK)
+- [x] Fail-closed Families ad provider interface, store entitlement and guard unit tests (not executed)
 - [x] Android build menu command
 - [x] Development-only FPS and frame-time logging for eventual device QA (not yet measured)
 - [x] Edit-mode geometry tests (not yet executed)
@@ -41,7 +44,10 @@
 - [ ] Real recorded nature audio and tuned sounds
 - [ ] Review real-time tree shape, leaf shading, apple appearance and fruit placement using Unity screenshots; improve after review
 - [ ] Frame-time, battery, heating profiling on low-end phones
-- [ ] Android signing, Google Play store release assets, permissions and age-rating review
+- [ ] Google Play Console non-consumable product `remove_ads` and license test accounts
+- [ ] Connect a Google Play Families self-certified ad SDK with correct child-directed settings
+- [ ] Test purchases, pending/deferred orders, refunds and restore on Play internal-testing build
+- [ ] Android signing, Google Play store release assets, privacy/data-safety declarations and age-rating review
 
 No APK is included. Do not describe the game as production-ready without Unity builds and hardware testing.
 

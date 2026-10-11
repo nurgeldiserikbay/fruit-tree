@@ -16,7 +16,7 @@
 - One batched mesh for leaves and another for branches. Unique pickable apple objects sharing one mesh.
 - Procedural grassy ground and gradient sky. Most apples placed toward the crown exterior.
 - Two-finger vertical drag pans inspection focus toward upper/lower branches. In Editor, Shift+right-drag pans focus.
-- No timer, account, backend, ads, in-app purchases, park exploration or external assets.
+- No timer, account, backend, park exploration or external assets. A disabled-by-default backend-free Remove Ads IAP integration is present; no ads SDK is installed.
 - Portrait orientation, device safe-area-aware HUD, offline operation.
 - Generated ambient audio is a technical placeholder and will need replacement with a licensed natural recording.
 - Generated visuals are procedural prototypes. They may need substantial art iteration to match promotional reference quality.
@@ -46,3 +46,6 @@ Unity Editor, Android devices and Unity's own C# assemblies are not available to
 - Run **Fruit Tree > Audit Fruit Reachability** (or **Fruit Tree > Validate Project**). It creates a temporary procedural tree far from the gameplay area and samples line-of-sight raycasts from 48 orbit angles and four heights.
 - The audit warns about apples that could not be selected from any sampled angle. Such warnings require visual review and repositioning of the affected fruit before release.
 - This is a *sampling diagnostic*, not a guarantee that every fruit is easy to spot, nor a substitute for an actual play session.
+
+## Monetization
+Backend-free remove-ads entitlement logic is implemented, but remains untested and the purchase control is disabled until a compliant ad provider is connected. See [MONETIZATION.md](MONETIZATION.md).

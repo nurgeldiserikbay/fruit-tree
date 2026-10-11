@@ -195,6 +195,55 @@ namespace FruitTree.Tests
             finally { Object.DestroyImmediate(leaf); }
         }
 
+
+        private sealed class FakeFamilyAds : IFamilySafeAdProvider
+        {
+            public bool FamiliesConfigurationApproved { get; set; }
+            public bool LastEnabled { get; private set; }
+            public void SetAdvertisingEnabled(bool enabled) { LastEnabled = enabled; }
+        }
+
+        [Test]
+        public void NoAdsBeforePlayOwnershipCheckOrWithoutCertifiedProvider()
+        {
+            var root = new GameObject("Ads State Test");
+            try
+            {
+                var policy = root.AddComponent<AdsAccessPolicy>();
+                var provider = new FakeFamilyAds { FamiliesConfigurationApproved = true };
+                policy.AttachProvider(provider);
+                Assert.IsFalse(policy.CanRequestAds);
+                policy.SetStoreEntitlement(false);
+                Assert.IsTrue(policy.CanRequestAds);
+                Assert.IsTrue(provider.LastEnabled);
+                policy.SetStoreEntitlement(true);
+                Assert.IsFalse(policy.CanRequestAds);
+                Assert.IsFalse(provider.LastEnabled);
+                policy.MarkEntitlementUnknown();
+                Assert.IsFalse(policy.CanRequestAds);
+                Assert.IsFalse(provider.LastEnabled);
+            }
+            finally { Object.DestroyImmediate(root); }
+        }
+
+        [Test]
+        public void NoAdvertisingWithoutFamilyApprovalEvenAfterOwnershipCheck()
+        {
+            var root = new GameObject("Policy Test");
+            try
+            {
+                var policy = root.AddComponent<AdsAccessPolicy>();
+                var provider = new FakeFamilyAds { FamiliesConfigurationApproved = false };
+                policy.AttachProvider(provider);
+                policy.SetStoreEntitlement(false);
+                Assert.IsFalse(policy.CanRequestAds);
+                Assert.IsFalse(provider.LastEnabled);
+                policy.AttachProvider(null);
+                Assert.IsFalse(policy.CanRequestAds);
+            }
+            finally { Object.DestroyImmediate(root); }
+        }
+
         [Test]
         public void GroundMeshesAreReasonablySmall()
         {
