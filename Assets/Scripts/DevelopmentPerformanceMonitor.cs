@@ -8,8 +8,13 @@ namespace FruitTree
     /// </summary>
     public sealed class DevelopmentPerformanceMonitor : MonoBehaviour
     {
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
         private const float SampleSeconds = 5f;
+        private void Awake()
+        {
+            // Profile only in Editor and development builds (Unity 6.6 compatible).
+            enabled = Debug.isDebugBuild;
+        }
+
         private int frames;
         private float seconds;
         private float slowestFrame;
@@ -35,6 +40,5 @@ namespace FruitTree
             seconds = 0f;
             slowestFrame = 0f;
         }
-#endif
     }
 }
