@@ -36,6 +36,24 @@ namespace FruitTree.Editor
             if (!System.IO.File.Exists("Assets/Scenes/Main.unity")) Generate();
         }
 
+        [MenuItem("Fruit Tree/Refresh Visuals (Back Up Scene)")]
+        public static void RefreshVisuals()
+        {
+            // Explicit action only: the saved local scene might contain user edits.
+            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+            const string scenePath = "Assets/Scenes/Main.unity";
+            if (System.IO.File.Exists(scenePath))
+            {
+                string backupDirectory = System.IO.Path.Combine(
+                    Application.dataPath, "../Builds/SceneBackups");
+                System.IO.Directory.CreateDirectory(backupDirectory);
+                string fileName = "Main-" + System.DateTime.UtcNow.ToString("yyyyMMdd-HHmmss") + ".unity";
+                System.IO.File.Copy(scenePath,
+                    System.IO.Path.Combine(backupDirectory, fileName), false);
+            }
+            Generate();
+        }
+
         [MenuItem("Fruit Tree/Generate Playable Scene")]
         public static void Generate()
         {
@@ -156,22 +174,37 @@ namespace FruitTree.Editor
             safe.transform.SetParent(canvasObject.transform, false);
             safe.AddComponent<SafeAreaFitter>();
 
-            var panel = new GameObject("Counter Background", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            var panel = new GameObject("Counter Background", typeof(RectTransform),
+                typeof(CanvasRenderer), typeof(RoundedPanel));
             panel.transform.SetParent(safe.transform, false);
-            var panelRect = panel.GetComponent<RectTransform>();
-            Anchor(panelRect, new Vector2(.30f, .895f), new Vector2(.70f, .967f));
-            panel.GetComponent<Image>().color = new Color(1f, .98f, .93f, .85f);
-            var count = MakeLabel("Apple Counter", safe.transform, "0 / 30", 49, new Color(.24f,.31f,.18f),
-                new Vector2(.30f, .895f), new Vector2(.70f, .967f));
+            Anchor(panel.GetComponent<RectTransform>(),
+                new Vector2(.355f, .903f), new Vector2(.645f, .966f));
+            var counterFace = panel.GetComponent<RoundedPanel>();
+            counterFace.color = new Color(.99f, .97f, .87f, .94f);
+            counterFace.CornerRadius = 48f;
+            counterFace.raycastTarget = false;
+            var count = MakeLabel("Apple Counter", safe.transform, "0 / 30", 45,
+                new Color(.21f, .32f, .19f),
+                new Vector2(.355f, .903f), new Vector2(.645f, .966f));
 
+            var hintBackground = new GameObject("Hint Background", typeof(RectTransform),
+                typeof(CanvasRenderer), typeof(RoundedPanel));
+            hintBackground.transform.SetParent(safe.transform, false);
+            Anchor(hintBackground.GetComponent<RectTransform>(),
+                new Vector2(.15f, .048f), new Vector2(.85f, .12f));
+            var hintFace = hintBackground.GetComponent<RoundedPanel>();
+            hintFace.color = new Color(.14f, .28f, .19f, .75f);
+            hintFace.CornerRadius = 40f;
+            hintFace.raycastTarget = false;
             var hint = MakeLabel("Control Hint", safe.transform, "Drag to rotate  -  Tap apples", 28,
-                new Color(.22f,.30f,.20f), new Vector2(.11f,.07f), new Vector2(.89f,.14f));
+                new Color(.99f, .99f, .95f),
+                new Vector2(.17f, .055f), new Vector2(.83f, .114f));
             var hud = canvasObject.AddComponent<HarvestHUD>();
             hud.tree = tree; hud.countText = count; hud.messageText = hint;
             // Keep the gameplay clean. Only the small pause button is visible.
             // Restart and sound are accessible through the pause menu.
             var pauseButton = MakeButton("Pause", safe.transform, "II",
-                new Vector2(.82f, .89f), new Vector2(.96f, .966f),
+                new Vector2(.864f, .9f), new Vector2(.954f, .966f),
                 new Color(.98f, .94f, .84f, .91f));
 
             var menu = new GameObject("Pause Menu", typeof(RectTransform),
@@ -268,11 +301,15 @@ namespace FruitTree.Editor
 
         private static Button MakeButton(string name, Transform parent, string text, Vector2 min, Vector2 max, Color color)
         {
-            var go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
+            var go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer),
+                typeof(RoundedPanel), typeof(Button));
             go.transform.SetParent(parent, false);
             Anchor(go.GetComponent<RectTransform>(), min, max);
-            go.GetComponent<Image>().color = color;
+            var face = go.GetComponent<RoundedPanel>();
+            face.CornerRadius = 44f;
+            face.color = color;
             var button = go.GetComponent<Button>();
+            button.targetGraphic = face;
             var tint = button.colors;
             tint.highlightedColor = new Color(.94f, .96f, .88f);
             tint.pressedColor = new Color(.76f, .83f, .71f);
