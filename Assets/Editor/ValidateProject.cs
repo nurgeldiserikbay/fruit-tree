@@ -56,6 +56,20 @@ namespace FruitTree.Editor
                 orchard.completionNextButton == null)
                 errors.Add("Orchard progression controller or collection UI is missing");
 
+            var screenFlow = UnityEngine.Object.FindAnyObjectByType<FruitTreeScreenFlow>();
+            if (screenFlow == null || screenFlow.homePanel == null ||
+                screenFlow.gameplayControls == null || screenFlow.settingsPanel == null ||
+                screenFlow.helpPanel == null || screenFlow.privacyPanel == null ||
+                screenFlow.pause != pause || screenFlow.orchard != orchard ||
+                pause.screenFlow != screenFlow ||
+                screenFlow.openPublishedPrivacyButton == null)
+                errors.Add("Home menu, Settings, Help, Privacy or flow references are missing");
+
+            if (!FruitTreePrivacyConfig.IsPublishedUrlValid(
+                FruitTreePrivacyConfig.PublishedPolicyUrl))
+                Debug.LogWarning("Fruit Tree: public Google Docs privacy URL is not configured. " +
+                    "This is acceptable for local Editor tests but BLOCKS Play Store release.");
+
             var soundObject = GameObject.Find("Orchard Sounds");
             var sound = soundObject != null ? soundObject.GetComponent<OrchardAudio>() : null;
             if (sound == null || sound.tree != tree || sound.soundStatusText == null)
@@ -64,8 +78,8 @@ namespace FruitTree.Editor
             if (hudObject != null)
             {
                 var buttons = hudObject.GetComponentsInChildren<Button>(true);
-                if (buttons.Length != 13)
-                    errors.Add("Expected 13 pause, parent, collection and next-tree buttons");
+                if (buttons.Length < 26)
+                    errors.Add("Expected at least 26 functional buttons across home, gameplay, pause and settings");
                 foreach (var button in buttons)
                 {
                     if (button.GetComponent<ParentHoldGate>() != null) continue;
