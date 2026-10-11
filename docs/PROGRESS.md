@@ -8,7 +8,7 @@
 - Semi-realistic appearance, low UI density, no network dependence.
 
 ## Committed code
-- [x] Project editor-version metadata updated to Unity 6000.6.5f1 (not yet compiled with this version)
+- [x] Project editor-version metadata updated to Unity 6000.6.5f1; user confirms Editor Game view renders; Console warnings awaiting recheck
 - [x] Unity project and Android configuration
 - [x] Deterministic batched tree generator (wood, leaf canopy, mesh apples)
 - [x] Bark texture generator, asymmetric trunk / twigs, leaf-tip wind shader
@@ -31,7 +31,7 @@
 - [x] Adult-access hold gate and pause-menu purchase/restore UI (disabled without ads SDK)
 - [x] Fail-closed Families ad provider interface, store entitlement and guard unit tests (not executed)
 - [x] Android build menu command
-- [x] Development-only FPS and frame-time logging for eventual device QA (not yet measured)
+- [x] Development-only FPS and frame-time logging via Debug.isDebugBuild (not yet measured)
 - [x] Edit-mode geometry tests (not yet executed)
 - [x] Play-mode tests for idempotent picking, stable round reset and interrupted animation (not yet executed)
 - [x] Apple-skin texture, trunk occlusion and shadow draw-call reductions
@@ -41,8 +41,10 @@
 - [x] Static block-delimiter check across 15 C# scripts (passed; not a compiler run)
 - [x] Prevent non-finite apple vertices at the top pole; regression test authored (not executed)
 
+- [x] Source changes for Unity 6000.6.5f1 warnings CS1998, UAC0009 and CS0618 (awaiting user Editor verification)
+
 ## NOT VERIFIED OR COMPLETE
-- [ ] Unity 6000.6.5f1 package import, compile and scene-opening acceptance test
+- [ ] Warning-free Unity 6000.6.5f1 compilation, scene validation and EditMode/PlayMode test run
 - [ ] Real Android device build and play test
 - [ ] Real recorded nature audio and tuned sounds
 - [ ] Review real-time tree shape, leaf shading, apple appearance and fruit placement using Unity screenshots; improve after review
