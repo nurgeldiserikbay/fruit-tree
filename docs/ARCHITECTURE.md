@@ -1,6 +1,6 @@
 # Fruit Tree — Unity gameplay architecture
 
-**Status:** proposed target design for the new multi-tree progression. Current repo still runs a single 30-apple procedural tree. This is a migration specification; it is **not** a claim that these systems are implemented.
+**Status:** first three-tree vertical slice is now wired into the scene generator (Apple 120 → Pear 140 → Cherry 220), with local JSON saves, sequential unlock and rebloom. **Unity playtesting and acceptance are still pending.** ScriptableObject catalogs, final species art, 10-tree release content and last-fruit help remain future work.
 
 ## Architectural objectives
 
@@ -196,4 +196,4 @@ Folder names are **planned**, not all present yet. Avoid moving current files wi
 4. **Expand to 10 trees** — content pipeline with validation, balancing and QA.
 5. **Android release** — profile, billing/ads policy (only after provider), localization, signing, store listing.
 
-**Current repository status:** phase 1 documentation; no automatic claim of phases 2–5. The existing apple-only game is a prototype and remains playable until the new system is integrated and tested.
+**Current repository status:** phase 1 rules/data and the first playable phase 2 integration are committed. A newly generated scene will use the three-tree prototype. Source was checked structurally, but Unity compilation, reachability and on-device performance remain unverified. See [three-tree playtest instructions](PLAYTEST_THREE_TREES.md).
