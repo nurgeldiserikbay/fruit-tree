@@ -81,7 +81,8 @@ namespace FruitTree.Tests
                 Assert.AreEqual("tree_002", loaded.ActiveTreeId);
                 Assert.IsTrue(loaded.IsUnlocked("tree_002"));
                 Assert.AreEqual(1, loaded.GetTree("tree_002").PickedCount);
-                Assert.IsTrue(loaded.GetTree("tree_002").PickedFruitIds.Contains("fruit_0017"));
+                Assert.IsTrue(new List<string>(loaded.GetTree("tree_002").PickedFruitIds)
+                    .Contains("fruit_0017"));
             }
             finally
             {
