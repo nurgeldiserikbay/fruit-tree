@@ -14,7 +14,7 @@ A relaxing, Android-first 3D fruit-picking game: one semi-realistic tree, freely
 - Procedural meadow and soft gradient sky, Unity Editor scene generator and Android portrait config.
 
 ## Start
-Install Unity 6 6000.0.32f1, open this directory in Unity Hub, let it compile and generate the first scene, then press Play. [Full instructions](docs/SETUP.md).
+Install Unity 6 6000.6.5f1, open this directory in Unity Hub, let it compile and generate the first scene, then press Play. [Full instructions](docs/SETUP.md).
 
 ## Next priorities
 Unity compilation and real-device verification, better bark and foliage art, performance profiling and real licensed environmental recordings. Generated audio currently serves only as a functional placeholder.

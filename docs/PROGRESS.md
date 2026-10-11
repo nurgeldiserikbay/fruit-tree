@@ -8,6 +8,7 @@
 - Semi-realistic appearance, low UI density, no network dependence.
 
 ## Committed code
+- [x] Project editor-version metadata updated to Unity 6000.6.5f1 (not yet compiled with this version)
 - [x] Unity project and Android configuration
 - [x] Deterministic batched tree generator (wood, leaf canopy, mesh apples)
 - [x] Bark texture generator, asymmetric trunk / twigs, leaf-tip wind shader
@@ -39,7 +40,7 @@
 - [x] Prevent non-finite apple vertices at the top pole; regression test authored (not executed)
 
 ## NOT VERIFIED OR COMPLETE
-- [ ] Unity Editor compile and scene-opening acceptance test
+- [ ] Unity 6000.6.5f1 package import, compile and scene-opening acceptance test
 - [ ] Real Android device build and play test
 - [ ] Real recorded nature audio and tuned sounds
 - [ ] Review real-time tree shape, leaf shading, apple appearance and fruit placement using Unity screenshots; improve after review

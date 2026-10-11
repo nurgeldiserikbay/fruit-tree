@@ -1,10 +1,10 @@
 # Fruit Tree - Unity 6 and Android
 
 ## First open
-1. Install Unity Hub and **Unity 6 6000.0.32f1** with Android Build Support (SDK, NDK, OpenJDK).
+1. Install Unity Hub and **Unity 6 6000.6.5f1** with Android Build Support (SDK, NDK, OpenJDK).
 2. Clone `https://github.com/nurgeldiserikbay/fruit-tree.git`.
 3. In Unity Hub choose Add project from disk and select the root directory.
-4. Wait for package import and C# script compilation. On first import the editor script automatically creates `Assets/Scenes/Main.unity`.
+4. Wait for package import and C# script compilation. The first import may take several minutes. If the Console shows errors, copy the first red error plus the full stack trace before retrying. On first import the editor script automatically creates `Assets/Scenes/Main.unity`.
 5. If the scene was not generated: choose **Fruit Tree > Generate Playable Scene**. Next choose **Fruit Tree > Validate Project** to check saved scene references, then press Play.
 6. Mouse: drag to orbit, wheel to zoom, click an apple to pick. Android: drag, pinch to zoom, tap.
 7. To create an Android APK: File > Build Profiles > Android > Switch Platform, then **Fruit Tree > Build Android APK**. The APK is written to `Builds/FruitTree.apk` in the repository root. Build And Run requires device debugging enabled.
@@ -22,6 +22,12 @@
 - Generated visuals are procedural prototypes. They may need substantial art iteration to match promotional reference quality.
 - The Unity editor creates the first scene automatically on first import; source files and stable metadata are committed, but the generated scene is not versioned yet.
 - Initial Unity scene is created by the editor and is not tracked until saved from the editor.
+
+## Unity 6000.6.5f1 migration note
+- The project now targets the already-installed 6000.6.5f1 editor. Source code and package references were authored before the upgrade, so compilation/package compatibility has **not yet been confirmed**.
+- If Unity Hub asks to open a project built with an older version, proceed with the upgrade. Commit any Unity-generated settings changes only after the Editor opens cleanly.
+- Do not downgrade the Editor to 6000.0.32f1, which Unity Hub marked with a security warning.
+- In Console, use **Clear**, then capture the first red error and subsequent details if compilation fails. Do not repeatedly regenerate the scene while red compile errors remain.
 
 ## IMPORTANT
 Unity Editor, Android devices and Unity's own C# assemblies are not available to ChatGPT in this session. The project code was authored and reviewed but **has not been compiled in Unity, played on a phone, or verified as release-ready**. Test the prototype in Unity before publishing.

@@ -3,7 +3,7 @@
 On Windows, after installing Unity 6 with Android Build Support:
 
 ```powershell
-pwsh -File tools/verify-unity.ps1 -UnityEditor "C:\Program Files\Unity\Hub\Editor\6000.0.32f1\Editor\Unity.exe" -BuildApk
+pwsh -File tools/verify-unity.ps1 -UnityEditor "C:\Program Files\Unity\Hub\Editor\6000.6.5f1\Editor\Unity.exe" -BuildApk
 ```
 
 `-BuildApk` is optional. EditMode and PlayMode test logs/results are written under `Builds/`.
