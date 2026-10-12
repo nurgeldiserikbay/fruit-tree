@@ -12,6 +12,8 @@ namespace FruitTree
     {
         public GameObject homePanel;
         public GameObject gameplayControls;
+        public GameObject zenExitPanel;
+        public bool IsZenMode { get; private set; }
         public GameObject settingsPanel;
         public GameObject helpPanel;
         public GameObject privacyPanel;
@@ -32,6 +34,8 @@ namespace FruitTree
         {
             // Keep the living background visible, but disable world taps until Play.
             IsPlaying = false;
+            IsZenMode = false;
+            if (zenExitPanel != null) zenExitPanel.SetActive(false);
             if (orbitCamera != null)
             {
                 orbitCamera.FitTreeInPortrait();
@@ -49,11 +53,28 @@ namespace FruitTree
         public void Play()
         {
             IsPlaying = true;
+            IsZenMode = false;
+            if (zenExitPanel != null) zenExitPanel.SetActive(false);
             CloseSubpanels();
             if (homePanel != null) homePanel.SetActive(false);
             if (pause != null) pause.Resume();
             if (gameplayControls != null) gameplayControls.SetActive(true);
             if (orbitCamera != null) orbitCamera.enabled = true;
+        }
+
+        public void EnterZenMode()
+        {
+            Play(); // Restore game time, camera and world interactions.
+            IsZenMode = true;
+            if (gameplayControls != null) gameplayControls.SetActive(false);
+            if (zenExitPanel != null) zenExitPanel.SetActive(true);
+        }
+
+        public void ExitZenMode()
+        {
+            IsZenMode = false;
+            if (zenExitPanel != null) zenExitPanel.SetActive(false);
+            if (IsPlaying && gameplayControls != null) gameplayControls.SetActive(true);
         }
 
         public void OpenCollectionFromHome()
@@ -67,6 +88,8 @@ namespace FruitTree
         {
             if (pause != null) pause.Resume();
             CloseSubpanels();
+            IsZenMode = false;
+            if (zenExitPanel != null) zenExitPanel.SetActive(false);
             IsPlaying = false;
             if (homePanel != null) homePanel.SetActive(true);
             if (gameplayControls != null) gameplayControls.SetActive(false);
@@ -164,6 +187,7 @@ namespace FruitTree
                 if (orchard != null) orchard.CloseTreeMenu();
                 return;
             }
+            if (IsZenMode) { ExitZenMode(); return; }
             if (!IsPlaying) return; // Android Back never unexpectedly exits the app.
             if (pause != null) pause.Toggle();
         }

@@ -66,6 +66,7 @@ namespace FruitTree.Editor
                 pause.screenFlow != screenFlow ||
                 screenFlow.openPublishedPrivacyButton == null ||
                 screenFlow.audioLevelLabel == null || screenFlow.motionLabel == null ||
+                screenFlow.zenExitPanel == null ||
                 screenFlow.activeTree != tree)
                 errors.Add("Home menu, Settings, Help, Privacy or flow references are missing");
 
@@ -82,7 +83,7 @@ namespace FruitTree.Editor
             if (hudObject != null)
             {
                 var buttons = hudObject.GetComponentsInChildren<Button>(true);
-                if (buttons.Length < 29)
+                if (buttons.Length < 31)
                     errors.Add("Expected at least 26 functional buttons across home, gameplay, pause and settings");
                 foreach (var button in buttons)
                 {

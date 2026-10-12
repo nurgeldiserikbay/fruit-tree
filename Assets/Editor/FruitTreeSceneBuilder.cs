@@ -249,19 +249,23 @@ namespace FruitTree.Editor
                 new Vector2(.23f, .555f), new Vector2(.77f, .63f),
                 new Color(.97f, .97f, .89f, 1f));
             var audio = MakeButton("Sound", menu.transform, "SOUND ON",
-                new Vector2(.23f, .345f), new Vector2(.77f, .42f),
+                new Vector2(.23f, .37f), new Vector2(.77f, .44f),
                 new Color(.97f, .97f, .89f, 1f));
+            var zenMode = MakeButton("Enter Zen Mode", menu.transform, "ZEN MODE",
+                new Vector2(.23f, .285f), new Vector2(.77f, .355f),
+                new Color(.90f, .96f, .81f, 1f));
             sound.soundStatusText = audio.GetComponentInChildren<Text>();
             UnityEventTools.AddPersistentListener(pauseButton.onClick, pauseController.Toggle);
             UnityEventTools.AddPersistentListener(resume.onClick, pauseController.Resume);
             UnityEventTools.AddPersistentListener(restart.onClick, orchard.OpenTreeMenu);
             UnityEventTools.AddPersistentListener(audio.onClick, sound.ToggleSound);
+            UnityEventTools.AddPersistentListener(zenMode.onClick, screenFlow.EnterZenMode);
 
             var settingsInPause = MakeButton("Pause Settings", menu.transform,
                 "SETTINGS", new Vector2(.23f, .45f), new Vector2(.77f, .525f),
                 new Color(.97f, .97f, .89f, 1f));
             var homeInPause = MakeButton("Pause Main Menu", menu.transform,
-                "MAIN MENU", new Vector2(.23f, .24f), new Vector2(.77f, .315f),
+                "MAIN MENU", new Vector2(.23f, .205f), new Vector2(.77f, .275f),
                 new Color(.97f, .97f, .89f, 1f));
             UnityEventTools.AddPersistentListener(settingsInPause.onClick,
                 screenFlow.OpenSettingsFromPause);
@@ -269,8 +273,8 @@ namespace FruitTree.Editor
                 screenFlow.ReturnHome);
 
             var parentButton = MakeButton("Parent Access", menu.transform,
-                "FOR PARENTS - HOLD", new Vector2(.18f, .12f),
-                new Vector2(.82f, .195f), new Color(.82f, .88f, .76f, 1f));
+                "FOR PARENTS - HOLD", new Vector2(.18f, .085f),
+                new Vector2(.82f, .165f), new Color(.82f, .88f, .76f, 1f));
             // Parent panel is the final sibling so it overlays ordinary pause controls.
             var parentPanel = new GameObject("Parent Options", typeof(RectTransform),
                 typeof(CanvasRenderer), typeof(Image));
@@ -361,6 +365,18 @@ namespace FruitTree.Editor
             orchard.completionNextButton.gameObject.SetActive(false);
             // Keep pause and parent overlays visually above the completion shortcut.
             orchard.completionNextButton.transform.SetSiblingIndex(menu.transform.GetSiblingIndex());
+
+            // Zen Mode intentionally hides every HUD control, but an always
+            // visible tiny exit button gives a way back without Android Back.
+            var zenExit = new GameObject("Zen Exit Controls", typeof(RectTransform));
+            zenExit.transform.SetParent(safe.transform, false);
+            Anchor(zenExit.GetComponent<RectTransform>(), Vector2.zero, Vector2.one);
+            screenFlow.zenExitPanel = zenExit;
+            var exitZen = MakeButton("Leave Zen Mode", zenExit.transform,
+                "EXIT ZEN", new Vector2(.36f, .914f),
+                new Vector2(.64f, .965f), new Color(.98f, .97f, .88f, .65f));
+            UnityEventTools.AddPersistentListener(exitZen.onClick, screenFlow.ExitZenMode);
+            zenExit.SetActive(false);
 
             BuildFrontEnd(safe.transform, screenFlow);
 
