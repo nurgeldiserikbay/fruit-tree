@@ -21,10 +21,18 @@ namespace FruitTree
         }
         public void Restart()
         {
+            // Multi-tree progress is authoritative: a visual reset here would
+            // desynchronize restored per-fruit IDs and the permanent unlocks.
+            // The orchard controller alone may rebloom a fully cleared tree.
+            if (OrchardMode)
+            {
+                Debug.LogWarning("Fruit Tree: use Rebloom for completed orchard trees.");
+                return;
+            }
             Time.timeScale = 1;
             if (tree == null) return;
             tree.ResetHarvest();
-            if (messageText != null) messageText.text = "Drag to rotate  -  Tap apples";
+            if (messageText != null) messageText.text = "Drag to rotate  -  Tap fruit";
         }
         private void Refresh(int picked, int total)
         {

@@ -10,6 +10,7 @@ namespace FruitTree
     {
         public GameObject panel;
         public HarvestHUD hud;
+        public OrchardGameController orchard;
         public GameObject parentPanel;
         public GameObject treePanel;
         public FruitTreeScreenFlow screenFlow;
@@ -30,6 +31,14 @@ namespace FruitTree
 
         public void Restart()
         {
+            if (hud != null && hud.OrchardMode)
+            {
+                // Only completed trees may restart, via the persisted round
+                // transition. A partial tree must not silently lose progress.
+                if (orchard != null && orchard.CanRebloomActive())
+                    orchard.Rebloom();
+                return;
+            }
             if (hud != null) hud.Restart();
             Resume();
         }

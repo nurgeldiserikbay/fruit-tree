@@ -181,6 +181,12 @@ namespace FruitTree
             if (pauseController != null) pauseController.Resume();
         }
 
+        public bool CanRebloomActive()
+        {
+            return initialized && progress != null &&
+                progress.GetTree(progress.ActiveTreeId)?.IsCleared == true;
+        }
+
         public void Rebloom()
         {
             if (!initialized || !progress.TryRebloomActive()) return;

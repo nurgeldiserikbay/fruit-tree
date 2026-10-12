@@ -336,6 +336,7 @@ namespace FruitTree.Editor
             pauseController.screenFlow = screenFlow;
             pauseController.panel = menu;
             pauseController.hud = hud;
+            pauseController.orchard = orchard;
             orchard.pauseController = pauseController;
 
             MakeDialogSurface("Pause Calm Card", menu.transform,
