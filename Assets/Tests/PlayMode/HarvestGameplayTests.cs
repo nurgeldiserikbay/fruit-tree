@@ -210,6 +210,40 @@ namespace FruitTree.Tests
         }
 
         [UnityTest]
+        public IEnumerator SceneryLightingFinishesItsFadeEvenWhileGameIsPaused()
+        {
+            var root = new GameObject("Paused Scenery Color Test");
+            var sunObject = new GameObject("Test Sun", typeof(Light));
+            sunObject.transform.SetParent(root.transform, false);
+            var sceneryObject = new GameObject("Environment");
+            sceneryObject.transform.SetParent(root.transform, false);
+            var environment = sceneryObject.AddComponent<EnvironmentController>();
+            var sun = sunObject.GetComponent<Light>();
+            environment.sun = sun;
+            float originalScale = Time.timeScale;
+
+            try
+            {
+                environment.ApplyThemeDirect(EnvironmentTheme.Meadow);
+                Time.timeScale = 0f;
+                environment.ApplyThemeDirect(EnvironmentTheme.CityPark);
+                Assert.AreEqual(EnvironmentTheme.CityPark, environment.CurrentTheme);
+                yield return new WaitForSecondsRealtime(1.2f);
+                Color target = EnvironmentThemes.Sun(EnvironmentTheme.CityPark);
+                Assert.That(sun.color.r, Is.EqualTo(target.r).Within(.015f));
+                Assert.That(sun.color.g, Is.EqualTo(target.g).Within(.015f));
+                Assert.That(sun.intensity, Is.EqualTo(.96f).Within(.015f));
+                Assert.AreEqual(0f, Time.timeScale);
+            }
+            finally
+            {
+                Time.timeScale = originalScale;
+                Object.Destroy(root);
+            }
+            yield return null;
+        }
+
+        [UnityTest]
         public IEnumerator ThemeAudioAndSceneryMeshReuseOnRepeatedSwitching()
         {
             var root = new GameObject("Environment Audio Integration Test");
