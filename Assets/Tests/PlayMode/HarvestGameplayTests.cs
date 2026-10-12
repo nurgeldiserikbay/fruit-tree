@@ -209,5 +209,53 @@ namespace FruitTree.Tests
             yield return null;
         }
 
+        [UnityTest]
+        public IEnumerator ThemeAudioAndSceneryMeshReuseOnRepeatedSwitching()
+        {
+            var root = new GameObject("Environment Audio Integration Test");
+            var scenery = new GameObject("Test Scenery");
+            scenery.transform.SetParent(root.transform);
+            var environment = scenery.AddComponent<EnvironmentController>();
+            var audioNode = new GameObject("Test Ambient Sound");
+            audioNode.transform.SetParent(root.transform);
+            var sound = audioNode.AddComponent<OrchardAudio>();
+            sound.environment = environment;
+            yield return null; // Awake and Start of both runtime components.
+
+            try
+            {
+                Assert.AreEqual(EnvironmentTheme.Meadow, sound.CurrentAmbientTheme);
+                Assert.AreEqual(1, sound.CachedThemeClipCount);
+                environment.UseForTree(1); // Park.
+                Assert.AreEqual(EnvironmentTheme.Park, sound.CurrentAmbientTheme);
+                Assert.AreEqual(2, sound.CachedThemeClipCount);
+
+                var sceneryMesh = scenery.transform.Find("Merged Theme Scenery")
+                    .GetComponent<MeshFilter>();
+                Mesh parkMesh = sceneryMesh.sharedMesh;
+                Assert.IsNotNull(parkMesh);
+                environment.UseForTree(0);
+                environment.UseForTree(1);
+                Assert.AreSame(parkMesh, sceneryMesh.sharedMesh,
+                    "Revisiting a biome must reuse cached geometry.");
+                Assert.AreEqual(2, sound.CachedThemeClipCount,
+                    "Revisiting a biome must reuse the small cached ambient clip.");
+
+                environment.UseForTree(2);
+                environment.UseForTree(3);
+                Assert.AreEqual(4, sound.CachedThemeClipCount);
+                Assert.AreEqual(EnvironmentTheme.CityPark, sound.CurrentAmbientTheme);
+                Assert.AreEqual(1, scenery.GetComponentsInChildren<MeshRenderer>().Length,
+                    "Only one combined decorative mesh renderer should be active.");
+                yield return new WaitForSecondsRealtime(1.6f);
+                Assert.AreEqual(EnvironmentTheme.CityPark, sound.CurrentAmbientTheme);
+            }
+            finally
+            {
+                Object.Destroy(root);
+            }
+            yield return null;
+        }
+
     }
 }
