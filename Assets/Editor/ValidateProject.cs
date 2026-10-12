@@ -47,12 +47,35 @@ namespace FruitTree.Editor
             if (pause == null || pause.panel == null || pause.parentPanel == null || pause.hud != hud)
                 errors.Add("Pause menu has missing references");
 
+            if (FruitTreeReleaseConfig.LanguageCode != "en")
+                errors.Add("First release supports English UI only.");
+
+            // Reject accidentally imported Russian/Kazakh labels in the playable
+            // scene. This does not restrict the language of developer docs.
+            foreach (var uiText in UnityEngine.Object.FindObjectsByType<Text>(
+                FindObjectsInactive.Include, FindObjectsSortMode.None))
+            {
+                if (uiText == null || string.IsNullOrEmpty(uiText.text)) continue;
+                foreach (char ch in uiText.text)
+                    if (ch >= '\\u0400' && ch <= '\\u052F')
+                    {
+                        errors.Add("Non-English game UI label: " + uiText.name);
+                        break;
+                    }
+            }
+
             var purchasing = UnityEngine.Object.FindAnyObjectByType<RemoveAdsPurchaser>();
             var adsPolicy = UnityEngine.Object.FindAnyObjectByType<AdsAccessPolicy>();
             if (purchasing == null || adsPolicy == null || purchasing.adsPolicy != adsPolicy ||
                 purchasing.buyButton == null || purchasing.restoreButton == null ||
                 purchasing.statusText == null || purchasing.priceText == null)
                 errors.Add("Backend-free IAP/ads policy references are missing");
+
+            if (!FruitTreeReleaseConfig.AdvertisingEnabled &&
+                (purchasing != null && purchasing.enabled))
+                errors.Add("Ad-free release must never initialize Google Play Billing.");
+            if (FruitTreeReleaseConfig.CanOfferRemoveAds(false))
+                errors.Add("Remove Ads cannot be sold while no real ad provider exists.");
 
             var orchard = UnityEngine.Object.FindAnyObjectByType<OrchardGameController>();
             if (orchard == null || orchard.tree != tree || orchard.hud != hud ||
@@ -135,6 +158,14 @@ namespace FruitTree.Editor
             if (sound == null || sound.tree != tree || sound.environment != environment ||
                 sound.soundStatusText == null)
                 errors.Add("Orchard audio has missing references");
+
+            if (!FruitTreeReleaseConfig.AdvertisingEnabled &&
+                pause != null && pause.parentPanel != null)
+            {
+                var purchaseEntry = pause.parentPanel.transform.parent.Find("Parent Access");
+                if (purchaseEntry == null || purchaseEntry.gameObject.activeSelf)
+                    errors.Add("Ad-free launch must hide the parent purchase entry.");
+            }
 
             if (hudObject != null)
             {
