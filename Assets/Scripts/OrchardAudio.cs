@@ -23,6 +23,17 @@ namespace FruitTree
         private AudioClip collect;
         public bool IsMuted => muted;
         public bool IsQuietAudio { get; private set; }
+        public EnvironmentTheme CurrentAmbientTheme => activeTheme;
+        public int CachedThemeClipCount
+        {
+            get
+            {
+                int count = 0;
+                for (int i = 0; i < generatedThemeClips.Length; i++)
+                    if (generatedThemeClips[i] != null) count++;
+                return count;
+            }
+        }
         private bool muted;
         private bool ownsAmbientClip;
         private bool ownsPickClip;
