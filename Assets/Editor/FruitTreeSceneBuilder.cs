@@ -518,6 +518,9 @@ namespace FruitTree.Editor
             MakeLabel("Home Tagline", hero.transform,
                 "Take your time. Enjoy the trees.", 36, white,
                 new Vector2(.07f, .10f), new Vector2(.93f, .35f));
+            flow.homeProgressLabel = MakeLabel("Home Saved Harvest", home.transform,
+                "TREE 1 / 10     0 / 120 FRUITS", 31, white,
+                new Vector2(.10f, .565f), new Vector2(.90f, .623f));
             var play = MakeButton("Home Play", home.transform, "CONTINUE",
                 new Vector2(.18f, .47f), new Vector2(.82f, .55f),
                 new Color(.97f, .86f, .61f, 1f));
