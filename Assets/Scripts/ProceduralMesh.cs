@@ -397,7 +397,7 @@ namespace FruitTree
         }
 
         /// <summary>
-        /// Red pomegranate with five small, mesh-integrated crown sepals.
+        /// Red pomegranate with five calyx sepals beneath the fruit, opposite the stem.
         /// No additional GameObjects, meshes or colliders for the crown.
         /// </summary>
         public static Mesh Pomegranate()
@@ -418,11 +418,11 @@ namespace FruitTree
                 float b = (petal + 1) * Mathf.PI * 2f / 5f;
                 float mid = (a + b) * .5f;
                 int start = verts.Count;
-                verts.Add(new Vector3(Mathf.Cos(a) * .035f, .142f,
+                verts.Add(new Vector3(Mathf.Cos(a) * .035f, -.175f,
                     Mathf.Sin(a) * .035f));
-                verts.Add(new Vector3(Mathf.Cos(b) * .035f, .142f,
+                verts.Add(new Vector3(Mathf.Cos(b) * .035f, -.175f,
                     Mathf.Sin(b) * .035f));
-                verts.Add(new Vector3(Mathf.Cos(mid) * .062f, .217f,
+                verts.Add(new Vector3(Mathf.Cos(mid) * .062f, -.244f,
                     Mathf.Sin(mid) * .062f));
                 uv.Add(new Vector2(0f, 0f));
                 uv.Add(new Vector2(1f, 0f));
