@@ -85,6 +85,7 @@ namespace FruitTree
             ReducedMotion = reduce;
             PlayerPrefs.SetInt("FruitTree.ReducedMotion", reduce ? 1 : 0);
             PlayerPrefs.Save();
+            if (reduce && IsReblooming) ResetHarvest();
             Transform leafObject = transform.Find("Merged Leaves");
             if (leafObject == null) return;
             var renderer = leafObject.GetComponent<Renderer>();

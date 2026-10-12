@@ -65,6 +65,11 @@ namespace FruitTree
         private void Update()
         {
             if (!IsAnimating) return;
+            if (PlayerPrefs.GetInt("FruitTree.ReducedMotion", 0) == 1)
+            {
+                Hide();
+                return;
+            }
             elapsed += Time.unscaledDeltaTime;
             float t = Mathf.Clamp01(elapsed / .42f);
             for (int i = 0; i < starts.Length; i++)
