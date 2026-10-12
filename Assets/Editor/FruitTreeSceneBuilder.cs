@@ -363,6 +363,29 @@ namespace FruitTree.Editor
                 orchard.FindRemainingFruit);
             orchard.remainingFruitHintButton.gameObject.SetActive(false);
 
+            // A soft, non-blocking moment of satisfaction after the final pick.
+            var clearNotice = new GameObject("Quiet Harvest Completion",
+                typeof(RectTransform), typeof(CanvasRenderer),
+                typeof(RoundedPanel), typeof(CanvasGroup));
+            clearNotice.transform.SetParent(gameRoot, false);
+            Anchor(clearNotice.GetComponent<RectTransform>(),
+                new Vector2(.18f, .255f), new Vector2(.82f, .316f));
+            var noticeFace = clearNotice.GetComponent<RoundedPanel>();
+            noticeFace.color = new Color(.18f, .31f, .23f, .74f);
+            noticeFace.CornerRadius = 36f;
+            noticeFace.raycastTarget = false;
+            var noticeGroup = clearNotice.GetComponent<CanvasGroup>();
+            noticeGroup.alpha = 0f;
+            noticeGroup.interactable = false;
+            noticeGroup.blocksRaycasts = false;
+            var noticeLabel = MakeLabel("Completion Message", clearNotice.transform,
+                "EVERY FRUIT COLLECTED", 38, new Color(.98f, .96f, .86f),
+                Vector2.zero, Vector2.one);
+            var completionFeedback = canvasObject.AddComponent<CalmCompletionFeedback>();
+            completionFeedback.orchard = orchard;
+            completionFeedback.messageGroup = noticeGroup;
+            completionFeedback.message = noticeLabel;
+
             // A calm completion shortcut, never displayed during ordinary harvesting.
             orchard.completionNextButton = MakeButton("Completion Next Tree",
                 gameRoot, "NEXT TREE", new Vector2(.31f, .14f),
