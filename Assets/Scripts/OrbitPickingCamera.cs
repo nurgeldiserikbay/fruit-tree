@@ -202,13 +202,41 @@ namespace FruitTree
             return uiHits.Count > 0;
         }
 
+        /// <summary>
+        /// Converts a small finger-sized screen margin into a bounded world
+        /// radius. The cap prevents a tap on one branch from taking distant fruit.
+        /// </summary>
+        public static float TouchAssistRadius(int screenHeight, float verticalFov, float depth)
+        {
+            float fov = Mathf.Clamp(verticalFov, 20f, 90f) * Mathf.Deg2Rad;
+            float unitsPerPixel = 2f * Mathf.Max(1f, depth) *
+                Mathf.Tan(fov * .5f) / Mathf.Max(1, screenHeight);
+            return Mathf.Clamp(unitsPerPixel * 14f, .035f, .12f);
+        }
+
         private void TryPick(Vector2 point)
         {
             Ray ray = viewCamera.ScreenPointToRay(point);
-            if (Physics.Raycast(ray, out RaycastHit hit, 30f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+            const float maxDistance = 30f;
+            // Direct hits win. Only a missed tap gets a small camera-aware margin;
+            // this keeps the actual fruit selection precise at crowded branches.
+            if (Physics.Raycast(ray, out RaycastHit hit, maxDistance,
+                Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
             {
-                var apple = hit.collider.GetComponentInParent<Apple>();
-                if (apple != null) apple.Pick();
+                var exactFruit = hit.collider.GetComponentInParent<Apple>();
+                if (exactFruit != null) exactFruit.Pick();
+                return;
+            }
+
+            float depth = target == null ? distance :
+                Vector3.Distance(viewCamera.transform.position, target.position);
+            float radius = TouchAssistRadius(Screen.height,
+                viewCamera.fieldOfView, depth);
+            if (Physics.SphereCast(ray, radius, out hit, maxDistance,
+                Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+            {
+                var nearbyFruit = hit.collider.GetComponentInParent<Apple>();
+                if (nearbyFruit != null) nearbyFruit.Pick();
             }
         }
     }
