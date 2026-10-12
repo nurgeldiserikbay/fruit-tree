@@ -89,6 +89,24 @@ namespace FruitTree.Editor
             if (budget == null || environment == null || budget.sun != environment.sun)
                 errors.Add("Android graphics quality budget is not wired to the scene sun");
 
+            var progressBar = UnityEngine.Object.FindAnyObjectByType<OrchardProgressBar>();
+            if (progressBar == null || progressBar.tree != tree || progressBar.fill == null)
+                errors.Add("Gameplay harvest progress strip is not connected");
+
+            var pulse = UnityEngine.Object.FindAnyObjectByType<FruitPickPulse>();
+            if (pulse == null || pulse.tree != tree ||
+                pulse.worldCamera != Camera.main || pulse.overlay == null ||
+                pulse.glints == null || pulse.glints.Length != 3)
+                errors.Add("Fruit-pick pooled visual pulse is not connected");
+            else
+            {
+                foreach (var glint in pulse.glints)
+                    if (glint == null || glint.blocksRaycasts ||
+                        glint.GetComponent<RoundedPanel>() == null ||
+                        glint.GetComponent<RoundedPanel>().raycastTarget)
+                        errors.Add("Fruit-pick glints must never block input");
+            }
+
             var completion = UnityEngine.Object.FindAnyObjectByType<CalmCompletionFeedback>();
             if (completion == null || completion.orchard != orchard ||
                 completion.message == null || completion.messageGroup == null ||
