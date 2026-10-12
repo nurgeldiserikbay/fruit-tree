@@ -24,6 +24,14 @@ namespace FruitTree.Progression
         {
             var main = TryRead(path);
             if (main != null) return main;
+            // A crash between writing the complete temporary file and
+            // replacing the primary save can leave a newer valid snapshot.
+            var interrupted = TryRead(temporary);
+            if (interrupted != null)
+            {
+                Debug.LogWarning("Fruit Tree: recovered complete interrupted save.");
+                return interrupted;
+            }
             var recovered = TryRead(backup);
             if (recovered != null)
             {
@@ -43,7 +51,25 @@ namespace FruitTree.Progression
                 string serialized = JsonUtility.ToJson(save, true);
                 File.WriteAllText(temporary, serialized);
                 if (File.Exists(path) && TryRead(path) != null)
+                {
+                    // On most Android file systems this replaces the existing
+                    // file atomically while keeping the previous valid version.
+                    // Do not destroy the last known-good backup first.
+                    try
+                    {
+                        File.Replace(temporary, path, backup);
+                        return true;
+                    }
+                    catch (PlatformNotSupportedException)
+                    {
+                        // Some device runtimes do not implement File.Replace.
+                    }
+                    catch (IOException)
+                    {
+                        // Conservative fallback: retain a valid old backup.
+                    }
                     File.Copy(path, backup, true);
+                }
                 if (File.Exists(path)) File.Delete(path);
                 File.Move(temporary, path);
                 return true;
