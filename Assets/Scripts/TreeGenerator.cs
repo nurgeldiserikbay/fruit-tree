@@ -235,8 +235,9 @@ namespace FruitTree
             Color fruitColor = speciesId == "pear" ? new Color(.82f, .78f, .23f) :
                 speciesId == "cherry" ? new Color(.74f, .045f, .065f) : Color.white;
             Material appleMaterial = Track(LitMaterial("Fruit " + speciesId, fruitColor, .38f));
-            if (speciesId == "apple" && appleMaterial.HasProperty("_MainTex"))
-                appleMaterial.SetTexture("_MainTex", Track(AppleSkinTexture.Create()));
+            if (appleMaterial.HasProperty("_MainTex"))
+                appleMaterial.SetTexture("_MainTex",
+                    Track(AppleSkinTexture.CreateForSpecies(speciesId)));
             // Just three shared skin variants per species: natural color variation
             // without allocating an individual material for every fruit.
             var skins = new Material[3];
@@ -273,7 +274,7 @@ namespace FruitTree
                 fruit.transform.localScale = Vector3.one * fruitScale;
                 fruit.transform.localRotation = Quaternion.Euler(Between(-10, 10), Between(0, 360), Between(-10, 10));
                 fruit.AddComponent<SphereCollider>().radius =
-                    speciesId == "cherry" ? .29f : .27f;
+                    speciesId == "cherry" ? .24f : .27f;
                 var component = fruit.AddComponent<Apple>();
                 component.Initialize(i);
                 component.Harvested += OnHarvest;
