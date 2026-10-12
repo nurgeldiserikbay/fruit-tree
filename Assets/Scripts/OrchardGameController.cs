@@ -125,6 +125,20 @@ namespace FruitTree
             return 0;
         }
 
+        /// <summary>
+        /// Saved active-tree progress for the lightweight home screen.
+        /// Calling it never changes or writes the player's harvest state.
+        /// </summary>
+        public string HomeSummary()
+        {
+            if (!initialized || progress == null)
+                return "YOUR ORCHARD AWAITS";
+            int index = LevelIndex();
+            TreeRoundState current = progress.GetTree(progress.ActiveTreeId);
+            return "TREE " + (index + 1) + " / " + Catalog.Length + "     " +
+                current.PickedCount + " / " + current.Definition.FruitCount + " FRUITS";
+        }
+
         public void OpenTreeMenu()
         {
             if (!initialized || treeMenuPanel == null) return;
