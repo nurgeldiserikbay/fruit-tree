@@ -8,6 +8,16 @@ namespace FruitTree
     public sealed class GroundGenerator : MonoBehaviour
     {
         private readonly List<UnityEngine.Object> generated = new List<UnityEngine.Object>();
+        private Material meadowMaterial;
+        private Material bladesMaterial;
+
+        public void SetPalette(Color meadowTint, Color grassTint)
+        {
+            if (meadowMaterial != null && meadowMaterial.HasProperty("_Color"))
+                meadowMaterial.SetColor("_Color", meadowTint);
+            if (bladesMaterial != null && bladesMaterial.HasProperty("_Color"))
+                bladesMaterial.SetColor("_Color", grassTint);
+        }
 
         private void Awake()
         {
@@ -18,6 +28,8 @@ namespace FruitTree
             if (material.HasProperty("_AmbientLight")) material.SetFloat("_AmbientLight", .67f);
             if (grassMaterial.HasProperty("_AmbientLight")) grassMaterial.SetFloat("_AmbientLight", .70f);
             if (grassMaterial.HasProperty("_Cull")) grassMaterial.SetFloat("_Cull", 0f);
+            meadowMaterial = material;
+            bladesMaterial = grassMaterial;
             generated.Add(material);
             generated.Add(grassMaterial);
             Create("Meadow Terrain", CreateTerrainMesh(), material);

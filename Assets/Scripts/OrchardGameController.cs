@@ -15,6 +15,7 @@ namespace FruitTree
     {
         public TreeGenerator tree;
         public OrbitPickingCamera orbitCamera;
+        public EnvironmentController environment;
         public HarvestHUD hud;
         public GameObject treeMenuPanel;
         public Text treeLabel;
@@ -87,6 +88,7 @@ namespace FruitTree
             tree.Configure(active.Definition.SpeciesId, active.Definition.FruitCount,
                 122 + levelIndex * 197);
             tree.RestorePickedFruits(active.PickedFruitIds);
+            if (environment != null) environment.UseForTree(levelIndex);
             hintCursor = -1;
             // Wait until deferred old objects have been destroyed before computing bounds.
             StartCoroutine(RefitCameraNextFrame());

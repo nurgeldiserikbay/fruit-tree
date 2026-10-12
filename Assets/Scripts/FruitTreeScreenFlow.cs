@@ -22,6 +22,8 @@ namespace FruitTree
         public OrbitPickingCamera orbitCamera;
         public OrchardAudio sound;
         public TreeGenerator activeTree;
+        public EnvironmentController environment;
+        public Text sceneryLabel;
         public Text audioLevelLabel;
         public Text motionLabel;
         public Text audioButtonLabel;
@@ -160,6 +162,12 @@ namespace FruitTree
             RefreshLabels();
         }
 
+        public void CycleScenery()
+        {
+            if (environment != null) environment.CycleScenery();
+            RefreshLabels();
+        }
+
         public void ToggleQuietAudio()
         {
             if (sound != null) sound.ToggleQuietAudio();
@@ -203,6 +211,9 @@ namespace FruitTree
         {
             if (audioButtonLabel != null && sound != null)
                 audioButtonLabel.text = sound.IsMuted ? "SOUND: OFF" : "SOUND: ON";
+            if (sceneryLabel != null && environment != null)
+                sceneryLabel.text = environment.IsAutomatic ?
+                    "SCENERY: AUTO" : "SCENERY: " + EnvironmentThemes.DisplayName(environment.CurrentTheme);
             if (audioLevelLabel != null && sound != null)
                 audioLevelLabel.text = sound.IsQuietAudio ? "AUDIO: SOFT" : "AUDIO: NORMAL";
             if (motionLabel != null && activeTree != null)

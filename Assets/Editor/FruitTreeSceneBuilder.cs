@@ -71,7 +71,7 @@ namespace FruitTree.Editor
             orchard.tree = root.GetComponent<TreeGenerator>();
 
             EnsureShaderIsInBuild();
-            new GameObject("Quiet Meadow").AddComponent<GroundGenerator>();
+            var ground = new GameObject("Quiet Meadow").AddComponent<GroundGenerator>();
             CreateSky();
             var cameraObject = new GameObject("Main Camera");
             cameraObject.tag = "MainCamera";
@@ -93,6 +93,12 @@ namespace FruitTree.Editor
             light.shadows = LightShadows.Soft;
             light.shadowStrength = .5f;
             sunObject.transform.rotation = Quaternion.Euler(43f, -32f, 0f);
+            var environment = ground.gameObject.AddComponent<EnvironmentController>();
+            environment.ground = ground;
+            var skyRoot = GameObject.Find("Soft Sky");
+            environment.skyRenderer = skyRoot != null ? skyRoot.GetComponent<Renderer>() : null;
+            environment.sun = light;
+            orchard.environment = environment;
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
             RenderSettings.ambientLight = new Color(.68f, .73f, .77f);
             RenderSettings.fog = true;
@@ -234,6 +240,7 @@ namespace FruitTree.Editor
             screenFlow.orbitCamera = orchard.orbitCamera;
             screenFlow.sound = sound;
             screenFlow.activeTree = tree;
+            screenFlow.environment = orchard.environment;
             screenFlow.gameplayControls = gameLayer;
             pauseController.screenFlow = screenFlow;
             pauseController.panel = menu;
@@ -430,23 +437,27 @@ namespace FruitTree.Editor
             MakeLabel("Settings Title", options.transform, "SETTINGS", 78, white,
                 new Vector2(.12f, .74f), new Vector2(.88f, .84f));
             var sound = MakeButton("Settings Sound", options.transform, "SOUND: ON",
-                new Vector2(.20f, .65f), new Vector2(.80f, .72f), ivory);
+                new Vector2(.20f, .665f), new Vector2(.80f, .735f), ivory);
             flow.audioButtonLabel = sound.GetComponentInChildren<Text>();
             var softAudio = MakeButton("Settings Quiet Audio", options.transform,
-                "AUDIO: SOFT", new Vector2(.20f, .555f), new Vector2(.80f, .625f), ivory);
+                "AUDIO: SOFT", new Vector2(.20f, .575f), new Vector2(.80f, .645f), ivory);
             flow.audioLevelLabel = softAudio.GetComponentInChildren<Text>();
             var motion = MakeButton("Settings Motion", options.transform,
-                "MOTION: GENTLE", new Vector2(.20f, .46f), new Vector2(.80f, .53f), ivory);
+                "MOTION: GENTLE", new Vector2(.20f, .485f), new Vector2(.80f, .555f), ivory);
             flow.motionLabel = motion.GetComponentInChildren<Text>();
+            var scenery = MakeButton("Settings Scenery", options.transform,
+                "SCENERY: AUTO", new Vector2(.20f, .395f), new Vector2(.80f, .465f), ivory);
+            flow.sceneryLabel = scenery.GetComponentInChildren<Text>();
             var policy = MakeButton("Settings Privacy", options.transform, "PRIVACY POLICY",
-                new Vector2(.20f, .365f), new Vector2(.80f, .435f), ivory);
+                new Vector2(.20f, .305f), new Vector2(.80f, .375f), ivory);
             var controls = MakeButton("Settings Controls", options.transform, "HOW TO PLAY",
-                new Vector2(.20f, .27f), new Vector2(.80f, .34f), ivory);
+                new Vector2(.20f, .215f), new Vector2(.80f, .285f), ivory);
             var back = MakeButton("Settings Back", options.transform, "BACK",
-                new Vector2(.27f, .155f), new Vector2(.73f, .225f), fern);
+                new Vector2(.27f, .105f), new Vector2(.73f, .175f), fern);
             UnityEventTools.AddPersistentListener(sound.onClick, flow.ToggleSound);
             UnityEventTools.AddPersistentListener(softAudio.onClick, flow.ToggleQuietAudio);
             UnityEventTools.AddPersistentListener(motion.onClick, flow.ToggleReducedMotion);
+            UnityEventTools.AddPersistentListener(scenery.onClick, flow.CycleScenery);
             UnityEventTools.AddPersistentListener(policy.onClick, flow.OpenPrivacy);
             UnityEventTools.AddPersistentListener(controls.onClick, flow.OpenHelp);
             UnityEventTools.AddPersistentListener(back.onClick, flow.CloseSettings);
