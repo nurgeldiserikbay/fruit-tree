@@ -13,7 +13,12 @@ namespace FruitTree.Tests
                 new TreeLevelDefinition("tree_002", "pear", 140),
                 new TreeLevelDefinition("tree_003", "cherry", 220),
                 new TreeLevelDefinition("tree_004", "peach", 130),
-                new TreeLevelDefinition("tree_005", "orange", 160)
+                new TreeLevelDefinition("tree_005", "orange", 160),
+                new TreeLevelDefinition("tree_006", "apricot", 180),
+                new TreeLevelDefinition("tree_007", "plum", 160),
+                new TreeLevelDefinition("tree_008", "lemon", 140),
+                new TreeLevelDefinition("tree_009", "mandarin", 200),
+                new TreeLevelDefinition("tree_010", "pomegranate", 110)
             });
         }
 
@@ -144,6 +149,68 @@ namespace FruitTree.Tests
             Assert.IsTrue(updated.IsUnlocked("tree_003"));
             Assert.IsFalse(updated.IsUnlocked("tree_004"));
             Assert.IsFalse(updated.IsUnlocked("tree_005"));
+        }
+
+        [Test]
+        public void AllTenSpeciesUnlockOnlyAfterPreviousTreeIsCompletelyPicked()
+        {
+            var game = NewGame();
+            Assert.AreEqual(10, game.Definitions.Count);
+            for (int index = 0; index < game.Definitions.Count; index++)
+            {
+                var def = game.Definitions[index];
+                Assert.IsTrue(game.SelectTree(def.Id));
+                Assert.IsFalse(game.IsUnlocked("tree_999"));
+                for (int i = 0; i < def.FruitCount - 1; i++)
+                    Assert.IsTrue(game.TryPickActive(def.FruitIdAt(i)));
+                if (index + 1 < game.Definitions.Count)
+                {
+                    string next = game.Definitions[index + 1].Id;
+                    Assert.IsFalse(game.IsUnlocked(next),
+                        "Unlocked next species before final fruit: " + def.Id);
+                }
+                Assert.IsTrue(game.TryPickActive(def.FruitIdAt(def.FruitCount - 1)));
+                Assert.IsTrue(game.GetTree(def.Id).IsCleared);
+                if (index + 1 < game.Definitions.Count)
+                    Assert.IsTrue(game.IsUnlocked(game.Definitions[index + 1].Id));
+                Assert.IsFalse(game.TryPickActive(def.FruitIdAt(0)),
+                    "Duplicate fruit pick should never count");
+            }
+            Assert.AreEqual("tree_010", game.ActiveTreeId);
+            var restored = new OrchardProgressionService(game.Definitions, game.ToSave());
+            Assert.IsTrue(restored.GetTree("tree_010").IsCleared);
+            Assert.AreEqual("tree_010", restored.ActiveTreeId);
+            Assert.IsTrue(restored.SelectTree("tree_001"));
+            Assert.IsTrue(restored.TryRebloomActive());
+            Assert.IsTrue(restored.IsUnlocked("tree_010"));
+        }
+
+        [Test]
+        public void ExistingFiveTreeSaveRestoresIntoTenWithoutUnlockedFutureTrees()
+        {
+            var originalFive = new[]
+            {
+                new TreeLevelDefinition("tree_001", "apple", 120),
+                new TreeLevelDefinition("tree_002", "pear", 140),
+                new TreeLevelDefinition("tree_003", "cherry", 220),
+                new TreeLevelDefinition("tree_004", "peach", 130),
+                new TreeLevelDefinition("tree_005", "orange", 160)
+            };
+            var oldGame = new OrchardProgressionService(originalFive);
+            foreach (var def in originalFive)
+            {
+                Assert.IsTrue(oldGame.SelectTree(def.Id));
+                // Make all but last species fully cleared.
+                int picked = def.Id == "tree_005" ? 17 : def.FruitCount;
+                for (int i = 0; i < picked; i++)
+                    Assert.IsTrue(oldGame.TryPickActive(def.FruitIdAt(i)));
+            }
+            var updated = new OrchardProgressionService(NewGame().Definitions, oldGame.ToSave());
+            Assert.AreEqual("tree_005", updated.ActiveTreeId);
+            Assert.AreEqual(17, updated.GetTree("tree_005").PickedCount);
+            Assert.IsFalse(updated.IsUnlocked("tree_006"));
+            Assert.IsFalse(updated.IsUnlocked("tree_010"));
+            Assert.IsTrue(updated.GetTree("tree_001").CompletedOnce);
         }
 
         [Test]
