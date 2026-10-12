@@ -116,6 +116,42 @@ namespace FruitTree.Tests
         }
 
         [UnityTest]
+        public IEnumerator OrchardPauseRestartMustNotClearIncompleteFruitProgress()
+        {
+            var root = new GameObject("Protected Orchard Pause Test");
+            var treeObject = new GameObject("Orchard Tree");
+            treeObject.transform.SetParent(root.transform);
+            var panel = new GameObject("Pause Panel");
+            panel.transform.SetParent(root.transform);
+            panel.SetActive(false);
+            var tree = treeObject.AddComponent<TreeGenerator>();
+            if (tree.Apples.Count == 0) tree.Generate();
+            var hud = root.AddComponent<HarvestHUD>();
+            hud.tree = tree;
+            hud.OrchardMode = true;
+            var pause = root.AddComponent<PauseController>();
+            pause.hud = hud;
+            pause.panel = panel;
+            try
+            {
+                tree.Apples[0].Pick();
+                Assert.AreEqual(1, tree.HarvestedCount);
+                pause.Toggle();
+                pause.Restart();
+                Assert.AreEqual(1, tree.HarvestedCount);
+                Assert.IsTrue(tree.Apples[0].IsHarvested);
+                Assert.IsTrue(pause.IsPaused,
+                    "An incomplete orchard must not silently restart or lose saved fruits.");
+            }
+            finally
+            {
+                pause.Resume();
+                Object.Destroy(root);
+            }
+            yield return null;
+        }
+
+        [UnityTest]
         public IEnumerator PauseAndResumeRestoreGameTime()
         {
             var root = new GameObject("Pause Test");
