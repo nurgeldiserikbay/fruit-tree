@@ -97,6 +97,34 @@ namespace FruitTree
             }
         }
 
+        /// <summary>
+        /// Single continuous low-poly distant ridgeline facing inward in 360°.
+        /// Works as a soft horizon without another terrain renderer/texture.
+        /// All vertices remain far outside the main tree picking zone.
+        /// </summary>
+        public void RidgeBand(float radius, float baseHeight, float ridgeHeight,
+            int segments, float phase, Color color)
+        {
+            if (segments < 8 || radius < 8f) return;
+            for (int i = 0; i < segments; i++)
+            {
+                float a = (i + phase) * 2f * Mathf.PI / segments;
+                float b = (i + 1 + phase) * 2f * Mathf.PI / segments;
+                float h0 = ridgeHeight * (.73f + .19f * Mathf.Sin(a * 3f) +
+                    .08f * Mathf.Sin(a * 7f + 1.3f));
+                float h1 = ridgeHeight * (.73f + .19f * Mathf.Sin(b * 3f) +
+                    .08f * Mathf.Sin(b * 7f + 1.3f));
+                Vector3 ground0 = new Vector3(Mathf.Cos(a) * radius,
+                    baseHeight, Mathf.Sin(a) * radius);
+                Vector3 ground1 = new Vector3(Mathf.Cos(b) * radius,
+                    baseHeight, Mathf.Sin(b) * radius);
+                Vector3 top0 = ground0 + Vector3.up * h0;
+                Vector3 top1 = ground1 + Vector3.up * h1;
+                Quad(ground0, ground1, top1, top0,
+                    color * (.93f + .06f * Mathf.Sin(a)));
+            }
+        }
+
         public Mesh Build(string name)
         {
             var mesh = new Mesh { name = name };
