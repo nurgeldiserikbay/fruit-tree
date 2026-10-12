@@ -94,7 +94,9 @@ namespace FruitTree.Tests
                 var hud = root.AddComponent<HarvestHUD>();
                 hud.OrchardMode = true;
                 hud.tree = tree;
-                tree.Apples[0].Pick();
+                // Exercise an already restored partial round without invoking
+                // PlayMode-only coroutines from an EditMode test.
+                tree.RestorePickedFruits(new[] { "fruit_0000" });
                 Assert.AreEqual(1, tree.HarvestedCount);
                 hud.Restart();
                 Assert.AreEqual(1, tree.HarvestedCount);
