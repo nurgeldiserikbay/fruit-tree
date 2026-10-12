@@ -1,5 +1,12 @@
 # Fruit Tree development state
 
+## Complete interrupted-save recovery (source update, 2026-10-12)
+
+- [x] On startup, recover a structurally valid, more recently written `.tmp` snapshot even if the previous primary is still valid; this avoids losing the latest successful temporary write after a shutdown between write and replace.
+- [x] Keep a valid primary when the temporary copy is older, invalid, or has the same modification time (safe fallback on coarse-timestamp file systems).
+- [x] Added three deterministic EditMode regression tests for newer-valid, older-valid and newer-invalid temporary snapshots.
+- [ ] Execute Unity EditMode tests and Android force-close/restart scenarios. This source fix is not a verified device release.
+
 ## Additional safety and accessibility fixes (2026-10-12)
 
 - [x] Offline save repository now uses the same structural validation for both loading and writing. Malformed snapshots are rejected **before** touching a previous valid on-disk save.

@@ -96,5 +96,44 @@ namespace FruitTree.Tests
                 UnityEngine.JsonUtility.ToJson(broken));
             Assert.AreEqual(2, repository.Load().trees[0].pickedFruitIds.Count);
         }
+        [Test]
+        public void NewerCompleteTemporaryIsRecoveredEvenIfPrimaryIsValid()
+        {
+            Assert.IsTrue(repository.Save(Create(3)));
+            string main = Path.Combine(folder, "fruit-tree-orchard.json");
+            string temporary = main + ".tmp";
+            File.WriteAllText(temporary, UnityEngine.JsonUtility.ToJson(Create(11)));
+            File.SetLastWriteTimeUtc(main, DateTime.UtcNow.AddMinutes(-10));
+            File.SetLastWriteTimeUtc(temporary, DateTime.UtcNow.AddMinutes(-5));
+
+            Assert.AreEqual(11, repository.Load().trees[0].pickedFruitIds.Count);
+        }
+
+        [Test]
+        public void OlderStaleTemporaryCannotRollBackValidPrimary()
+        {
+            Assert.IsTrue(repository.Save(Create(14)));
+            string main = Path.Combine(folder, "fruit-tree-orchard.json");
+            string temporary = main + ".tmp";
+            File.WriteAllText(temporary, UnityEngine.JsonUtility.ToJson(Create(2)));
+            File.SetLastWriteTimeUtc(temporary, DateTime.UtcNow.AddMinutes(-10));
+            File.SetLastWriteTimeUtc(main, DateTime.UtcNow.AddMinutes(-5));
+
+            Assert.AreEqual(14, repository.Load().trees[0].pickedFruitIds.Count);
+        }
+
+        [Test]
+        public void NewerButInvalidTemporaryCannotReplaceValidPrimary()
+        {
+            Assert.IsTrue(repository.Save(Create(9)));
+            string main = Path.Combine(folder, "fruit-tree-orchard.json");
+            string temporary = main + ".tmp";
+            File.WriteAllText(temporary, "{invalid json");
+            File.SetLastWriteTimeUtc(main, DateTime.UtcNow.AddMinutes(-10));
+            File.SetLastWriteTimeUtc(temporary, DateTime.UtcNow.AddMinutes(-5));
+
+            Assert.AreEqual(9, repository.Load().trees[0].pickedFruitIds.Count);
+        }
+
     }
 }

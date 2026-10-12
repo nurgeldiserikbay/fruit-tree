@@ -23,10 +23,18 @@ namespace FruitTree.Progression
         public OrchardSaveData Load()
         {
             var main = TryRead(path);
-            if (main != null) return main;
-            // A crash between writing the complete temporary file and
-            // replacing the primary save can leave a newer valid snapshot.
+            // A crash after writing .tmp but before replacing a valid primary
+            // can leave the newest complete harvest snapshot in .tmp.
             var interrupted = TryRead(temporary);
+            if (main != null)
+            {
+                if (interrupted != null && IsNewer(temporary, path))
+                {
+                    Debug.LogWarning("Fruit Tree: recovered newer interrupted save.");
+                    return interrupted;
+                }
+                return main;
+            }
             if (interrupted != null)
             {
                 Debug.LogWarning("Fruit Tree: recovered complete interrupted save.");
@@ -106,6 +114,19 @@ namespace FruitTree.Progression
                 if (tree.treeId == save.activeTreeId) containsActive = true;
             }
             return containsActive;
+        }
+
+        private static bool IsNewer(string candidate, string current)
+        {
+            try
+            {
+                // Timestamp order is intentionally conservative. On devices with
+                // coarse timestamps, a tie keeps the established primary save.
+                return File.GetLastWriteTimeUtc(candidate) >
+                    File.GetLastWriteTimeUtc(current);
+            }
+            catch (IOException) { return false; }
+            catch (UnauthorizedAccessException) { return false; }
         }
 
         private static OrchardSaveData TryRead(string file)
