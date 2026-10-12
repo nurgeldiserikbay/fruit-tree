@@ -66,7 +66,10 @@ namespace FruitTree
 
         public void Pick()
         {
-            if (IsHarvested) return;
+            // Harvesting is disallowed while a newly blossomed fruit is growing.
+            // Guard the public method as well as the physics raycast pathway.
+            if (IsHarvested || !gameObject.activeInHierarchy ||
+                !GetComponent<Collider>().enabled) return;
             IsHarvested = true;
             GetComponent<Collider>().enabled = false;
             Harvested?.Invoke(this);
