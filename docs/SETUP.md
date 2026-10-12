@@ -95,3 +95,7 @@ GitHub tracks scene-generation code; the generated `Assets/Scenes/Main.unity` is
 ## Signed Google Play AAB (not yet built)
 
 After the user publishes the real Google Docs Privacy Policy and configures its URL, switch Build Profiles to Android, enable ARM64 + IL2CPP and set Android target API 36 or later (recheck Play Console requirements). Configure the private upload keystore and passwords only on the development machine. Run **Fruit Tree → Validate Project** then **Fruit Tree → Build Signed Android AAB**. The output is `Builds/FruitTree-release.aab`. Upload it first to an internal testing track. Never commit the keystore or a generated AAB, and do not present this source-only feature as a completed build.
+
+## 100% fruit accessibility release audit
+
+The signed bundle command automatically runs **Fruit Tree → Audit All Ten Tree Species** after validating the generated scene. The audit creates a temporary isolated tree for each species and uses the actual saved level counts and seeds. Sampled camera positions must be able to raycast to **every fruit** at least once. Any failures block the AAB, with species names and missing fruit objects in the error message. This tool is not a substitute for final fingertip tests at real screen sizes, and it has not yet been executed in Unity.

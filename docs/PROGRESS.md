@@ -5,8 +5,9 @@
 - [x] First release explicitly **English-only** (`FruitTreeReleaseConfig.LanguageCode = "en"`), with scene validation rejecting Cyrillic UI labels.
 - [x] First release explicitly **ad-free with no purchases**; `REMOVE ADS` panel entry hidden and Play Billing initialization disabled.
 - [x] Editor-generated scene revision stamp added. Validation now explains how to refresh the outdated local scene with a backup, instead of pretending GitHub C# commits update the local scene automatically.
-- [x] Guarded **Build Signed Android AAB** Unity editor command added (policy, ARM64, IL2CPP, API and local keystore checks). **No AAB has been built.**
+- [x] Guarded **Build Signed Android AAB** Unity editor command added (policy, ARM64, IL2CPP, API, up-to-date scene, all-ten-tree reachability audit, local keystore checks). **No AAB has been built.**
 - [x] English-only and ad-free launch tests authored (not executed in Unity).
+- [x] Full ten-species reachability audit added as a separate Editor menu command and mandatory signed-AAB gate; source-only, not yet run.
 - [ ] User's real public Privacy Policy URL and release signing credentials; Unity compile, PlayMode/EditMode testing, authentic screenshots, real-device profiling and signed internal-test AAB remain pending.
 
 

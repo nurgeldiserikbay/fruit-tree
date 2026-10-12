@@ -17,7 +17,8 @@
 - [x] Source: merged blossom animation, species-specific leaf forms/wood tints and startup duplicate-tree optimization (Unity PlayMode QA pending).
 - [ ] Finish final-quality fruit/branch/foliage meshes, terrain and lighting; visually approve four environments in Unity.
 - [x] Source: bounded finger-sized tap fallback and voluntary last-fruit guide with short-lived non-blocking marker (not yet tested in Unity).
-- [ ] Every fruit on every tree reachable and 100% clear achievable without frustration; check optional last-fruit assistance on phones.
+- [x] Source: **Fruit Tree → Audit All Ten Tree Species** checks sampled 360-degree camera raycasts for every fruit and fails a signed AAB build if any are unreachable (not run in Unity).
+- [ ] Every fruit on every tree reachable and 100% clear achievable without frustration; run the Editor audit and verify the optional last-fruit assistance on real phones.
 - [x] Source: live fruit progress strip and pooled, touch-through 0.42-second harvest glints; new edit-mode tests authored.
 - [ ] Responsive 9:16, 9:20 and cut-out / safe-area UI testing.
 - [ ] Final natural atmosphere recordings (or approved synthesized audio), licensed/owned SFX and final sound mixing; comfort volume/motion settings are in source but not QA-approved.
@@ -42,7 +43,7 @@
 
 - [ ] Verify **target API >= 36** for new Android mobile app submissions from 2026-08-31 (or an approved extension, where applicable).
 - [ ] Check actual minSdk and permissions in merged Android manifest.
-- [x] Source: guarded Unity menu command **Fruit Tree → Build Signed Android AAB**. It blocks missing public policy, keystore, ARM64, IL2CPP and API 36+.
+- [x] Source: guarded Unity menu command **Fruit Tree → Build Signed Android AAB**. It blocks missing public policy, keystore, ARM64, IL2CPP, API 36+, outdated scene versions and failed all-ten-species reachability audit.
 - [ ] Actually generate and install the signed **release AAB** with the publisher's private upload key; local Unity Build Support and real policy URL are required.
 - [ ] Use private keystore/upload key; do NOT commit secrets. Enable Play App Signing.
 - [ ] Install an internal-track build from Play Store; test install, resume, offline save, UI and Android 16. Billing is disabled for the ad-free launch.
