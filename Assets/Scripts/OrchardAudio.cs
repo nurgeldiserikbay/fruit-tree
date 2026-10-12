@@ -40,24 +40,23 @@ namespace FruitTree
 
         private void Start()
         {
-            if (tree != null) tree.HarvestChanged += OnHarvest;
+            if (tree != null) tree.FruitPicked += OnFruitPicked;
             ambience.Play();
             UpdateStatusText();
         }
 
         private void OnDestroy()
         {
-            if (tree != null) tree.HarvestChanged -= OnHarvest;
+            if (tree != null) tree.FruitPicked -= OnFruitPicked;
             if (ownsPickClip && collect != null) Destroy(collect);
             if (ownsAmbientClip && ambience != null && ambience.clip != null) Destroy(ambience.clip);
         }
 
-        private int lastHarvested;
-        private void OnHarvest(int current, int total)
+        private void OnFruitPicked(Apple fruit)
         {
-            if (current == 0) { lastHarvested = 0; return; }
-            if (current > lastHarvested && !muted) effects.PlayOneShot(collect);
-            lastHarvested = current;
+            // Restore/scene switching can update the HUD count without a real tap.
+            // Only a successful player pick has a quiet, tactile SFX.
+            if (fruit != null && !muted && collect != null) effects.PlayOneShot(collect);
         }
 
         public void ToggleSound()
