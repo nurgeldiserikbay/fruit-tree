@@ -4,13 +4,13 @@
 
 ## Gameplay / UX acceptance
 
-- [x] Source: Apple (120), Pear (140), Cherry (220) progression prototype.
+- [x] Source: Apple (120), Pear (140), Cherry (220), Peach (130), Orange (160) five-tree progression prototype (source only, unverified Unity integration).
 - [x] Source: local saved progress, 100%-clear tree unlock and rebloom.
 - [x] Source: main menu, CONTINUE, MY TREES, SETTINGS, HOW TO PLAY, Pause → Main Menu, privacy summary and link configuration (committed; awaiting first Unity scene refresh).
 - [x] Source: voluntary last-ten-fruit camera guide, Zen Mode (HUD-free), soft audio/motion preferences and collection switch close/resume.
 - [x] Source: regression tests for Zen Mode and last-fruit hint thresholds (not run in Unity).
 - [ ] Build and play-test every button, Zen Mode, hint and Android Back behaviour in Unity 6000.6.5f1.
-- [ ] Finish at least 10 individually recognizable tree species (first-release content target).
+- [ ] Finish at least 10 individually recognizable tree species (first-release content target); 5 source-level species exist, 5+ remain.
 - [x] Source: four switchable low-cost environments — Meadow, Park, City Park, Mountains (not yet visually tested).
 - [x] Source: first natural-apple mesh/skin pass, distinct lighter round cherry mesh, 64×64 pear/cherry skin maps, smaller fruit proportions, curved short grass and soft clear-tree feedback (not yet Unity-tested).
 - [x] Source: merged blossom animation, species-specific leaf forms/wood tints and startup duplicate-tree optimization (Unity PlayMode QA pending).

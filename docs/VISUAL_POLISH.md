@@ -53,3 +53,11 @@ When the user starts the final acceptance phase, pull main and **Fruit Tree → 
 - **Launch performance:** `TreeGenerator` has a serialized `generateAutomatically` option; the scene builder disables a redundant default 30-fruit generation before `OrchardGameController` creates the correct saved species. Standalone trees keep their default auto-generation.
 
 These features are committed to source and have **unexecuted Unity tests**. The flower timing, leaf/wood colors, screenshots and phone frame time still require actual Editor/device verification. A visible flower sequence is not a guarantee of final art quality.
+
+## Peach and orange expansion (2026-10-12)
+
+- New fruit profiles: Peach uses an apple-derived mesh reshaped with a shallow suture; Orange uses a compact cherry-derived round citrus body with subtle ribbing.
+- Dedicated shared 64×64 RGB24 mipmapped peach/orange skin swatches with warm blush and fine citrus pores.
+- Peach and Orange have different canopy spreads, major-branch counts, foliage proportions/colors and bark shades. Their meshes remain merged for mobile cost control.
+- Peach: **130** fruits; Orange: **160**. Previous IDs, exact tree counts and JSON schema stay stable, so existing players' earlier progress should survive the catalog extension.
+- Mesh, fruit-count, stable-ID, strict 100% unlock and save-extension tests have been authored. **No Unity Editor/Android run has taken place.**

@@ -1,5 +1,15 @@
 # Fruit Tree development state
 
+## Five-tree collection expansion (2026-10-12)
+
+- [x] Source: Peach 130 (`tree_004`) and Orange 160 (`tree_005`) following existing Apple 120, Pear 140, Cherry 220.
+- [x] Source: independently shaped peach (subtle seam) and citrus (round slight ribbing) mesh, species-specific bark/canopy/leaf color and 64×64 skin swatches.
+- [x] Existing IDs, counts, earlier clear history, local save schema v1 and strict 100%-before-next unlock preserved.
+- [x] EditMode tests authored for all five stable fruit-ID sets, mesh budgets, sequential unlock, replay and older three-tree-save expansion.
+- [ ] Unity compile, actual fruit visibility/100%-reachability, PlayMode checks and real Android performance remain unverified.
+
+See [FIVE_TREE_RELEASE_NOTES.md](FIVE_TREE_RELEASE_NOTES.md).
+
 ## Gentle rebloom and distinct tree shape (2026-10-12)
 
 - [x] Source: cleared trees can rebloom through a **single shared coroutine**, with pale flower petals and staggered growth of all existing fruit instances.

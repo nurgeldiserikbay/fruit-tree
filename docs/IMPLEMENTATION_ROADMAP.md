@@ -6,7 +6,7 @@ Move from an already working 30-apple Unity prototype to a multi-species calming
 
 ### Milestone A — data and persistence foundations
 
-- [x] First three species rules catalog built into controller (replace with ScriptableObject assets later).
+- [x] Five species rules catalog built into controller (replace with ScriptableObject assets later).
 - [x] Implement pure TreeRoundState and OrchardProgressionService with exactly-once full-clear logic (Unity tests authored, not yet run).
 - [x] Write save schema v1 and local persistence with temp + backup recovery (source committed, not verified on Android).
 - [x] Authored EditMode tests: new save, 119/120 lock, 120/120 unlock, duplicate pick, replay and save in-memory roundtrip (not yet executed in Unity).
@@ -14,16 +14,16 @@ Move from an already working 30-apple Unity prototype to a multi-species calming
 
 **Acceptance:** unit tests **must pass in Unity** and existing Unity game must keep running. Source and tests are committed; Unity run is still outstanding.
 
-### Milestone B — playable three-tree vertical slice
+### Milestone B — playable five-tree source milestone
 
 - [x] Give each fruit a stable identity, tracked in the new progression domain (code committed).
 - [x] Wire OrchardGameController to the old camera, HUD and fruit-picking scripts (Unity test pending).
-- [x] Per-tree spawned fruit count: Apple 120, Pear 140, Cherry 220 in code.
+- [x] Per-tree spawned fruit count: Apple 120, Pear 140, Cherry 220, Peach 130, Orange 160 in code.
 - [x] Build Tree Collection and completion-next UI; only unlocked next tree selectable (pending actual Unity verification).
 - [x] Implement saved clear state and replay/rebloom action (code committed).
 - [ ] Test pick-complete-restart without bypassing levels; QA final reachable fruit.
 
-**Acceptance:** 3 unique trees with 100%-clear sequential unlocking and infinite voluntary replay. No regression in Pause, audio or touch controls.
+**Acceptance:** 5 unique trees with 100%-clear sequential unlocking and infinite voluntary replay. No regression in Pause, audio or touch controls.
 
 ### Milestone C — serenity and visual distinction
 
@@ -39,7 +39,7 @@ Move from an already working 30-apple Unity prototype to a multi-species calming
 
 ### Milestone D — species content and scaling
 
-- [ ] Expand to first-release catalog of 10 trees, with authored data validation.
+- [ ] Expand to first-release catalog of 10 trees, with authored data validation; 5 code-level trees completed, 5 or more remain.
 - [ ] On-device profile 100–300 fruit, optimize mesh/material instancing and collider selection.
 - [ ] Save migrations for slot versions and new content.
 - [ ] KZ/RU text keys and accessible UI sizes; help not locked behind ads.
