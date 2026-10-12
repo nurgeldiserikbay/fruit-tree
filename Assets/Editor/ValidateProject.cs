@@ -66,6 +66,7 @@ namespace FruitTree.Editor
                 pause.screenFlow != screenFlow ||
                 screenFlow.openPublishedPrivacyButton == null ||
                 screenFlow.audioLevelLabel == null || screenFlow.motionLabel == null ||
+                screenFlow.sceneryLabel == null || screenFlow.environment == null ||
                 screenFlow.zenExitPanel == null ||
                 screenFlow.activeTree != tree)
                 errors.Add("Home menu, Settings, Help, Privacy or flow references are missing");
@@ -75,6 +76,15 @@ namespace FruitTree.Editor
                 Debug.LogWarning("Fruit Tree: public Google Docs privacy URL is not configured. " +
                     "This is acceptable for local Editor tests but BLOCKS Play Store release.");
 
+            var environment = UnityEngine.Object.FindAnyObjectByType<EnvironmentController>();
+            var terrain = UnityEngine.Object.FindAnyObjectByType<GroundGenerator>();
+            if (environment == null || terrain == null ||
+                environment.ground != terrain || environment.skyRenderer == null ||
+                environment.sun == null || orchard == null ||
+                orchard.environment != environment || screenFlow == null ||
+                screenFlow.environment != environment)
+                errors.Add("Lightweight scenery theme controller and UI wiring are missing");
+
             var soundObject = GameObject.Find("Orchard Sounds");
             var sound = soundObject != null ? soundObject.GetComponent<OrchardAudio>() : null;
             if (sound == null || sound.tree != tree || sound.soundStatusText == null)
@@ -83,7 +93,7 @@ namespace FruitTree.Editor
             if (hudObject != null)
             {
                 var buttons = hudObject.GetComponentsInChildren<Button>(true);
-                if (buttons.Length < 31)
+                if (buttons.Length < 32)
                     errors.Add("Expected at least 26 functional buttons across home, gameplay, pause and settings");
                 foreach (var button in buttons)
                 {
