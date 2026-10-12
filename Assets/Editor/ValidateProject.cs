@@ -57,7 +57,7 @@ namespace FruitTree.Editor
             {
                 if (uiText == null || string.IsNullOrEmpty(uiText.text)) continue;
                 foreach (char ch in uiText.text)
-                    if (ch >= '\\u0400' && ch <= '\\u052F')
+                    if (ch >= '\u0400' && ch <= '\u052F')
                     {
                         errors.Add("Non-English game UI label: " + uiText.name);
                         break;
