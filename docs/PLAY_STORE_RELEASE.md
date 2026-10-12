@@ -12,7 +12,7 @@
 - [ ] Build and play-test every button, Zen Mode, hint and Android Back behaviour in Unity 6000.6.5f1.
 - [ ] Finish at least 10 individually recognizable tree species (first-release content target).
 - [x] Source: four switchable low-cost environments — Meadow, Park, City Park, Mountains (not yet visually tested).
-- [x] Source: first natural-apple mesh/skin pass, smaller Apple/Pear/Cherry proportions, curved short grass and soft clear-tree feedback (not yet Unity-tested).
+- [x] Source: first natural-apple mesh/skin pass, distinct lighter round cherry mesh, 64×64 pear/cherry skin maps, smaller fruit proportions, curved short grass and soft clear-tree feedback (not yet Unity-tested).
 - [ ] Finish final-quality fruit/branch/foliage meshes, terrain and lighting; visually approve four environments in Unity.
 - [ ] Every fruit on every tree reachable and 100% clear achievable without frustration; optional last-fruit assistance.
 - [ ] Responsive 9:16, 9:20 and cut-out / safe-area UI testing.

@@ -2,7 +2,7 @@
 
 ## Fruit / landscape / completion polish (2026-10-12)
 
-- [x] Source: natural apple shoulder/lobe silhouette, softer 128×128 apple-skin freckles and three color variants per species.
+- [x] Source: natural apple shoulder/lobe silhouette, softer 128×128 apple-skin freckles, real round cherry geometry, shared 64×64 pear/cherry skins and three color variants per species.
 - [x] Source: smaller Apple/Pear/Cherry fruit with closer twig attachment, preserved stable picked-fruit IDs.
 - [x] Source: softer short curved grass and subtle terrain tinting within existing mesh budgets.
 - [x] Source: gentle nonblocking complete-harvest fade only after last real pick; no restore celebration.

@@ -7,8 +7,9 @@
 - **Apple silhouette:** keeps the existing low-budget 16×20 procedural topology but adds rounded shoulders, five subtle calyx lobes and a recessed stem dimple. Model is now less like a plain sphere.
 - **Fruit size:** Apple random scale **0.54–0.64** (formerly 0.79–0.90); Pear 0.70–0.80 (formerly 0.88–1.0); Cherry 0.43–0.53 (formerly 0.48–0.61).
 - **Placement:** fruit hangs a little closer to twigs, with less radial push out of the crown and smaller jitter; still individually tappable, with a slightly forgiving hit sphere.
-- **Skin:** same small 128×128 RGB24 mipmapped texture, with mild russet/gold streaks and sparse freckles; no larger texture requirement.
-- **Variation:** exactly three shared material tints per species instead of a separate material for every fruit. Materials use Standard shader GPU instancing when supported.
+- **Skin:** the existing 128×128 RGB24 apple texture gains soft blush/russet streaks; pear/cherry get **separate 64×64 RGB24 mipmapped swatches** shared across every instance. No per-fruit texture allocation.
+- **Cherry mesh:** no longer a shrunken five-lobed apple. Uses its own round 12×16 latitude/longitude mesh (221 vertices vs the apple's 357), keeping consistent click/harvest rules.
+- **Variation:** exactly three shared material tints per species instead of a separate material for every fruit. Materials use Standard shader GPU instancing when `SystemInfo.supportsInstancing` is available. On-device draw-call reduction has not been measured.
 - **Progress IDs:** `fruit_0000`... identifiers unchanged; existing local progress, tree-clearing, unlock and rebloom rules are untouched.
 
 ## Ground comfort
@@ -27,7 +28,7 @@
 
 ## Verification written but not executed
 
-- `VisualPolishTests` checks apple dimensions, finite mesh coordinates, grass height/geometry budget and monotone gentle completion fades.
+- `VisualPolishTests` checks apple dimensions, finite mesh coordinates, reduced cherry mesh, 64×64 pear/cherry skins, grass height/geometry budget and gentle completion fades.
 - A separate numerical reproduction of the apple mesh formula measured 545/560 outward-facing relevant triangles (**97.3%**) vs the existing >95% test requirement. **This is not a Unity Test Runner result.**
 - `ValidateProject` now checks the new completion UI references.
 - Source and `.meta` file structure checked; **Unity, APK/AAB and phone performance tests are outstanding**.

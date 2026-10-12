@@ -25,7 +25,7 @@ Install Unity 6 6000.6.5f1, open this directory in Unity Hub, let it compile and
 The first three-tree collection has been integrated into the playable Unity scene generator, but it and the newly added front-end screens still need end-to-end verification. The planned ten-species release is not complete.
 
 ## Next priorities
-Unity compilation and real-device verification, better bark and foliage art, performance profiling and real licensed environmental recordings. The latest [visual comfort pass](docs/VISUAL_POLISH.md) adds more organic apple geometry/skin, smaller fruit, softer grass, instancing-ready materials and a quiet tree-clear fade. Generated audio currently serves only as a functional placeholder.
+Unity compilation and real-device verification, better bark and foliage art, performance profiling and real licensed environmental recordings. The latest [visual comfort pass](docs/VISUAL_POLISH.md) adds more organic apple geometry/skin, distinct cheaper cherry geometry, 64×64 pear/cherry textures, smaller fruit, softer grass, instancing-ready materials and a quiet tree-clear fade. Generated audio currently serves only as a functional placeholder.
 
 For later automated local verification, see [PowerShell verification script](tools/verify-unity.ps1). It runs EditMode/PlayMode tests and can optionally build an APK on a machine with Unity 6 and Android modules installed.
 
