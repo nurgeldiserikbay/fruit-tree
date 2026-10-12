@@ -40,6 +40,45 @@ namespace FruitTree.Editor
             }
         }
 
+        /// <summary>
+        /// Release gate: scans all ten loaded species from sampled viewpoints
+        /// without consuming saved progress or touching the real game scene.
+        /// Run in the Editor before signing an Android App Bundle.
+        /// </summary>
+        [MenuItem("Fruit Tree/Audit All Ten Tree Species")]
+        public static void AuditAllSpecies()
+        {
+            var problems = new List<string>();
+            var levels = OrchardGameController.LevelDefinitions;
+            for (int index = 0; index < levels.Count; index++)
+            {
+                var level = levels[index];
+                var probe = new GameObject("Audit " + level.SpeciesId);
+                probe.transform.position = new Vector3(1000f + index * 100f, 0f, 1000f);
+                try
+                {
+                    var generated = probe.AddComponent<TreeGenerator>();
+                    generated.SetAutomaticGeneration(false);
+                    generated.Configure(level.SpeciesId, level.FruitCount, 122 + index * 197);
+                    Physics.SyncTransforms();
+                    var missed = FindUnreachable(generated, 48, 4);
+                    if (missed.Count > 0)
+                    {
+                        problems.Add(level.SpeciesId + ": " + missed.Count + "/" +
+                            level.FruitCount + " unreachable — " +
+                            string.Join(", ", missed));
+                    }
+                }
+                finally { Object.DestroyImmediate(probe); }
+            }
+
+            if (problems.Count > 0)
+                throw new System.InvalidOperationException(
+                    "Fruit Tree 100% harvest audit failed. Rework fruit placement: " +
+                    string.Join("; ", problems));
+            Debug.Log("Fruit Tree: all ten species passed the sampled fruit reachability audit.");
+        }
+
         public static List<string> FindUnreachable(TreeGenerator tree, int angleSteps, int heightSteps)
         {
             if (tree == null) throw new System.ArgumentNullException(nameof(tree));
