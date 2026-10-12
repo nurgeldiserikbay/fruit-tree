@@ -220,6 +220,64 @@ namespace FruitTree.Tests
         }
 
         [UnityTest]
+        public IEnumerator ReducedMotionRebloomSkipsBloomAndAllowsImmediatePicking()
+        {
+            int previous = PlayerPrefs.GetInt("FruitTree.ReducedMotion", 0);
+            var root = new GameObject("No Motion Orchard Test");
+            var tree = root.AddComponent<TreeGenerator>();
+            if (tree.Apples.Count == 0) tree.Generate();
+            try
+            {
+                tree.SetReducedMotion(true);
+                tree.Apples[0].Pick();
+                Assert.AreEqual(1, tree.HarvestedCount);
+                tree.ResetHarvestAnimated();
+                Assert.IsFalse(tree.IsReblooming);
+                Assert.IsTrue(tree.Apples[0].GetComponent<Collider>().enabled);
+                Assert.IsTrue(tree.Apples[0].gameObject.activeSelf);
+                Assert.IsNull(root.transform.Find("Merged Rebloom Flowers"),
+                    "Reduced Motion should not allocate blossom meshes.");
+                tree.Apples[0].Pick();
+                Assert.AreEqual(1, tree.HarvestedCount);
+            }
+            finally
+            {
+                PlayerPrefs.SetInt("FruitTree.ReducedMotion", previous);
+                Object.Destroy(root);
+            }
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator TurningOnReducedMotionDuringBloomFinishesItSafely()
+        {
+            int previous = PlayerPrefs.GetInt("FruitTree.ReducedMotion", 0);
+            var root = new GameObject("Reduced Motion Toggle Test");
+            var tree = root.AddComponent<TreeGenerator>();
+            if (tree.Apples.Count == 0) tree.Generate();
+            try
+            {
+                tree.SetReducedMotion(false);
+                tree.ResetHarvestAnimated();
+                Assert.IsTrue(tree.IsReblooming);
+                tree.SetReducedMotion(true);
+                Assert.IsFalse(tree.IsReblooming);
+                foreach (Apple fruit in tree.Apples)
+                {
+                    Assert.IsTrue(fruit.GetComponent<Collider>().enabled);
+                    Assert.IsFalse(fruit.IsHarvested);
+                    Assert.IsTrue(fruit.gameObject.activeSelf);
+                }
+            }
+            finally
+            {
+                PlayerPrefs.SetInt("FruitTree.ReducedMotion", previous);
+                Object.Destroy(root);
+            }
+            yield return null;
+        }
+
+        [UnityTest]
         public IEnumerator SwitchingTreeDuringRebloomCancelsOldVisuals()
         {
             var root = new GameObject("Rebloom Interrupt Test");
