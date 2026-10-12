@@ -56,6 +56,9 @@ namespace FruitTree.Editor
             string path = Path.Combine(projectRoot, "Builds", "FruitTree-release.aab");
             Directory.CreateDirectory(Path.GetDirectoryName(path));
             ValidateProject.Run();
+            // A game requiring 100% fruit collection must not ship with an
+            // unreachable fruit on any of the ten species.
+            FruitReachabilityAudit.AuditAllSpecies();
 
             bool previousBundleSetting = EditorUserBuildSettings.buildAppBundle;
             try
