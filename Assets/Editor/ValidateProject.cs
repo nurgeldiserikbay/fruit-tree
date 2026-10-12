@@ -83,7 +83,8 @@ namespace FruitTree.Editor
                 orchard.previousButton == null || orchard.rebloomButton == null ||
                 orchard.completionNextButton == null ||
                 orchard.remainingFruitHintButton == null ||
-                orchard.pauseController != pause)
+                orchard.pauseController != pause ||
+                pause == null || pause.orchard != orchard)
                 errors.Add("Orchard progression controller or collection UI is missing");
 
             var screenFlow = UnityEngine.Object.FindAnyObjectByType<FruitTreeScreenFlow>();
