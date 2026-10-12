@@ -1,5 +1,16 @@
 # Fruit Tree development state
 
+## Main-menu and harvest UI comfort pass (2026-10-12)
+
+- [x] Source: the home screen keeps the tree visible behind a lighter veil, with a single rounded hero panel, warmer primary Continue button and quieter typography.
+- [x] Source: the home screen displays the active tree number and picked/total fruit from the saved orchard progression, without modifying progress.
+- [x] Source: a narrow, non-interactive harvest progress strip responds to `TreeGenerator.HarvestChanged` and initializes correctly from saved fruit count.
+- [x] Source: three pooled, non-blocking tap glints fade away over 0.42 seconds after a genuine fruit pick. No new GameObjects or extra shaders are created per pick; updates run only while the effect is visible.
+- [x] Source: rounded dialog surfaces now make Pause, Settings, Tree Collection, How To Play and Privacy screens stylistically consistent while showing some of the world behind them.
+- [x] Authored EditMode tests for progress fractions, zero/half/full state and monotonic pulse fade; updated scene validator with required references and touch-through conditions.
+- [ ] **Unverified in Unity Editor:** actual screens, font scaling, 9:16 and 9:20 layouts, overlays, device touch and FPS; scheduled for the final acceptance phase.
+
+
 ## Device graphics budget (2026-10-12)
 
 - [x] Source: single-start Android device class for Low/Balanced/High graphics quality, frame-rate caps, shadow distance/type and MSAA.

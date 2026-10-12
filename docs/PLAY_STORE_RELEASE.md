@@ -6,7 +6,7 @@
 
 - [x] Source: ten-species code catalog and procedurally modeled fruit collection (not yet compiled or visually accepted in Unity).
 - [x] Source: local saved progress, 100%-clear tree unlock and rebloom.
-- [x] Source: main menu, CONTINUE, MY TREES, SETTINGS, HOW TO PLAY, Pause → Main Menu, privacy summary and link configuration (committed; awaiting first Unity scene refresh).
+- [x] Source: main menu, CONTINUE, MY TREES, SETTINGS, HOW TO PLAY, Pause → Main Menu, privacy summary and link configuration, with translucent hero and live saved-tree progress text (committed; awaiting Unity visual QA).
 - [x] Source: voluntary last-ten-fruit camera guide, Zen Mode (HUD-free), soft audio/motion preferences and collection switch close/resume.
 - [x] Source: regression tests for Zen Mode and last-fruit hint thresholds (not run in Unity).
 - [ ] Build and play-test every button, Zen Mode, hint and Android Back behaviour in Unity 6000.6.5f1.
@@ -17,6 +17,7 @@
 - [x] Source: merged blossom animation, species-specific leaf forms/wood tints and startup duplicate-tree optimization (Unity PlayMode QA pending).
 - [ ] Finish final-quality fruit/branch/foliage meshes, terrain and lighting; visually approve four environments in Unity.
 - [ ] Every fruit on every tree reachable and 100% clear achievable without frustration; optional last-fruit assistance.
+- [x] Source: live fruit progress strip and pooled, touch-through 0.42-second harvest glints; new edit-mode tests authored.
 - [ ] Responsive 9:16, 9:20 and cut-out / safe-area UI testing.
 - [ ] Final natural atmosphere recordings (or approved synthesized audio), licensed/owned SFX and final sound mixing; comfort volume/motion settings are in source but not QA-approved.
 - [ ] Kazakh / Russian localization if both languages are declared in the listing (do not falsely claim supported locales).

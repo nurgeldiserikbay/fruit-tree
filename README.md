@@ -66,3 +66,7 @@ The release-content **code** now includes ten species with low-memory procedural
 ### Latest atmosphere and performance update
 
 Four scenery themes now have light distant ridges, park lamps and urban window details, rendered in the existing combined decor mesh. Small scenery meshes and synthetic sound clips are cached by theme, and a 1.5-second crossfade accompanies scenery changes. See [environment system](docs/ENVIRONMENT_SYSTEM.md). Full Unity/device verification and production sound design are still pending.
+
+## Latest home and touch-feedback polish (code integrated)
+
+The home screen now uses a more transparent backdrop with a rounded reading card and a saved progress summary. Gameplay adds a thin harvest progress indicator and three pooled, gentle fruit-pick glints, all without extra harvest GameObjects. Pause, tree collection, settings and help share a light rounded-panel design. [Development status](docs/PROGRESS.md). **Unity visual/phone acceptance is still pending.**
