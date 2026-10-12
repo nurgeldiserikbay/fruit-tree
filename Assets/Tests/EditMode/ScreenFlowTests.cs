@@ -130,6 +130,35 @@ namespace FruitTree.Tests
         }
 
         [Test]
+        public void FirstPlayStoreEditionIsEnglishOnlyAndCannotSellAdRemoval()
+        {
+            Assert.AreEqual("en", FruitTreeReleaseConfig.LanguageCode);
+            Assert.IsFalse(FruitTreeReleaseConfig.AdvertisingEnabled);
+            Assert.IsFalse(FruitTreeReleaseConfig.PurchasesEnabled);
+            Assert.IsFalse(FruitTreeReleaseConfig.CanOfferRemoveAds(false));
+            Assert.IsFalse(FruitTreeReleaseConfig.CanOfferRemoveAds(true));
+        }
+
+        [Test]
+        public void SceneVersionChangesDoNotModifySavedFruitIds()
+        {
+            var go = new GameObject("Scene Revision");
+            try
+            {
+                var version = go.AddComponent<FruitTreeSceneVersion>();
+                Assert.IsFalse(version.IsCurrent);
+                version.StampGeneratedScene();
+                Assert.IsTrue(version.IsCurrent);
+                Assert.AreEqual(FruitTreeSceneVersion.Current, version.GeneratedVersion);
+                // Scene rebuild metadata is independent from local fruit progress.
+                var tree = new Progression.TreeLevelDefinition("tree_001", "apple", 120);
+                Assert.AreEqual("fruit_0000", tree.FruitIdAt(0));
+                Assert.AreEqual("fruit_0119", tree.FruitIdAt(119));
+            }
+            finally { Object.DestroyImmediate(go); }
+        }
+
+        [Test]
         public void OnlyPublishedGoogleDocsHttpsLinksAreAllowed()
         {
             Assert.IsTrue(FruitTreePrivacyConfig.IsPublishedUrlValid(
