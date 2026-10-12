@@ -95,7 +95,8 @@ namespace FruitTree
 
         public void Configure(string species, int fruitCount, int generationSeed)
         {
-            if (species != "apple" && species != "pear" && species != "cherry")
+            if (species != "apple" && species != "pear" && species != "cherry" &&
+                species != "peach" && species != "orange")
                 throw new ArgumentException("Unsupported tree species: " + species);
             if (fruitCount < 1 || fruitCount > 300)
                 throw new ArgumentOutOfRangeException(nameof(fruitCount));
@@ -144,10 +145,14 @@ namespace FruitTree
             var wood = new ProceduralMesh();
             var foliage = new ProceduralMesh();
             var fruitAnchors = new List<Vector3>();
-            var brown = speciesId == "pear" ? new Color(.72f, .71f, .65f) :
+            var brown = speciesId == "peach" ? new Color(.76f, .66f, .60f) :
+                speciesId == "orange" ? new Color(.66f, .65f, .55f) :
+                speciesId == "pear" ? new Color(.72f, .71f, .65f) :
                 speciesId == "cherry" ? new Color(.69f, .60f, .57f) :
                 new Color(.78f, .73f, .67f);
-            var branchColor = speciesId == "pear" ? new Color(.77f, .73f, .66f) :
+            var branchColor = speciesId == "peach" ? new Color(.81f, .68f, .62f) :
+                speciesId == "orange" ? new Color(.69f, .67f, .57f) :
+                speciesId == "pear" ? new Color(.77f, .73f, .66f) :
                 speciesId == "cherry" ? new Color(.73f, .63f, .60f) :
                 new Color(.83f, .76f, .67f);
             // A slight bend in the trunk and irregularly-spaced limbs avoid the
@@ -161,14 +166,18 @@ namespace FruitTree
                 new[] { .43f, .33f, .22f, .035f }, brown);
 
             const float goldenAngle = 2.39996323f;
-            int majorBranches = speciesId == "pear" ? 17 : speciesId == "cherry" ? 23 : 19;
-            float crownSpread = speciesId == "pear" ? .79f : speciesId == "cherry" ? .92f : 1f;
+            int majorBranches = speciesId == "peach" ? 21 : speciesId == "orange" ? 20 :
+                speciesId == "pear" ? 17 : speciesId == "cherry" ? 23 : 19;
+            float crownSpread = speciesId == "orange" ? .85f : speciesId == "peach" ? 1.05f :
+                speciesId == "pear" ? .79f : speciesId == "cherry" ? .92f : 1f;
             for (int i = 0; i < majorBranches; i++)
             {
                 float elevation = i / (float)(majorBranches - 1);
                 float height = (speciesId == "cherry" ?
                     Mathf.Lerp(1.22f, 3.32f, elevation) :
                     speciesId == "pear" ? Mathf.Lerp(1.47f, 3.74f, elevation) :
+                    speciesId == "peach" ? Mathf.Lerp(1.30f, 3.38f, elevation) :
+                    speciesId == "orange" ? Mathf.Lerp(1.26f, 3.29f, elevation) :
                     Mathf.Lerp(1.36f, 3.55f, elevation)) + Between(-.13f, .13f);
                 float angle = goldenAngle * i + Between(-.18f, .18f);
                 Vector3 radial = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle));
@@ -223,11 +232,14 @@ namespace FruitTree
                                 .59f + Between(-.065f,.09f), .19f + tint);
                             if (speciesId == "pear") leafColor = new Color(.31f+tint, .52f+tint, .18f);
                             if (speciesId == "cherry") leafColor = new Color(.27f+tint, .53f+tint, .18f);
+                            if (speciesId == "peach") leafColor = new Color(.30f+tint, .57f+tint, .22f);
+                            if (speciesId == "orange") leafColor = new Color(.26f+tint, .49f+tint, .24f);
                             foliage.Leaf(center + offset * .75f, direction,
-                                speciesId == "cherry" ? Between(.15f,.22f) : Between(.21f,.32f),
+                                speciesId == "cherry" || speciesId == "peach" ?
+                                    Between(.17f,.26f) : Between(.21f,.32f),
                                 speciesId == "pear" ? Between(.11f,.16f) : Between(.16f,.22f),
-                                leafColor, speciesId == "pear" ? .93f :
-                                    speciesId == "cherry" ? .12f : .58f);
+                                leafColor, speciesId == "pear" || speciesId == "orange" ? .93f :
+                                    speciesId == "cherry" || speciesId == "peach" ? .12f : .58f);
                         }
                     }
                 }
@@ -273,9 +285,13 @@ namespace FruitTree
             if (leafMaterial.HasProperty("_Cull")) leafMaterial.SetFloat("_Cull", 0f);
             MakeMeshObject("Merged Leaves", Track(foliage.Build("Leaves")), leafMaterial);
             Mesh appleMesh = Track(speciesId == "pear" ? ProceduralMesh.Pear() :
-                speciesId == "cherry" ? ProceduralMesh.Cherry() : ProceduralMesh.Apple());
+                speciesId == "cherry" ? ProceduralMesh.Cherry() :
+                speciesId == "peach" ? ProceduralMesh.Peach() :
+                speciesId == "orange" ? ProceduralMesh.Orange() : ProceduralMesh.Apple());
             Color fruitColor = speciesId == "pear" ? new Color(.82f, .78f, .23f) :
-                speciesId == "cherry" ? new Color(.74f, .045f, .065f) : Color.white;
+                speciesId == "cherry" ? new Color(.74f, .045f, .065f) :
+                speciesId == "peach" ? new Color(.97f, .77f, .67f) :
+                speciesId == "orange" ? new Color(.98f, .67f, .24f) : Color.white;
             Material appleMaterial = Track(LitMaterial("Fruit " + speciesId, fruitColor, .38f));
             if (appleMaterial.HasProperty("_MainTex"))
                 appleMaterial.SetTexture("_MainTex",
@@ -293,8 +309,12 @@ namespace FruitTree
                     speciesId == "pear" ?
                     (variant == 1 ? new Color(.92f, 1f, .88f) :
                         new Color(1f, .93f, .76f)) :
-                    (variant == 1 ? new Color(.88f, .89f, 1f) :
-                        new Color(1f, .82f, .85f));
+                    speciesId == "cherry" ? (variant == 1 ? new Color(.88f, .89f, 1f) :
+                        new Color(1f, .82f, .85f)) :
+                    speciesId == "peach" ? (variant == 1 ? new Color(1f, .91f, .92f) :
+                        new Color(.95f, 1f, .92f)) :
+                    (variant == 1 ? new Color(1f, .93f, .82f) :
+                        new Color(.98f, 1f, .89f));
                 skins[variant] = Track(tone);
             }
             Material stemMaterial = Track(LitMaterial("Stem", new Color(.28f,.19f,.095f), .12f));
@@ -312,11 +332,14 @@ namespace FruitTree
                 fruit.transform.localPosition = at;
                 // Gentle size variety with ~30% smaller apples than the early prototype.
                 float fruitScale = speciesId == "cherry" ? Between(.43f, .53f) :
-                    speciesId == "pear" ? Between(.70f, .80f) : Between(.54f, .64f);
+                    speciesId == "pear" ? Between(.70f, .80f) :
+                    speciesId == "peach" ? Between(.65f, .75f) :
+                    speciesId == "orange" ? Between(.73f, .84f) : Between(.54f, .64f);
                 fruit.transform.localScale = Vector3.one * fruitScale;
                 fruit.transform.localRotation = Quaternion.Euler(Between(-10, 10), Between(0, 360), Between(-10, 10));
                 fruit.AddComponent<SphereCollider>().radius =
-                    speciesId == "cherry" ? .24f : .27f;
+                    speciesId == "cherry" ? .24f :
+                    speciesId == "peach" ? .28f : speciesId == "orange" ? .24f : .27f;
                 var component = fruit.AddComponent<Apple>();
                 component.Initialize(i);
                 component.Harvested += OnHarvest;
@@ -328,7 +351,7 @@ namespace FruitTree
                 // Attach the end of the stem to the exact twig anchor, rather than
                 // letting apples appear to float when viewed from behind.
                 Vector3 top = fruit.transform.TransformPoint(new Vector3(0f,
-                    speciesId == "pear" ? .29f : .155f, 0f));
+                    appleMesh.bounds.max.y, 0f));
                 Vector3 twig = transform.TransformPoint(attachment);
                 Vector3 axis = twig - top;
                 stem.transform.position = (top + twig) * .5f;
@@ -475,7 +498,8 @@ namespace FruitTree
             // Avoid dozens of dynamic shadow-casting meshes on constrained phones.
             if (label == "Merged Leaves" || label == "Merged Rebloom Flowers" ||
                 label.StartsWith("apple ") ||
-                label.StartsWith("pear ") || label.StartsWith("cherry "))
+                label.StartsWith("pear ") || label.StartsWith("cherry ") ||
+                label.StartsWith("peach ") || label.StartsWith("orange "))
                 renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             return go;
         }
