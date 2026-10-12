@@ -198,6 +198,11 @@ namespace FruitTree.Tests
                 Assert.AreEqual(140, tree.Apples.Count);
                 Assert.AreEqual(0, tree.HarvestedCount);
                 Assert.IsTrue(tree.Apples[0].GetComponent<Collider>().enabled);
+                var obsoleteFlowers = root.transform.Find("Merged Rebloom Flowers");
+                if (obsoleteFlowers != null)
+                    Assert.IsFalse(obsoleteFlowers.gameObject.activeSelf,
+                        "Old bloom visuals must be hidden immediately on tree switch");
+                yield return null; // Unity defers Object.Destroy until frame end.
                 Assert.IsNull(root.transform.Find("Merged Rebloom Flowers"));
             }
             finally { Object.Destroy(root); }
