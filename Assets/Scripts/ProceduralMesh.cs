@@ -322,5 +322,120 @@ namespace FruitTree
             mesh.RecalculateBounds();
             return mesh;
         }
+
+        /// <summary>Short, rounded apricot with a muted cheek seam.</summary>
+        public static Mesh Apricot()
+        {
+            var mesh = Peach();
+            mesh.name = "Small Golden Apricot";
+            var vertices = mesh.vertices;
+            for (int i = 0; i < vertices.Length; i++)
+                vertices[i] = new Vector3(vertices[i].x * .94f,
+                    vertices[i].y * .86f, vertices[i].z * .94f);
+            mesh.vertices = vertices;
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            return mesh;
+        }
+
+        /// <summary>Oval purple plum; lower-poly than a full apple.</summary>
+        public static Mesh Plum()
+        {
+            var mesh = Cherry();
+            mesh.name = "Long Purple Plum";
+            var vertices = mesh.vertices;
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                Vector3 v = vertices[i];
+                float t = Mathf.Clamp01((v.y + .15f) / .3f);
+                float taper = Mathf.Lerp(1.12f, .91f, t);
+                vertices[i] = new Vector3(v.x * taper, v.y * 1.37f, v.z * taper);
+            }
+            mesh.vertices = vertices;
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            return mesh;
+        }
+
+        /// <summary>True citrus lemon shape with little tapered end points.</summary>
+        public static Mesh Lemon()
+        {
+            var mesh = Cherry();
+            mesh.name = "Tapered Yellow Lemon";
+            var vertices = mesh.vertices;
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                Vector3 v = vertices[i];
+                float t = Mathf.Clamp01((v.y + .15f) / .3f);
+                float taper = .95f + .15f * Mathf.Sin(t * Mathf.PI);
+                float tip = .032f * Mathf.Pow(Mathf.Abs(t * 2f - 1f), 8f);
+                vertices[i] = new Vector3(v.x * taper, v.y * 1.43f +
+                    (t > .5f ? tip : -tip), v.z * taper);
+            }
+            mesh.vertices = vertices;
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            return mesh;
+        }
+
+        /// <summary>Low-poly flattened mandarin with a broad citrus shoulder.</summary>
+        public static Mesh Mandarin()
+        {
+            var mesh = Orange();
+            mesh.name = "Flat Tangerine Mandarin";
+            var vertices = mesh.vertices;
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                Vector3 v = vertices[i];
+                vertices[i] = new Vector3(v.x * 1.12f, v.y * .72f,
+                    v.z * 1.12f);
+            }
+            mesh.vertices = vertices;
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            return mesh;
+        }
+
+        /// <summary>
+        /// Red pomegranate with five small, mesh-integrated crown sepals.
+        /// No additional GameObjects, meshes or colliders for the crown.
+        /// </summary>
+        public static Mesh Pomegranate()
+        {
+            var mesh = Apple();
+            mesh.name = "Crowned Pomegranate";
+            var verts = new List<Vector3>(mesh.vertices);
+            var uv = new List<Vector2>(mesh.uv);
+            var tris = new List<int>(mesh.triangles);
+            for (int i = 0; i < verts.Count; i++)
+            {
+                Vector3 v = verts[i];
+                verts[i] = new Vector3(v.x * 1.025f, v.y * .96f, v.z * 1.025f);
+            }
+            for (int petal = 0; petal < 5; petal++)
+            {
+                float a = petal * Mathf.PI * 2f / 5f;
+                float b = (petal + 1) * Mathf.PI * 2f / 5f;
+                float mid = (a + b) * .5f;
+                int start = verts.Count;
+                verts.Add(new Vector3(Mathf.Cos(a) * .035f, .142f,
+                    Mathf.Sin(a) * .035f));
+                verts.Add(new Vector3(Mathf.Cos(b) * .035f, .142f,
+                    Mathf.Sin(b) * .035f));
+                verts.Add(new Vector3(Mathf.Cos(mid) * .062f, .217f,
+                    Mathf.Sin(mid) * .062f));
+                uv.Add(new Vector2(0f, 0f));
+                uv.Add(new Vector2(1f, 0f));
+                uv.Add(new Vector2(.5f, 1f));
+                tris.Add(start); tris.Add(start + 1); tris.Add(start + 2);
+                tris.Add(start + 2); tris.Add(start + 1); tris.Add(start);
+            }
+            mesh.SetVertices(verts);
+            mesh.SetUVs(0, uv);
+            mesh.SetTriangles(tris, 0);
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            return mesh;
+        }
     }
 }
