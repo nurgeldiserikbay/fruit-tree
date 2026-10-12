@@ -5,6 +5,52 @@ namespace FruitTree
     /// <summary>Small seamless apple-skin color texture with subtle natural mottling.</summary>
     public static class AppleSkinTexture
     {
+        public static Texture2D CreateForSpecies(string species)
+        {
+            if (species == "apple") return Create();
+
+            // Compact 64 px shared swatch for pears/cherries: no per-fruit
+            // texture allocation, no individual materials per harvested fruit.
+            const int size = 64;
+            var texture = new Texture2D(size, size, TextureFormat.RGB24, true)
+            {
+                name = species == "pear" ? "Pear Skin" : "Cherry Skin",
+                wrapMode = TextureWrapMode.Repeat,
+                filterMode = FilterMode.Trilinear
+            };
+            var pixels = new Color32[size * size];
+            for (int y = 0; y < size; y++)
+            {
+                float v = y / (float)(size - 1);
+                for (int x = 0; x < size; x++)
+                {
+                    float u = x / (float)(size - 1);
+                    float a = Mathf.PerlinNoise(u * 5f + 21f, v * 5f + 11f);
+                    float b = Mathf.PerlinNoise((u - 1f) * 5f + 21f, v * 5f + 11f);
+                    float mottling = Mathf.Lerp(a, b, u);
+                    float freckles = Mathf.PerlinNoise(u * 29f + 44f, v * 27f + 18f);
+                    if (species == "pear")
+                    {
+                        float tone = .89f + .15f * mottling;
+                        float speck = freckles > .8f ? .07f : 0f;
+                        pixels[y * size + x] = new Color(
+                            Mathf.Clamp01(tone + speck), Mathf.Clamp01(tone * .96f +
+                            speck * .65f), Mathf.Clamp01(tone * .66f));
+                    }
+                    else
+                    {
+                        float tone = .88f + .14f * mottling;
+                        pixels[y * size + x] = new Color(
+                            Mathf.Clamp01(tone), Mathf.Clamp01(tone * .92f),
+                            Mathf.Clamp01(tone * .88f));
+                    }
+                }
+            }
+            texture.SetPixels32(pixels);
+            texture.Apply(true, true);
+            return texture;
+        }
+
         public static Texture2D Create()
         {
             const int width = 128;
