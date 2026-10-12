@@ -21,6 +21,8 @@ namespace FruitTree
         public int TotalApples => appleCount;
         private System.Random random;
         private readonly List<UnityEngine.Object> runtimeResources = new List<UnityEngine.Object>();
+        private Coroutine rebloomAnimation;
+        public bool IsReblooming { get; private set; }
 
         private T Track<T>(T resource) where T : UnityEngine.Object
         {
@@ -39,7 +41,21 @@ namespace FruitTree
             runtimeResources.Clear();
         }
 
-        private void OnDestroy() { ReleaseResources(); }
+        private void OnDestroy()
+        {
+            CancelRebloom();
+            ReleaseResources();
+        }
+
+        private void CancelRebloom()
+        {
+            if (rebloomAnimation != null)
+            {
+                StopCoroutine(rebloomAnimation);
+                rebloomAnimation = null;
+            }
+            IsReblooming = false;
+        }
 
         private void Awake()
         {
@@ -92,6 +108,7 @@ namespace FruitTree
 
         public void Generate()
         {
+            CancelRebloom();
             for (int i = transform.childCount - 1; i >= 0; i--)
             {
                 var child = transform.GetChild(i).gameObject;
@@ -305,6 +322,7 @@ namespace FruitTree
         /// </summary>
         public void ResetHarvest()
         {
+            CancelRebloom();
             if (apples.Count == 0)
             {
                 Generate();
@@ -314,6 +332,58 @@ namespace FruitTree
                 if (apple != null) apple.ResetApple();
             HarvestedCount = 0;
             HarvestChanged?.Invoke(HarvestedCount, appleCount);
+        }
+
+        /// <summary>
+        /// Lightweight staggered regrowth using one coroutine for all fruits.
+        /// The saved domain state is reset before this cosmetic animation starts.
+        /// </summary>
+        public void ResetHarvestAnimated()
+        {
+            if (!Application.isPlaying)
+            {
+                ResetHarvest();
+                return;
+            }
+
+            CancelRebloom();
+            if (apples.Count == 0)
+            {
+                Generate();
+                return;
+            }
+            for (int i = 0; i < apples.Count; i++)
+                if (apples[i] != null) apples[i].BeginRebloom();
+
+            HarvestedCount = 0;
+            HarvestChanged?.Invoke(0, appleCount);
+            IsReblooming = true;
+            rebloomAnimation = StartCoroutine(AnimateRebloom());
+        }
+
+        private System.Collections.IEnumerator AnimateRebloom()
+        {
+            const float duration = 1.65f;
+            const float stagger = .65f;
+            const float growDuration = 1.0f;
+            float time = 0f;
+            while (time < duration)
+            {
+                time = Mathf.Min(duration, time + Time.unscaledDeltaTime);
+                for (int i = 0; i < apples.Count; i++)
+                {
+                    Apple fruit = apples[i];
+                    if (fruit == null) continue;
+                    float offset = ((i * 37) % apples.Count) /
+                        (float)Mathf.Max(1, apples.Count - 1) * stagger;
+                    fruit.GrowRebloom((time - offset) / growDuration);
+                }
+                yield return null;
+            }
+            for (int i = 0; i < apples.Count; i++)
+                if (apples[i] != null) apples[i].GrowRebloom(1f);
+            rebloomAnimation = null;
+            IsReblooming = false;
         }
 
         private void OnHarvest(Apple apple)

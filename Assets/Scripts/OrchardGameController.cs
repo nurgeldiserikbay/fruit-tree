@@ -154,10 +154,13 @@ namespace FruitTree
         public void Rebloom()
         {
             if (!initialized || !progress.TryRebloomActive()) return;
-            tree.ResetHarvest();
-            hintCursor = -1;
+            // Persist round number and empty picked set BEFORE any new fruits appear.
             SaveProgress();
+            tree.ResetHarvestAnimated();
+            hintCursor = -1;
             RefreshCollectionUI();
+            CloseTreeMenu();
+            if (pauseController != null) pauseController.Resume();
         }
 
         /// <summary>

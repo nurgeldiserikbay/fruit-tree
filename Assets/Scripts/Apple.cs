@@ -45,6 +45,25 @@ namespace FruitTree
             IsHarvested = false;
         }
 
+        /// <summary>
+        /// A new harvest round is already saved before this visual transition.
+        /// Collider stays disabled until the fruit reaches its full size.
+        /// </summary>
+        public void BeginRebloom()
+        {
+            ResetApple();
+            GetComponent<Collider>().enabled = false;
+            transform.localScale = Vector3.zero;
+        }
+
+        public void GrowRebloom(float progress)
+        {
+            float t = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(progress));
+            transform.localScale = originalScale * t;
+            if (t >= 1f)
+                GetComponent<Collider>().enabled = true;
+        }
+
         public void Pick()
         {
             if (IsHarvested) return;
