@@ -28,8 +28,8 @@ All **fruit IDs** remain local `fruit_0000` through `fruit_(N−1)`. The saved J
 - Verify app pause, close, process restart, corrupted primary-save fallback, restored exact per-fruit picked set and rebloom of prior clears. Test upgrading saved states from both three- and five-tree versions.
 - Inspect merged blossom regrowth on all ten trees. No growth-stage fruit is pickable; switching levels cancels stale animation.
 - Visit all four environment themes, including automatic per-level cycling and Settings manual override; verify the new one-second sun/sky/terrain/fog color fade completes even while paused. Measure frame time, RAM, battery and heat on Android devices. Confirm the Low/Balanced/High startup graphics budget selects the intended tier, and verify 30/60 FPS are caps rather than guaranteed actual performance.
-- Confirm main-menu navigation, Zen Mode, reduced-motion and audio settings, Android Back, accessibility and localization before publishing. Verify rounded home/overlay panels, saved-tree home summary, event-driven progress strip and pooled visual tap glints remain readable and touch-through at 9:16 and 9:20.
-- Generate production AAB signed with private keystore, verify target SDK and actual Play Console disclosures. Add the final **public Privacy Policy URL** and audited Data safety details at the final release gate.
+- Confirm main-menu navigation, Zen Mode, reduced-motion and audio settings, Android Back and accessibility before publishing. **English is the only supported game language.** Check no KZ/RU selector or labels appear. Verify rounded home/overlay panels, saved-tree home summary, event-driven progress strip and pooled visual tap glints remain readable and touch-through at 9:16 and 9:20.
+- Use the guarded **Build Signed Android AAB** command and the publisher's private keystore; confirm ARM64, IL2CPP, target SDK and actual Play Console disclosures. Verify that the ad-free release has no accessible purchases or ads. Add the final **public Privacy Policy URL** and audited Data safety details at the final release gate.
 
 ## Performance boundaries
 

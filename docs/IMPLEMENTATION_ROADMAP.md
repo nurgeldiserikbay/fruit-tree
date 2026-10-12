@@ -43,7 +43,8 @@ Move from an already working 30-apple Unity prototype to a multi-species calming
 - [ ] Visually review species uniqueness, balance, 100% fruit reachability and performance on Android.
 - [ ] On-device profile 100–300 fruit, optimize mesh/material instancing and collider selection.
 - [ ] Save migrations for slot versions and new content.
-- [ ] KZ/RU text keys and accessible UI sizes; help not locked behind ads.
+- [x] Product language fixed to English (`en`); English-only UI scene validation, no language selector.
+- [ ] Accessibility and readable UI sizes verified on devices; help never locked behind ads.
 - [ ] Automated round-trip save and stress test suites.
 
 ### Milestone E — release

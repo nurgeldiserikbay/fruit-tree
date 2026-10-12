@@ -1,6 +1,6 @@
 # Fruit Tree — Google Play release readiness
 
-**Status (2026-10-12): Not ready for production.** This is a checklist and evidence plan; do not mark a feature complete merely because C# code is committed.
+**Status (2026-10-12): Not ready for production. English-only, ad-free first release.** This is a checklist and evidence plan; do not mark a feature complete merely because C# code is committed.
 
 ## Gameplay / UX acceptance
 
@@ -21,7 +21,7 @@
 - [x] Source: live fruit progress strip and pooled, touch-through 0.42-second harvest glints; new edit-mode tests authored.
 - [ ] Responsive 9:16, 9:20 and cut-out / safe-area UI testing.
 - [ ] Final natural atmosphere recordings (or approved synthesized audio), licensed/owned SFX and final sound mixing; comfort volume/motion settings are in source but not QA-approved.
-- [ ] Kazakh / Russian localization if both languages are declared in the listing (do not falsely claim supported locales).
+- [x] **English-only UI and Play listing.** No Kazakh/Russian language selector or localization promised.
 - [ ] Graceful offline operation, app switch/pause, interrupted save and progress restore.
 - [x] Source: provisional mobile Low/Balanced/High quality tier selection; unknown hardware safely defaults to Balanced.
 - [ ] Profiling on real low-/mid-range Android phones (FPS, heat, RAM, battery).
@@ -34,7 +34,7 @@
 - [ ] Audit all SDKs, Android permissions, collected/shared data and complete the **Data safety** declaration truthfully.
 - [ ] Review **Google Play Families**/target audience content, ad SDK certification, purchase gates and suitability.
 - [ ] Do not enable ads until a compliant partner is integrated and audited. Never charge to remove nonexistent ads.
-- [ ] Test `remove_ads` using internal test-track accounts; verify pending/deferred, restored, canceled and refunded purchases.
+- [x] No ads and no paid IAP offer in the first release. Legacy Remove Ads code is dormant; don't activate it until a real compliant ad provider exists and is tested.
 - [ ] Apply a content rating and audience declarations.
 - [ ] Confirm whether account deletion provisions apply; current design has no in-app user account.
 
@@ -42,9 +42,10 @@
 
 - [ ] Verify **target API >= 36** for new Android mobile app submissions from 2026-08-31 (or an approved extension, where applicable).
 - [ ] Check actual minSdk and permissions in merged Android manifest.
-- [ ] Generate a **signed release AAB**, not just the development APK.
+- [x] Source: guarded Unity menu command **Fruit Tree → Build Signed Android AAB**. It blocks missing public policy, keystore, ARM64, IL2CPP and API 36+.
+- [ ] Actually generate and install the signed **release AAB** with the publisher's private upload key; local Unity Build Support and real policy URL are required.
 - [ ] Use private keystore/upload key; do NOT commit secrets. Enable Play App Signing.
-- [ ] Install internal-track bundle from Play Store; test install, resume, offline save, Play billing and Android 16.
+- [ ] Install an internal-track build from Play Store; test install, resume, offline save, UI and Android 16. Billing is disabled for the ad-free launch.
 - [ ] Verify orientation, app label, package ID, adaptive launcher icon, no debug/development switches and no unintended permissions.
 - [ ] Increment versionName/versionCode per release.
 - [ ] Configure Play Console testing track, testers, countries and (if required) testing participation criteria.
@@ -54,17 +55,18 @@
 - [ ] Final 512×512 store icon, Android adaptive icon (foreground/background/monochrome as needed).
 - [ ] 1024×500 feature graphic, no misleading screenshots / text.
 - [ ] Authentic portrait phone screenshots from the **actual** working game (menus + each fruit species + completion).
-- [ ] Short description, full description and screenshots localized to languages you really support.
+- [x] English-only Play Store description draft; copy must be confirmed against the tested build.
+- [ ] Authentic English gameplay screenshots and release-approved descriptions.
 - [ ] Support email, developer contact, privacy URL and accurate disclosures.
 - [ ] Screenshots reflect the in-app visuals (do not substitute concept illustrations for gameplay).
 
 ## Launch blocker list
 
-1. Full new home/settings/privacy interface has been committed but **not compiled or visually verified by the user**.
+1. All UI screens exist in source, but **have not been compiled, tested, or visually accepted in Unity**. Existing generated local scenes must be refreshed (with backup) to show new UI.
 2. Policy URL, contact email and final Google Docs publication are missing.
 3. SDK data audit, AAB signature and Play Console setup not done.
 4. Ten species exist as unverified procedural source models; final visual assets, fruit accessibility and Android performance require substantial work.
-5. Purchase flows and final-fruit reachability require on-device tests.
+5. Every-fruit reachability and app navigation need on-device tests. No purchase flow should be accessible in this ad-free release.
 
 References:
 - Privacy policy / Data safety: https://support.google.com/googleplay/android-developer/answer/10144311

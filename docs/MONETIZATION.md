@@ -4,9 +4,9 @@
 
 The code supports a Google Play **non-consumable** product called `remove_ads` using Unity IAP 5.0.4 for Unity 6.0.32f1.
 
-**Important: NO advertising SDK is installed in this repository. No ads are shown and the Buy button remains disabled.** Charging for "removing ads" before actual ads exist would be misleading. The future ad provider has to be integrated separately and verified for Google Play Families compliance.
+**Important: the first English-only release is ad-free, with billing initialization disabled and the entire Parent purchase entry hidden. NO advertising SDK is installed.** Charging for "removing ads" before actual ads exist would be misleading. The future ad provider has to be integrated separately and verified for Google Play Families compliance.
 
-The non-consumable entitlement is retrieved from Google Play on launch with `FetchPurchases`, and after a paid pending order the app unlocks the entitlement and calls `ConfirmPurchase` to acknowledge it. The option is in the Pause menu under **FOR PARENTS - HOLD** (hold about 3 seconds). This is a friction gate, **not** age verification or a guarantee against purchases by children.
+The non-consumable entitlement is retrieved from Google Play on launch with `FetchPurchases`, and after a paid pending order the app unlocks the entitlement and calls `ConfirmPurchase` to acknowledge it. The legacy option code remains for future use but its Pause-menu **FOR PARENTS - HOLD** entry is hidden in this release. This is a friction gate, **not** age verification or a guarantee against purchases by children.
 
 ## What requires Play Console before a real purchase
 
@@ -44,3 +44,7 @@ If Google Play is unreachable, the ownership state is `Unknown` and **ads are su
 ## Test status
 
 No Unity Editor or Play Console runtime tests were run in this coding environment. Written EditMode tests verify ad gating with a fake provider. They do not exercise Google Play Billing. Manual Play internal-testing verification is mandatory before release.
+
+## First-release override (2026-10-12)
+
+`FruitTreeReleaseConfig` sets `AdvertisingEnabled = false` and `PurchasesEnabled = false`. The generated Unity scene disables `RemoveAdsPurchaser` and hides the parent purchase entry, so offline users are not sent to Play Billing just to play. `AdsAccessPolicy.CanRequestAds` also enforces the global feature flag. Preserve these values until an audited ad SDK, real ads, applicable store item and internal-track billing tests actually exist.

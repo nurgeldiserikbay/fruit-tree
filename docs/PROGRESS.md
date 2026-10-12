@@ -1,5 +1,15 @@
 # Fruit Tree development state
 
+## English-only and release-engineering hardening (2026-10-12)
+
+- [x] First release explicitly **English-only** (`FruitTreeReleaseConfig.LanguageCode = "en"`), with scene validation rejecting Cyrillic UI labels.
+- [x] First release explicitly **ad-free with no purchases**; `REMOVE ADS` panel entry hidden and Play Billing initialization disabled.
+- [x] Editor-generated scene revision stamp added. Validation now explains how to refresh the outdated local scene with a backup, instead of pretending GitHub C# commits update the local scene automatically.
+- [x] Guarded **Build Signed Android AAB** Unity editor command added (policy, ARM64, IL2CPP, API and local keystore checks). **No AAB has been built.**
+- [x] English-only and ad-free launch tests authored (not executed in Unity).
+- [ ] User's real public Privacy Policy URL and release signing credentials; Unity compile, PlayMode/EditMode testing, authentic screenshots, real-device profiling and signed internal-test AAB remain pending.
+
+
 ## Tree silhouettes, touch accessibility and gentle scenery fades (2026-10-12)
 
 - [x] Source: the ten existing `FruitSpeciesProfile` entries now define trunk height, upward branch lift, twig angle and crown-filler extent; pear is more upright and cherry/peach are more spreading.
@@ -111,7 +121,7 @@ See [ENVIRONMENT_SYSTEM.md](ENVIRONMENT_SYSTEM.md).
 - [x] EditMode tests for navigation and Privacy URL validation (not yet executed).
 - [ ] User Unity 6000.6.5f1 compilation and portrait visual tests of new screens, Zen Mode, hint, settings and menu switching — deferred to final acceptance as requested.
 - [ ] Publish real privacy policy, replace contact placeholders, complete SDK data audit, add verified public URL.
-- [ ] Android release AAB, API 36, store assets, 10 distinct trees, localization and real-device tests.
+- [ ] Actual signed Android release AAB, real device tests, store images and end-to-end ten-tree acceptance. Language is English only.
 
 
 ## Approved future direction (2026-10-11)

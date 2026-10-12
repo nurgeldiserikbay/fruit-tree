@@ -9,7 +9,7 @@ A relaxing, Android-first 3D fruit-picking game. **Agreed future loop:** fully h
 - Rounded apple meshes with procedural skin texture and stems connected to twigs, harvest animation and wood occlusion.
 - 360-degree touch orbit and pinch zoom, mouse support for development.
 - Safe-area HUD, allocation-free fruit-round restart, fruit progress.
-- Parent-area Remove Ads purchase/restore wiring with Unity IAP 5; purchase disabled until a compliant ad provider is connected.
+- **English-only, ad-free first release**; dormant Remove Ads / Unity IAP scaffolding is hidden and never starts Play Billing.
 - Four quiet procedurally synthesized biome ambiences with smooth crossfades and harvest feedback, sound toggle (placeholder audio, not final mix).
 - Procedural meadow and soft gradient sky, custom rounded HUD, Unity Editor scene generator and Android portrait config.
 
@@ -18,7 +18,7 @@ Install Unity 6 6000.6.5f1, open this directory in Unity Hub, let it compile and
 
 ## Game design and new progression architecture
 
-- [Approved GDD (Қазақша)](docs/GAME_DESIGN.md)
+- [Approved development GDD (written in Kazakh; game UI is English)](docs/GAME_DESIGN.md)
 - [Architecture and save model](docs/ARCHITECTURE.md)
 - [Implementation milestones](docs/IMPLEMENTATION_ROADMAP.md)
 
@@ -70,3 +70,7 @@ Four scenery themes now have light distant ridges, park lamps and urban window d
 ## Latest home and touch-feedback polish (code integrated)
 
 The home screen now uses a more transparent backdrop with a rounded reading card and a saved progress summary. Gameplay adds a thin harvest progress indicator and three pooled, gentle fruit-pick glints, all without extra harvest GameObjects. Pause, tree collection, settings and help share a light rounded-panel design. [Development status](docs/PROGRESS.md). **Unity visual/phone acceptance is still pending.**
+
+## English-only release and build safety
+
+Only English is supported in the game and Play Store listing; no KZ/RU selection or translation is planned. The first release has **no active ads or purchases**. Unity-generated local scenes carry a version stamp; run **Fruit Tree → Refresh Visuals (Back Up Scene)** if validation says your scene is out of date. The new **Fruit Tree → Build Signed Android AAB** editor command requires the real published Privacy Policy and your own local upload key before proceeding. [Release checklist](docs/PLAY_STORE_RELEASE.md). **No actual release AAB or Unity/phone QA has been completed.**

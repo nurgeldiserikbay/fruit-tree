@@ -16,7 +16,7 @@
 - One batched mesh for leaves and another for branches. Unique pickable apple objects sharing one mesh.
 - Procedural grassy ground and gradient sky. Most apples placed toward the crown exterior.
 - Two-finger vertical drag pans inspection focus toward upper/lower branches. In Editor, Shift+right-drag pans focus.
-- No timer, account, backend, park exploration or external assets. A disabled-by-default backend-free Remove Ads IAP integration is present; no ads SDK is installed.
+- No timer, account, backend or park exploration. The launch is English-only and ad-free; dormant IAP scaffolding is not initialized.
 - Portrait orientation, device safe-area-aware HUD, offline operation.
 - Generated ambient audio is a technical placeholder and will need replacement with a licensed natural recording.
 - Generated visuals are procedural prototypes. They may need substantial art iteration to match promotional reference quality.
@@ -54,7 +54,7 @@ Unity Editor, Android devices and Unity's own C# assemblies are not available to
 - This is a *sampling diagnostic*, not a guarantee that every fruit is easy to spot, nor a substitute for an actual play session.
 
 ## Monetization
-Backend-free remove-ads entitlement logic is implemented, but remains untested and the purchase control is disabled until a compliant ad provider is connected. See [MONETIZATION.md](MONETIZATION.md).
+There is no active purchase flow or ad SDK in the first release. Billing is not initialized and the parent purchase entry is hidden. See [MONETIZATION.md](MONETIZATION.md) for optional future integration.
 
 ## Refreshing the visual scene after the first Unity screenshot
 1. Save your work and stop Play mode. Pull the latest `main` branch (Git) and wait for Unity to recompile.
@@ -81,9 +81,17 @@ After all graphics/content work and Play Store prerequisites are implemented:
 - From Pause choose **ZEN MODE**: all standard HUD elements disappear and **EXIT ZEN** remains accessible; normal fruit collection still works and continues saving.
 - From Settings toggle **AUDIO: SOFT/NORMAL**, **SOUND: ON/OFF**, **MOTION: GENTLE/MINIMAL**; close and reopen the app, confirm persisted preferences.
 - Tree Collection → NEXT/PREVIOUS now closes Pause as the new tree loads, and previously picked fruit stays saved.
-- Check Android Back navigation, Unity EditMode/PlayMode tests, performance on phones, IAP and published privacy policy before release.
+- Check Android Back navigation, Unity EditMode/PlayMode tests, English-only UI, FPS on phones and public Privacy Policy before release. Purchases/ads are disabled.
 
 This is a verification plan. The newest features have **not** been compiled or run in Unity in the authoring environment.
 
 ## Four environment themes
 After a scene refresh, Settings → **SCENERY** cycles automatic / Meadow / Park / City Park / Mountains. No scenery has physics colliders. Detailed implementation and future test checklist: [ENVIRONMENT_SYSTEM.md](ENVIRONMENT_SYSTEM.md). The new scenery code has not been tested in Unity or on Android yet.
+
+## Keeping the Unity scene current
+
+GitHub tracks scene-generation code; the generated `Assets/Scenes/Main.unity` is local and intentionally not committed. Pulling `main` does **not** automatically rebuild an old local scene. New scenes include a `FruitTreeSceneVersion` stamp. When `Fruit Tree → Validate Project` reports an outdated scene, stop Play and choose **Fruit Tree → Refresh Visuals (Back Up Scene)**. This makes a local timestamped backup before regenerating. The process does not erase saved orchard progress in `Application.persistentDataPath`.
+
+## Signed Google Play AAB (not yet built)
+
+After the user publishes the real Google Docs Privacy Policy and configures its URL, switch Build Profiles to Android, enable ARM64 + IL2CPP and set Android target API 36 or later (recheck Play Console requirements). Configure the private upload keystore and passwords only on the development machine. Run **Fruit Tree → Validate Project** then **Fruit Tree → Build Signed Android AAB**. The output is `Builds/FruitTree-release.aab`. Upload it first to an internal testing track. Never commit the keystore or a generated AAB, and do not present this source-only feature as a completed build.

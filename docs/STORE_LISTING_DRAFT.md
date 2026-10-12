@@ -20,12 +20,8 @@ Take your time. The garden can wait.
 
 **Before publication:** adjust text to actual tested tree count, audio quality, UI features and accessible languages. Do not advertise ten fully polished trees until the ten source-level species have been visually reviewed, tested and verified as playable. Do not promise no advertising if a future compliant ad SDK is enabled.
 
-## Қазақша қысқаша сипаттама (жоба)
+## Supported language
 
-Жемістерді асықпай жинап, әдемі 3D ағаштар әлемінде демалыңыз.
+**English only (en)** for all in-game text and Play Store listing. Do not add Kazakh/Russian store translations or promise a language selector.
 
-## Орысша қысқаша сипаттама (жоба)
-
-Собирайте фрукты без спешки и отдыхайте среди красивых 3D-деревьев.
-
-**Note:** KZ/RU localization is still planned and should not be claimed as fully implemented.
+**Publication gate:** the description and screenshot claims must match a signed, tested English Android build. The Privacy Policy URL and official publisher contact must be added before release.
