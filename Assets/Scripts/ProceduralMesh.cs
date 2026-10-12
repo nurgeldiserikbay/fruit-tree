@@ -162,34 +162,43 @@ namespace FruitTree
 
         public static Mesh Apple()
         {
-            var mesh = new Mesh { name = "Rounded Apple" };
+            // Rounded shoulders, five subtle calyx lobes and a small dimple
+            // make the silhouette feel like an apple rather than a plain sphere.
+            // Preserve the same vertex topology for stable rendering and tests.
+            var mesh = new Mesh { name = "Five-Lobed Orchard Apple" };
             const int latitude = 16, longitude = 20;
-            var verts = new List<Vector3>();
-            var tris = new List<int>();
-            var uvs = new List<Vector2>();
+            var verts = new List<Vector3>((latitude + 1) * (longitude + 1));
+            var tris = new List<int>(latitude * longitude * 6);
+            var uvs = new List<Vector2>(verts.Capacity);
             for (int y = 0; y <= latitude; y++)
             {
                 float t = y / (float)latitude;
-                float a = t * Mathf.PI;
-                // Floating-point Sin(PI) can be slightly negative; fractional powers
-                // of negative values would produce NaN vertices on the top pole.
-                float sine = Mathf.Max(0f, Mathf.Sin(a));
-                float radius = Mathf.Pow(sine, .72f) * (.17f + .045f * t);
+                float angle = t * Mathf.PI;
+                float sine = Mathf.Max(0f, Mathf.Sin(angle));
+                float shoulder = Mathf.SmoothStep(.53f, .91f, t);
+                float body = Mathf.Pow(sine, .69f) * (.176f + .028f * t);
+                float upperDimple = Mathf.Pow(Mathf.Clamp01((t - .86f) / .14f), 2f);
+                float baseY = -.18f + .375f * t - .044f * upperDimple;
                 for (int x = 0; x <= longitude; x++)
                 {
                     float theta = x * Mathf.PI * 2f / longitude;
-                    float scallop = 1f + .035f * Mathf.Cos(theta * 5f) * Mathf.Pow(t, 4f);
-                    float indent = -.055f * Mathf.Pow(t, 18f) * Mathf.Pow(Mathf.Cos(theta * 2.5f), 2f);
-                    verts.Add(new Vector3(radius * scallop * Mathf.Cos(theta), -.18f + .38f * t + indent, radius * scallop * Mathf.Sin(theta)));
+                    float lobes = Mathf.Cos(theta * 5f);
+                    float variation = 1f + .039f * lobes * shoulder;
+                    float bottomLobes = .007f * Mathf.Pow(1f - t, 9f) * lobes;
+                    float upperLobes = .012f * shoulder * upperDimple * lobes;
+                    verts.Add(new Vector3(body * variation * Mathf.Cos(theta),
+                        baseY + bottomLobes + upperLobes,
+                        body * variation * Mathf.Sin(theta)));
                     uvs.Add(new Vector2(x / (float)longitude, t));
                 }
             }
             for (int y = 0; y < latitude; y++)
                 for (int x = 0; x < longitude; x++)
                 {
-                    int a = y * (longitude + 1) + x, b = a + longitude + 1;
-                    tris.Add(a); tris.Add(b); tris.Add(a+1);
-                    tris.Add(a+1); tris.Add(b); tris.Add(b+1);
+                    int a = y * (longitude + 1) + x;
+                    int b = a + longitude + 1;
+                    tris.Add(a); tris.Add(b); tris.Add(a + 1);
+                    tris.Add(a + 1); tris.Add(b); tris.Add(b + 1);
                 }
             mesh.SetVertices(verts);
             mesh.SetUVs(0, uvs);
