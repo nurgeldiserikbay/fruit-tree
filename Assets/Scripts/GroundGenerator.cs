@@ -76,8 +76,13 @@ namespace FruitTree
                     float outerBump = Mathf.Clamp01((distance - 1f) / 3f);
                     float noise = Mathf.PerlinNoise(px * .33f + 34f, pz * .33f + 12f);
                     vertices.Add(new Vector3(px, -.055f + (noise - .5f) * .13f * outerBump, pz));
-                    float variation = Mathf.PerlinNoise(px * .47f + 91f, pz * .47f + 16f);
-                    colors.Add(new Color(.40f + variation * .075f, .57f + variation * .085f, .29f + variation * .04f));
+                    float variation = Mathf.PerlinNoise(px * .24f + 91f, pz * .24f + 16f);
+                    float fine = Mathf.PerlinNoise(px * .91f + 57f, pz * .91f + 43f);
+                    float shade = .78f + variation * .13f + fine * .07f;
+                    float clearing = 1f - Mathf.SmoothStep(1.1f, 3.8f, distance);
+                    Color baseGreen = new Color(.40f, .55f, .32f);
+                    colors.Add(Color.Lerp(baseGreen * shade,
+                        new Color(.52f, .61f, .37f), clearing * .32f));
                     uv.Add(new Vector2(x / (float)divisions, z / (float)divisions));
                 }
             for (int z = 0; z < divisions; z++)
@@ -100,43 +105,56 @@ namespace FruitTree
 
         public static Mesh CreateGrassMesh()
         {
+            // One small merged mesh of short, bent blades. The old tall flat
+            // triangles were visually harsh; five vertices make a softer curve.
             var random = new System.Random(902);
-            const int bladeCount = 315;
-            var vertices = new List<Vector3>(bladeCount * 3);
-            var colors = new List<Color>(bladeCount * 3);
-            var uv = new List<Vector2>(bladeCount * 3);
-            var triangles = new List<int>(bladeCount * 3);
+            const int bladeCount = 300;
+            var vertices = new List<Vector3>(bladeCount * 5);
+            var colors = new List<Color>(bladeCount * 5);
+            var uv = new List<Vector2>(bladeCount * 5);
+            var triangles = new List<int>(bladeCount * 12);
             for (int i = 0; i < bladeCount; i++)
             {
                 float angle = (float)random.NextDouble() * Mathf.PI * 2f;
-                float radius = Mathf.Sqrt((float)random.NextDouble()) * 5.6f;
-                if (radius < .65f) continue;
+                float radius = Mathf.Sqrt((float)random.NextDouble()) * 5.9f;
+                if (radius < .8f) continue;
                 float x = Mathf.Cos(angle) * radius;
                 float z = Mathf.Sin(angle) * radius;
                 float noise = Mathf.PerlinNoise(x * .33f + 34f, z * .33f + 12f);
-                float y = -.055f + (noise - .5f) * .18f * Mathf.Clamp01((radius - 1f) / 3f);
-                float height = .06f + .10f * (float)random.NextDouble();
-                float width = .04f + .03f * (float)random.NextDouble();
+                float y = -.055f + (noise - .5f) * .13f *
+                    Mathf.Clamp01((radius - 1f) / 3f);
+                float height = .045f + .074f * (float)random.NextDouble();
+                float width = .022f + .026f * (float)random.NextDouble();
                 float rot = (float)random.NextDouble() * Mathf.PI * 2f;
-                Vector3 side = new Vector3(Mathf.Cos(rot), 0f, Mathf.Sin(rot)) * width;
-                Vector3 origin = new Vector3(x, y, z);
+                Vector3 side = new Vector3(Mathf.Cos(rot), 0f, Mathf.Sin(rot));
+                Vector3 lean = new Vector3(-side.z, 0f, side.x) * height * .30f;
+                Vector3 basePos = new Vector3(x, y, z);
+                Vector3 middle = basePos + Vector3.up * (height * .52f) + lean * .32f;
                 int first = vertices.Count;
-                vertices.Add(origin - side);
-                vertices.Add(origin + side);
-                vertices.Add(origin + new Vector3(side.z * 1.3f, height, -side.x * 1.3f));
-                var green = new Color(.29f + .09f * (float)random.NextDouble(),
-                    .52f + .14f * (float)random.NextDouble(), .20f);
-                colors.Add(green * .85f);
-                colors.Add(green * .85f);
-                colors.Add(green * 1.15f);
-                uv.Add(Vector2.zero);
-                uv.Add(Vector2.right);
-                uv.Add(Vector2.up);
-                triangles.Add(first);
-                triangles.Add(first + 1);
-                triangles.Add(first + 2);
+                vertices.Add(basePos - side * width);
+                vertices.Add(basePos + side * width);
+                vertices.Add(middle - side * width * .61f);
+                vertices.Add(middle + side * width * .61f);
+                vertices.Add(basePos + Vector3.up * height + lean);
+                float tone = (float)random.NextDouble();
+                var leaf = new Color(.31f + .075f * tone,
+                    .49f + .14f * tone, .20f + .055f * tone);
+                colors.Add(leaf * .80f);
+                colors.Add(leaf * .80f);
+                colors.Add(leaf * .95f);
+                colors.Add(leaf * .95f);
+                colors.Add(leaf * 1.12f);
+                uv.Add(new Vector2(0f, 0f));
+                uv.Add(new Vector2(1f, 0f));
+                uv.Add(new Vector2(.2f, .52f));
+                uv.Add(new Vector2(.8f, .52f));
+                uv.Add(new Vector2(.5f, 1f));
+                triangles.Add(first); triangles.Add(first + 2); triangles.Add(first + 1);
+                triangles.Add(first + 1); triangles.Add(first + 2); triangles.Add(first + 3);
+                triangles.Add(first + 2); triangles.Add(first + 4); triangles.Add(first + 3);
+                triangles.Add(first + 3); triangles.Add(first + 4); triangles.Add(first + 2);
             }
-            var mesh = new Mesh { name = "Merged Wild Grass" };
+            var mesh = new Mesh { name = "Soft Curved Grass" };
             mesh.SetVertices(vertices);
             mesh.SetColors(colors);
             mesh.SetUVs(0, uv);
