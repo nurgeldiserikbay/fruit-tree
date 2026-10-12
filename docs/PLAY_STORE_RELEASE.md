@@ -23,7 +23,8 @@
 - [ ] Responsive 9:16, 9:20 and cut-out / safe-area UI testing.
 - [ ] Final natural atmosphere recordings (or approved synthesized audio), licensed/owned SFX and final sound mixing; comfort volume/motion settings are in source but not QA-approved.
 - [x] **English-only UI and Play listing.** No Kazakh/Russian language selector or localization promised.
-- [ ] Graceful offline operation, app switch/pause, interrupted save and progress restore.
+- [x] Source: reject invalid/duplicate saved tree records and authored offline backup/interrupted-write recovery tests (not yet run).
+- [ ] Graceful offline operation, app switch/pause, interrupted save and progress restore confirmed on real Android devices.
 - [x] Source: provisional mobile Low/Balanced/High quality tier selection; unknown hardware safely defaults to Balanced.
 - [ ] Profiling on real low-/mid-range Android phones (FPS, heat, RAM, battery).
 

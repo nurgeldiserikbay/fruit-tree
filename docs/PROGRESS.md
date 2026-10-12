@@ -1,5 +1,13 @@
 # Fruit Tree development state
 
+## Offline save-integrity recovery (2026-10-12)
+
+- [x] Source: reject syntactically valid but incomplete local save files (empty tree list, null picked-ID collection, negative counters, duplicate saved tree IDs, or missing active-tree record).
+- [x] Source: preserve existing `.bak` / `.tmp` recovery sequence; do not reset stored fruit IDs or the ten-tree progression rules.
+- [x] Authored `OrchardSaveRecoveryTests` for backup recovery, valid interrupted writes and duplicate tree entry rejection.
+- [ ] Execute Unity EditMode suite, corrupted-save Android tests, full fruit reachability audit and visual QA before publication.
+
+
 ## English-only and release-engineering hardening (2026-10-12)
 
 - [x] First release explicitly **English-only** (`FruitTreeReleaseConfig.LanguageCode = "en"`), with scene validation rejecting Cyrillic UI labels.
