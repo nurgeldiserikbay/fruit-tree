@@ -143,5 +143,66 @@ namespace FruitTree.Tests
             yield return null;
         }
 
+        [UnityTest]
+        public IEnumerator RebloomIsGradualAndOnlyMatureFruitCanBePicked()
+        {
+            var root = new GameObject("Rebloom Visual Test");
+            var tree = root.AddComponent<TreeGenerator>();
+            if (tree.Apples.Count == 0) tree.Generate();
+            var fruit = tree.Apples[0];
+            var fullSize = fruit.transform.localScale;
+            try
+            {
+                fruit.Pick();
+                Assert.AreEqual(1, tree.HarvestedCount);
+                tree.ResetHarvestAnimated();
+
+                Assert.IsTrue(tree.IsReblooming);
+                Assert.AreEqual(0, tree.HarvestedCount);
+                Assert.IsFalse(fruit.GetComponent<Collider>().enabled);
+                Assert.AreEqual(Vector3.zero, fruit.transform.localScale);
+                fruit.Pick();
+                Assert.AreEqual(0, tree.HarvestedCount,
+                    "Growing fruit must not be harvestable even through the public Pick method");
+
+                var flowers = root.transform.Find("Merged Rebloom Flowers");
+                Assert.IsNotNull(flowers, "The blossoms should share one merged draw mesh");
+                Assert.IsTrue(flowers.gameObject.activeSelf);
+                Assert.Less(flowers.GetComponent<MeshFilter>().sharedMesh.vertexCount, 13000);
+
+                yield return new WaitForSecondsRealtime(2.1f);
+                Assert.IsFalse(tree.IsReblooming);
+                Assert.IsTrue(fruit.GetComponent<Collider>().enabled);
+                Assert.That(Vector3.Distance(fullSize, fruit.transform.localScale),
+                    Is.LessThan(.0001f));
+                Assert.IsFalse(flowers.gameObject.activeSelf);
+                fruit.Pick();
+                Assert.AreEqual(1, tree.HarvestedCount);
+            }
+            finally { Object.Destroy(root); }
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator SwitchingTreeDuringRebloomCancelsOldVisuals()
+        {
+            var root = new GameObject("Rebloom Interrupt Test");
+            var tree = root.AddComponent<TreeGenerator>();
+            if (tree.Apples.Count == 0) tree.Generate();
+            try
+            {
+                tree.ResetHarvestAnimated();
+                Assert.IsTrue(tree.IsReblooming);
+                tree.Configure("pear", 140, 319);
+                Assert.IsFalse(tree.IsReblooming);
+                Assert.AreEqual(140, tree.Apples.Count);
+                Assert.AreEqual(0, tree.HarvestedCount);
+                Assert.IsTrue(tree.Apples[0].GetComponent<Collider>().enabled);
+                Assert.IsNull(root.transform.Find("Merged Rebloom Flowers"));
+            }
+            finally { Object.Destroy(root); }
+            yield return null;
+        }
+
     }
 }
