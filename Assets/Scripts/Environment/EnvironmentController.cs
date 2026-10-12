@@ -151,7 +151,8 @@ namespace FruitTree
             RenderSettings.fogEndDistance = 45f;
             // Initial scene preparation must be immediate (including Editor tests).
             // Subsequent theme selections gently blend color over one second.
-            if (!paletteInitialized || !Application.isPlaying || !isActiveAndEnabled)
+            if (!paletteInitialized || !Application.isPlaying || !isActiveAndEnabled ||
+                PlayerPrefs.GetInt("FruitTree.ReducedMotion", 0) == 1)
                 ApplyPalette(destination);
             else
                 paletteTransition = StartCoroutine(BlendPalette(displayedPalette, destination));
@@ -177,6 +178,8 @@ namespace FruitTree
             while (elapsed < duration)
             {
                 elapsed = Mathf.Min(duration, elapsed + Time.unscaledDeltaTime);
+                if (PlayerPrefs.GetInt("FruitTree.ReducedMotion", 0) == 1)
+                    break;
                 ApplyPalette(Palette.Lerp(beginning, ending,
                     TransitionWeight(elapsed / duration)));
                 yield return null;

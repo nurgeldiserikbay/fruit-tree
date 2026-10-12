@@ -55,7 +55,8 @@ namespace FruitTree
                 overlay, position, null, out var local))
             {
                 marker.anchoredPosition = local + new Vector2(0f, 34f);
-                marker.localScale = Vector3.one * (1f + .1f * Mathf.Sin(elapsed * 6f));
+                marker.localScale = PlayerPrefs.GetInt("FruitTree.ReducedMotion", 0) == 1 ?
+                    Vector3.one : Vector3.one * (1f + .1f * Mathf.Sin(elapsed * 6f));
                 markerGroup.alpha = .74f * Visibility(elapsed);
             }
         }

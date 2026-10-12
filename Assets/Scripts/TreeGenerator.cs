@@ -361,7 +361,9 @@ namespace FruitTree
         /// </summary>
         public void ResetHarvestAnimated()
         {
-            if (!Application.isPlaying)
+            // Respect the accessibility setting: all newly available fruit
+            // becomes tappable immediately, without scale or blossom motion.
+            if (!Application.isPlaying || ReducedMotion)
             {
                 ResetHarvest();
                 return;

@@ -36,6 +36,11 @@ namespace FruitTree
 
         private void Show(Apple picked)
         {
+            if (PlayerPrefs.GetInt("FruitTree.ReducedMotion", 0) == 1)
+            {
+                Hide();
+                return;
+            }
             if (picked == null || worldCamera == null || overlay == null ||
                 glints == null || glints.Length != starts.Length) return;
             Vector3 screen = worldCamera.WorldToScreenPoint(picked.transform.position);
