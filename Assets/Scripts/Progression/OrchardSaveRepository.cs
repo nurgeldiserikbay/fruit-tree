@@ -43,7 +43,8 @@ namespace FruitTree.Progression
 
         public bool Save(OrchardSaveData save)
         {
-            if (save == null || save.schemaVersion != 1) return false;
+            // Never overwrite the last recoverable save with invalid data.
+            if (!IsValidSave(save)) return false;
             try
             {
                 string folder = Path.GetDirectoryName(path);
@@ -81,6 +82,32 @@ namespace FruitTree.Progression
             }
         }
 
+        /// <summary>
+        /// Run exactly the same structural checks before writing and after
+        /// loading, so a bad in-memory snapshot cannot overwrite valid history.
+        /// Catalog-specific fruit bounds are validated separately on restore.
+        /// </summary>
+        private static bool IsValidSave(OrchardSaveData save)
+        {
+            if (save == null || save.schemaVersion != 1 ||
+                save.trees == null || save.trees.Count == 0 ||
+                string.IsNullOrEmpty(save.activeTreeId))
+                return false;
+
+            var ids = new System.Collections.Generic.HashSet<string>(
+                StringComparer.Ordinal);
+            bool containsActive = false;
+            foreach (var tree in save.trees)
+            {
+                if (tree == null || string.IsNullOrEmpty(tree.treeId) ||
+                    tree.pickedFruitIds == null || tree.roundNumber < 1 ||
+                    tree.timesCleared < 0 || !ids.Add(tree.treeId))
+                    return false;
+                if (tree.treeId == save.activeTreeId) containsActive = true;
+            }
+            return containsActive;
+        }
+
         private static OrchardSaveData TryRead(string file)
         {
             try
@@ -88,27 +115,7 @@ namespace FruitTree.Progression
                 if (!File.Exists(file)) return null;
                 var content = File.ReadAllText(file);
                 var save = JsonUtility.FromJson<OrchardSaveData>(content);
-                if (save == null || save.schemaVersion != 1 ||
-                    save.trees == null || save.trees.Count == 0 ||
-                    string.IsNullOrEmpty(save.activeTreeId))
-                    return null;
-
-                // A syntactically valid but truncated JSON object is not a
-                // recoverable game. Reject incomplete tree entries so the
-                // valid previous backup can restore the player's collection.
-                var ids = new System.Collections.Generic.HashSet<string>(
-                    StringComparer.Ordinal);
-                bool containsActive = false;
-                foreach (var tree in save.trees)
-                {
-                    if (tree == null || string.IsNullOrEmpty(tree.treeId) ||
-                        tree.pickedFruitIds == null || tree.roundNumber < 1 ||
-                        tree.timesCleared < 0 || !ids.Add(tree.treeId))
-                        return null;
-                    if (tree.treeId == save.activeTreeId) containsActive = true;
-                }
-                if (!containsActive) return null;
-                return save;
+                return IsValidSave(save) ? save : null;
             }
             catch (Exception)
             {
