@@ -32,7 +32,11 @@ namespace FruitTree
         {
             // Keep the living background visible, but disable world taps until Play.
             IsPlaying = false;
-            if (orbitCamera != null) orbitCamera.enabled = false;
+            if (orbitCamera != null)
+            {
+                orbitCamera.FitTreeInPortrait();
+                orbitCamera.enabled = false;
+            }
             if (gameplayControls != null) gameplayControls.SetActive(false);
             if (homePanel != null) homePanel.SetActive(true);
             if (settingsPanel != null) settingsPanel.SetActive(false);

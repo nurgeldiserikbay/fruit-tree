@@ -174,6 +174,11 @@ namespace FruitTree
             }
         }
 
+        public static bool ShouldOfferHint(int remaining)
+        {
+            return remaining > 0 && remaining <= 10;
+        }
+
         public bool CanOfferHint()
         {
             if (!initialized || progress == null) return false;

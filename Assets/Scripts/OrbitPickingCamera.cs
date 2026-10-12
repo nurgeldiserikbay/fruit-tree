@@ -57,6 +57,7 @@ namespace FruitTree
             focusHeight = wantedFocusHeight;
             wantedDistance = framedDistance;
             distance = framedDistance;
+            ApplyCameraTransform(); // Home backdrop must be framed before input is disabled.
         }
 
         /// <summary>
@@ -98,7 +99,9 @@ namespace FruitTree
                 1f - Mathf.Exp(-10f * Time.unscaledDeltaTime));
         }
 
-        private void LateUpdate()
+        private void LateUpdate() { ApplyCameraTransform(); }
+
+        private void ApplyCameraTransform()
         {
             if (target == null) return;
             Vector3 focus = target.position + Vector3.up * focusHeight;

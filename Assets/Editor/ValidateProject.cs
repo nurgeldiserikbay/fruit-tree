@@ -53,7 +53,9 @@ namespace FruitTree.Editor
             if (orchard == null || orchard.tree != tree || orchard.hud != hud ||
                 orchard.treeMenuPanel == null || orchard.nextButton == null ||
                 orchard.previousButton == null || orchard.rebloomButton == null ||
-                orchard.completionNextButton == null)
+                orchard.completionNextButton == null ||
+                orchard.remainingFruitHintButton == null ||
+                orchard.pauseController != pause)
                 errors.Add("Orchard progression controller or collection UI is missing");
 
             var screenFlow = UnityEngine.Object.FindAnyObjectByType<FruitTreeScreenFlow>();
@@ -62,7 +64,9 @@ namespace FruitTree.Editor
                 screenFlow.helpPanel == null || screenFlow.privacyPanel == null ||
                 screenFlow.pause != pause || screenFlow.orchard != orchard ||
                 pause.screenFlow != screenFlow ||
-                screenFlow.openPublishedPrivacyButton == null)
+                screenFlow.openPublishedPrivacyButton == null ||
+                screenFlow.audioLevelLabel == null || screenFlow.motionLabel == null ||
+                screenFlow.activeTree != tree)
                 errors.Add("Home menu, Settings, Help, Privacy or flow references are missing");
 
             if (!FruitTreePrivacyConfig.IsPublishedUrlValid(
@@ -78,7 +82,7 @@ namespace FruitTree.Editor
             if (hudObject != null)
             {
                 var buttons = hudObject.GetComponentsInChildren<Button>(true);
-                if (buttons.Length < 26)
+                if (buttons.Length < 29)
                     errors.Add("Expected at least 26 functional buttons across home, gameplay, pause and settings");
                 foreach (var button in buttons)
                 {

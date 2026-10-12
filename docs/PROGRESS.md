@@ -5,6 +5,7 @@
 - [x] Source: main menu with Continue / My Trees / Settings / How to Play.
 - [x] Quiet-audio, mute and reduced-leaf-motion preferences stored locally (source committed; Editor/device QA pending).
 - [x] Source: Pause → Main Menu and Settings, screen-aware Android Back behaviour.
+- [x] Game camera framed immediately on home screen before player input is disabled; pending Unity visual QA.
 - [x] Source: in-app privacy summary, safe published-Google-Docs URL configuration and disable-on-missing-link logic.
 - [x] Draft Google Docs Privacy Policy, Play listing text and release-readiness checklist.
 - [x] EditMode tests for navigation and Privacy URL validation (not yet executed).
