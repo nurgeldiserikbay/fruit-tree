@@ -227,6 +227,30 @@ namespace FruitTree.Editor
             orchard.treeLabel = MakeLabel("Current Tree Name", gameRoot,
                 "APPLE TREE", 31, new Color(.21f, .32f, .19f),
                 new Vector2(.24f, .856f), new Vector2(.76f, .898f));
+            // Thin, non-interactive progress line; uses the existing harvest
+            // event, not a frame-by-frame update or per-fruit UI objects.
+            var progressTrack = new GameObject("Harvest Progress Track",
+                typeof(RectTransform), typeof(CanvasRenderer), typeof(RoundedPanel));
+            progressTrack.transform.SetParent(gameRoot, false);
+            Anchor(progressTrack.GetComponent<RectTransform>(),
+                new Vector2(.32f, .83f), new Vector2(.68f, .84f));
+            var trackGraphic = progressTrack.GetComponent<RoundedPanel>();
+            trackGraphic.color = new Color(.15f, .27f, .19f, .24f);
+            trackGraphic.CornerRadius = 9f;
+            trackGraphic.raycastTarget = false;
+            var progressFill = new GameObject("Harvest Progress Fill",
+                typeof(RectTransform), typeof(CanvasRenderer), typeof(RoundedPanel));
+            progressFill.transform.SetParent(progressTrack.transform, false);
+            Anchor(progressFill.GetComponent<RectTransform>(),
+                Vector2.zero, new Vector2(0f, 1f));
+            var fillGraphic = progressFill.GetComponent<RoundedPanel>();
+            fillGraphic.color = new Color(.86f, .77f, .43f);
+            fillGraphic.CornerRadius = 9f;
+            fillGraphic.raycastTarget = false;
+            var progressIndicator = canvasObject.AddComponent<OrchardProgressBar>();
+            progressIndicator.tree = tree;
+            progressIndicator.fill = progressFill.GetComponent<RectTransform>();
+
             // Keep the gameplay clean. Only the small pause button is visible.
             // Restart and sound are accessible through the pause menu.
             var pauseButton = MakeButton("Pause", gameRoot, "II",
@@ -435,24 +459,39 @@ namespace FruitTree.Editor
             var white = new Color(.98f, .98f, .95f, 1f);
             var dim = new Color(.09f, .19f, .13f, .78f);
 
-            var home = MakeOverlay("Home Screen", safe, new Color(.08f, .19f, .14f, .72f));
+            // The orchard remains visible behind a light darkening veil;
+            // only the logo section needs its own translucent reading surface.
+            var home = MakeOverlay("Home Screen", safe, new Color(.06f, .14f, .10f, .38f));
             flow.homePanel = home;
-            MakeLabel("Game Logo", home.transform, "FRUIT TREE", 108, white,
-                new Vector2(.06f, .70f), new Vector2(.94f, .82f));
-            MakeLabel("Home Tagline", home.transform,
-                "A quiet moment among the trees", 36, white,
-                new Vector2(.08f, .63f), new Vector2(.92f, .69f));
+            var hero = new GameObject("Home Orchard Title Card",
+                typeof(RectTransform), typeof(CanvasRenderer), typeof(RoundedPanel));
+            hero.transform.SetParent(home.transform, false);
+            Anchor(hero.GetComponent<RectTransform>(),
+                new Vector2(.075f, .635f), new Vector2(.925f, .867f));
+            var heroFace = hero.GetComponent<RoundedPanel>();
+            heroFace.CornerRadius = 64f;
+            heroFace.color = new Color(.10f, .24f, .17f, .75f);
+            heroFace.raycastTarget = false;
+            MakeLabel("Home Eyebrow", hero.transform, "A LITTLE ORCHARD, JUST FOR YOU",
+                28, new Color(.90f, .88f, .68f),
+                new Vector2(.08f, .69f), new Vector2(.92f, .90f));
+            MakeLabel("Game Logo", hero.transform, "FRUIT TREE", 104, white,
+                new Vector2(.05f, .32f), new Vector2(.95f, .72f));
+            MakeLabel("Home Tagline", hero.transform,
+                "Take your time. Enjoy the trees.", 36, white,
+                new Vector2(.07f, .10f), new Vector2(.93f, .35f));
             var play = MakeButton("Home Play", home.transform, "CONTINUE",
-                new Vector2(.19f, .45f), new Vector2(.81f, .525f), ivory);
+                new Vector2(.18f, .47f), new Vector2(.82f, .55f),
+                new Color(.97f, .86f, .61f, 1f));
             var collection = MakeButton("Home Collection", home.transform, "MY TREES",
-                new Vector2(.19f, .355f), new Vector2(.81f, .43f), ivory);
+                new Vector2(.18f, .367f), new Vector2(.82f, .447f), ivory);
             var settings = MakeButton("Home Settings", home.transform, "SETTINGS",
-                new Vector2(.19f, .26f), new Vector2(.81f, .335f), ivory);
+                new Vector2(.18f, .264f), new Vector2(.82f, .344f), ivory);
             var help = MakeButton("Home How To Play", home.transform, "HOW TO PLAY",
-                new Vector2(.19f, .165f), new Vector2(.81f, .24f), fern);
+                new Vector2(.18f, .161f), new Vector2(.82f, .241f), fern);
             MakeLabel("Home Footer", home.transform,
-                "Relax. Explore. Collect.", 30, white,
-                new Vector2(.10f, .065f), new Vector2(.90f, .12f));
+                "10 FRUIT TREES  •  4 PEACEFUL LANDSCAPES", 29, white,
+                new Vector2(.07f, .06f), new Vector2(.93f, .11f));
             UnityEventTools.AddPersistentListener(play.onClick, flow.Play);
             UnityEventTools.AddPersistentListener(collection.onClick,
                 flow.OpenCollectionFromHome);
