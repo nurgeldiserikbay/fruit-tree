@@ -9,7 +9,8 @@ namespace FruitTree.Tests
         [TestCase(4096, 1024, MobilePerformanceTier.Balanced)]
         [TestCase(8192, 1024, MobilePerformanceTier.Balanced)]
         [TestCase(8192, 2048, MobilePerformanceTier.High)]
-        [TestCase(0, 0, MobilePerformanceTier.High)]
+        [TestCase(0, 0, MobilePerformanceTier.Balanced)]
+        [TestCase(8192, 0, MobilePerformanceTier.Balanced)]
         public void MemoryBasedTiersAreStableWithoutDeviceQueries(
             int ramMb, int gpuMb, MobilePerformanceTier expected)
         {
