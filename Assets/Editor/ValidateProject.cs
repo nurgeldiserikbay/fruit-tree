@@ -108,6 +108,17 @@ namespace FruitTree.Editor
                         errors.Add("Fruit-pick glints must never block input");
             }
 
+            var fruitGuide = UnityEngine.Object.FindAnyObjectByType<RemainingFruitGuide>();
+            if (fruitGuide == null || orchard == null ||
+                orchard.remainingFruitGuide != fruitGuide ||
+                fruitGuide.worldCamera != Camera.main ||
+                fruitGuide.overlay == null || fruitGuide.marker == null ||
+                fruitGuide.markerGroup == null ||
+                fruitGuide.markerGroup.blocksRaycasts ||
+                fruitGuide.marker.GetComponent<RoundedPanel>() == null ||
+                fruitGuide.marker.GetComponent<RoundedPanel>().raycastTarget)
+                errors.Add("Optional last-fruit guide is not wired or blocks touch input");
+
             var completion = UnityEngine.Object.FindAnyObjectByType<CalmCompletionFeedback>();
             if (completion == null || completion.orchard != orchard ||
                 completion.message == null || completion.messageGroup == null ||
