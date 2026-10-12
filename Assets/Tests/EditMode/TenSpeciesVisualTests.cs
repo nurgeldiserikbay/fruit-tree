@@ -35,6 +35,30 @@ namespace FruitTree.Tests
         }
 
         [Test]
+        public void TenTreeProfilesCreateDifferentCanopySilhouettesWithoutNewMeshes()
+        {
+            FruitSpeciesProfile pear = FruitSpeciesProfile.Get("pear");
+            FruitSpeciesProfile cherry = FruitSpeciesProfile.Get("cherry");
+            FruitSpeciesProfile peach = FruitSpeciesProfile.Get("peach");
+            FruitSpeciesProfile apple = FruitSpeciesProfile.Get("apple");
+            Assert.Greater(pear.BranchRise, apple.BranchRise);
+            Assert.Greater(pear.TrunkHeight, cherry.TrunkHeight);
+            Assert.Less(cherry.BranchRise, apple.BranchRise);
+            Assert.Greater(cherry.FillerSpread, pear.FillerSpread);
+            Assert.Less(peach.BranchRise, apple.BranchRise);
+
+            foreach (string id in Species)
+            {
+                var profile = FruitSpeciesProfile.Get(id);
+                Assert.That(profile.BranchRise, Is.InRange(.1f, .85f), id);
+                Assert.That(profile.TwigUpwardFactor, Is.InRange(.65f, 1.25f), id);
+                Assert.That(profile.TrunkHeight, Is.InRange(3.6f, 4.4f), id);
+                Assert.Greater(profile.FillerTopHeight, profile.CrownHeightHigh, id);
+                Assert.That(profile.FillerSpread, Is.InRange(.7f, 1.25f), id);
+            }
+        }
+
+        [Test]
         public void AllTenFruitShapesHaveFiniteGeometryAndSmallMeshBudgets()
         {
             foreach (string id in Species)

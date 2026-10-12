@@ -50,6 +50,25 @@ namespace FruitTree.Tests
         }
 
         [Test]
+        public void SceneColorTransitionEasesSmoothlyWithoutOvershoot()
+        {
+            Assert.AreEqual(0f, EnvironmentController.TransitionWeight(-2f));
+            Assert.AreEqual(0f, EnvironmentController.TransitionWeight(0f));
+            Assert.AreEqual(1f, EnvironmentController.TransitionWeight(1f));
+            Assert.AreEqual(1f, EnvironmentController.TransitionWeight(4f));
+            Assert.Less(EnvironmentController.TransitionWeight(.15f), .15f);
+            Assert.Greater(EnvironmentController.TransitionWeight(.85f), .85f);
+            float previous = 0f;
+            for (int step = 1; step <= 20; step++)
+            {
+                float weight = EnvironmentController.TransitionWeight(step / 20f);
+                Assert.GreaterOrEqual(weight, previous);
+                Assert.LessOrEqual(weight, 1f);
+                previous = weight;
+            }
+        }
+
+        [Test]
         public void EveryThemeDefinesValidSkyAndTerrainPalette()
         {
             for (int i = 0; i < EnvironmentThemes.Count; i++)

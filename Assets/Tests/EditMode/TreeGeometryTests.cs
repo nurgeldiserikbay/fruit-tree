@@ -206,6 +206,20 @@ namespace FruitTree.Tests
         }
 
         [Test]
+        public void FingerAssistIsSmallAndAdaptsToPhoneResolution()
+        {
+            float fullHd = OrbitPickingCamera.TouchAssistRadius(1920, 47f, 8f);
+            float compact = OrbitPickingCamera.TouchAssistRadius(720, 47f, 8f);
+            Assert.That(fullHd, Is.InRange(.035f, .12f));
+            Assert.Greater(compact, fullHd);
+            Assert.LessOrEqual(compact, .12f);
+            Assert.AreEqual(.12f,
+                OrbitPickingCamera.TouchAssistRadius(320, 80f, 16f), .00001f);
+            Assert.That(OrbitPickingCamera.TouchAssistRadius(0, 0f, 0f),
+                Is.InRange(.035f, .12f));
+        }
+
+        [Test]
         public void PortraitCameraAutomaticallyFramesGeneratedTree()
         {
             var root = new GameObject("Camera Fit Test");
