@@ -52,7 +52,13 @@ namespace FruitTree
 
             int stored = PlayerPrefs.GetInt(PreferenceKey, -1);
             overrideIndex = EnvironmentThemes.IsValid(stored) ? stored : -1;
-            Apply();
+            // GroundGenerator.Awake may not have run yet: wait until all Awake
+            // calls finish before applying material tints or building decoration.
+        }
+
+        private void Start()
+        {
+            if (sceneryMesh == null) Apply();
         }
 
         public void UseForTree(int index)
