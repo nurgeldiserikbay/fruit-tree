@@ -150,9 +150,9 @@ namespace FruitTree
             // A slight bend in the trunk and irregularly-spaced limbs avoid the
             // artificial radial symmetry of the first prototype.
             Vector3 trunkBase = Vector3.zero;
-            Vector3 trunkLow = new Vector3(.055f, 1.22f, -.025f);
-            Vector3 trunkMid = new Vector3(-.04f, 2.53f, .06f);
-            Vector3 trunkTop = new Vector3(.04f, 4.02f, -.025f);
+            Vector3 trunkLow = new Vector3(.055f, profile.TrunkHeight * .30f, -.025f);
+            Vector3 trunkMid = new Vector3(-.04f, profile.TrunkHeight * .63f, .06f);
+            Vector3 trunkTop = new Vector3(.04f, profile.TrunkHeight, -.025f);
             wood.BranchCurve(
                 new[] { trunkBase, trunkLow, trunkMid, trunkTop },
                 new[] { .43f, .33f, .22f, .035f }, brown);
@@ -182,7 +182,8 @@ namespace FruitTree
                     float fraction = section / 3f;
                     limbPoints[section] = origin + radial * (length * fraction) +
                         sideways * (Mathf.Sin(fraction * Mathf.PI) * bend) +
-                        Vector3.up * (.12f * fraction + .48f * fraction * fraction);
+                        Vector3.up * (.12f * fraction +
+                            profile.BranchRise * fraction * fraction);
                     limbRadii[section] = Mathf.Lerp(baseRadius, .022f, fraction);
                 }
                 wood.BranchCurve(limbPoints, limbRadii, branchColor);
@@ -194,10 +195,12 @@ namespace FruitTree
                     float fraction = .32f + twigIndex * .14f;
                     float sideSign = twigIndex % 2 == 0 ? 1f : -1f;
                     Vector3 start = origin + radial * (length * fraction) +
-                        Vector3.up * (.12f * fraction + .48f * fraction * fraction);
+                        Vector3.up * (.12f * fraction +
+                            profile.BranchRise * fraction * fraction);
                     Vector3 twigDirection = (radial * .65f +
                         sideways * sideSign * Between(.28f, .7f) +
-                        Vector3.up * Between(.18f,.58f)).normalized;
+                        Vector3.up * (Between(.18f,.58f) *
+                            profile.TwigUpwardFactor)).normalized;
                     float twigLength = Between(.44f, .77f) * (1f - elevation * .18f);
                     Vector3 end = start + twigDirection * twigLength;
                     wood.Branch(start, end, .039f, .008f, branchColor);
@@ -230,10 +233,12 @@ namespace FruitTree
             {
                 float heightRatio = (cluster + .5f) / 24f;
                 float angle = cluster * goldenAngle;
-                float radius = Mathf.Lerp(1.6f, .55f, heightRatio) * Between(.75f, 1.1f);
+                float radius = Mathf.Lerp(1.6f, .55f, heightRatio) *
+                    profile.FillerSpread * Between(.75f, 1.1f);
                 Vector3 center = new Vector3(
                     Mathf.Cos(angle) * radius,
-                    Mathf.Lerp(2.65f, 4.25f, heightRatio),
+                    Mathf.Lerp(profile.CrownHeightLow + 1.2f,
+                        profile.FillerTopHeight, heightRatio),
                     Mathf.Sin(angle) * radius);
                 for (int leafIndex = 0; leafIndex < 9; leafIndex++)
                 {
