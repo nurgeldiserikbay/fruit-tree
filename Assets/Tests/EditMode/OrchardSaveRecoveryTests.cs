@@ -66,6 +66,26 @@ namespace FruitTree.Tests
         }
 
         [Test]
+        public void InvalidInMemorySnapshotCannotReplaceValidOrchardProgress()
+        {
+            Assert.IsTrue(repository.Save(Create(8)));
+            string savePath = Path.Combine(folder, "fruit-tree-orchard.json");
+            string before = File.ReadAllText(savePath);
+
+            var malformed = Create(10);
+            malformed.trees.Clear();
+            Assert.IsFalse(repository.Save(malformed));
+            Assert.AreEqual(before, File.ReadAllText(savePath));
+            Assert.AreEqual(8, repository.Load().trees[0].pickedFruitIds.Count);
+
+            var duplicate = Create(12);
+            duplicate.trees.Add(duplicate.trees[0]);
+            Assert.IsFalse(repository.Save(duplicate));
+            Assert.AreEqual(before, File.ReadAllText(savePath));
+            Assert.AreEqual(8, repository.Load().trees[0].pickedFruitIds.Count);
+        }
+
+        [Test]
         public void DuplicateTreeEntriesAreRejectedInFavorOfBackup()
         {
             Assert.IsTrue(repository.Save(Create(2)));
