@@ -251,6 +251,40 @@ namespace FruitTree.Editor
             progressIndicator.tree = tree;
             progressIndicator.fill = progressFill.GetComponent<RectTransform>();
 
+            // Three pooled non-blocking glints in a stretched full-screen overlay.
+            // They appear only on genuine fruit taps and never intercept input.
+            var pickEffectOverlay = new GameObject("Fruit Pick Glints",
+                typeof(RectTransform));
+            pickEffectOverlay.transform.SetParent(gameRoot, false);
+            Anchor(pickEffectOverlay.GetComponent<RectTransform>(),
+                Vector2.zero, Vector2.one);
+            var pickEffectGroups = new CanvasGroup[3];
+            for (int i = 0; i < pickEffectGroups.Length; i++)
+            {
+                var sparkle = new GameObject("Harvest Glow " + (i + 1),
+                    typeof(RectTransform), typeof(CanvasRenderer),
+                    typeof(RoundedPanel), typeof(CanvasGroup));
+                sparkle.transform.SetParent(pickEffectOverlay.transform, false);
+                var rect = sparkle.GetComponent<RectTransform>();
+                rect.anchorMin = rect.anchorMax = new Vector2(.5f, .5f);
+                rect.sizeDelta = Vector2.one * (i == 1 ? 21f : 15f);
+                var graphic = sparkle.GetComponent<RoundedPanel>();
+                graphic.CornerRadius = 32f;
+                graphic.color = i == 1 ?
+                    new Color(1f, .93f, .66f) : new Color(.99f, .97f, .86f);
+                graphic.raycastTarget = false;
+                var group = sparkle.GetComponent<CanvasGroup>();
+                group.alpha = 0f;
+                group.interactable = false;
+                group.blocksRaycasts = false;
+                pickEffectGroups[i] = group;
+            }
+            var fruitPulse = canvasObject.AddComponent<FruitPickPulse>();
+            fruitPulse.tree = tree;
+            fruitPulse.worldCamera = orchard.orbitCamera.GetComponent<Camera>();
+            fruitPulse.overlay = pickEffectOverlay.GetComponent<RectTransform>();
+            fruitPulse.glints = pickEffectGroups;
+
             // Keep the gameplay clean. Only the small pause button is visible.
             // Restart and sound are accessible through the pause menu.
             var pauseButton = MakeButton("Pause", gameRoot, "II",
