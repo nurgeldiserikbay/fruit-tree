@@ -285,6 +285,30 @@ namespace FruitTree.Editor
             fruitPulse.overlay = pickEffectOverlay.GetComponent<RectTransform>();
             fruitPulse.glints = pickEffectGroups;
 
+            // A tiny gold pointer is shown only when the player asks where a
+            // remaining fruit is. The hit area remains completely unobstructed.
+            var lastFruitMarker = new GameObject("Optional Last Fruit Marker",
+                typeof(RectTransform), typeof(CanvasRenderer),
+                typeof(RoundedPanel), typeof(CanvasGroup));
+            lastFruitMarker.transform.SetParent(pickEffectOverlay.transform, false);
+            var markerRect = lastFruitMarker.GetComponent<RectTransform>();
+            markerRect.anchorMin = markerRect.anchorMax = new Vector2(.5f, .5f);
+            markerRect.sizeDelta = Vector2.one * 24f;
+            var markerFace = lastFruitMarker.GetComponent<RoundedPanel>();
+            markerFace.CornerRadius = 30f;
+            markerFace.color = new Color(.98f, .84f, .36f);
+            markerFace.raycastTarget = false;
+            var markerGroup = lastFruitMarker.GetComponent<CanvasGroup>();
+            markerGroup.alpha = 0f;
+            markerGroup.interactable = false;
+            markerGroup.blocksRaycasts = false;
+            var fruitGuide = canvasObject.AddComponent<RemainingFruitGuide>();
+            fruitGuide.worldCamera = orchard.orbitCamera.GetComponent<Camera>();
+            fruitGuide.overlay = pickEffectOverlay.GetComponent<RectTransform>();
+            fruitGuide.marker = markerRect;
+            fruitGuide.markerGroup = markerGroup;
+            orchard.remainingFruitGuide = fruitGuide;
+
             // Keep the gameplay clean. Only the small pause button is visible.
             // Restart and sound are accessible through the pause menu.
             var pauseButton = MakeButton("Pause", gameRoot, "II",
