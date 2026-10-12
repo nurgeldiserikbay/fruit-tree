@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using FruitTree.Progression;
@@ -26,6 +27,8 @@ namespace FruitTree
         public Button completionNextButton;
         public Button remainingFruitHintButton;
         public PauseController pauseController;
+        public event Action TreeCleared;
+        public event Action TreeDisplayed;
 
         private OrchardProgressionService progress;
         private OrchardSaveRepository saves;
@@ -79,6 +82,8 @@ namespace FruitTree
             }
             SaveProgress();
             RefreshCollectionUI();
+            if (progress.GetTree(progress.ActiveTreeId).IsCleared)
+                TreeCleared?.Invoke();
         }
 
         private void DisplayActiveTree()
@@ -93,6 +98,7 @@ namespace FruitTree
             // Wait until deferred old objects have been destroyed before computing bounds.
             StartCoroutine(RefitCameraNextFrame());
             RefreshCollectionUI();
+            TreeDisplayed?.Invoke();
         }
 
         private IEnumerator RefitCameraNextFrame()
