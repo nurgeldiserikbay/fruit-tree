@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace FruitTree
@@ -17,6 +18,8 @@ namespace FruitTree
         private Material sceneryMaterial;
         private Material skyMaterial;
         private Mesh sceneryMesh;
+        private readonly Mesh[] themeMeshes = new Mesh[EnvironmentThemes.Count];
+        public event Action<EnvironmentTheme> ThemeChanged;
         private MeshFilter sceneryFilter;
         private int treeIndex;
         private int overrideIndex = -1;
@@ -92,6 +95,9 @@ namespace FruitTree
 
         private void BuildTheme(EnvironmentTheme theme)
         {
+            if (!EnvironmentThemes.IsValid((int)theme))
+                throw new ArgumentOutOfRangeException(nameof(theme));
+            if (sceneryMesh != null && CurrentTheme == theme) return;
             CurrentTheme = theme;
             if (ground != null)
                 ground.SetPalette(EnvironmentThemes.GroundTint(theme),
@@ -116,14 +122,14 @@ namespace FruitTree
             RenderSettings.ambientLight = Color.Lerp(EnvironmentThemes.Horizon(theme),
                 Color.white, .14f);
 
-            Mesh next = CreateSceneryMesh(theme);
-            if (sceneryFilter != null) sceneryFilter.sharedMesh = next;
-            if (sceneryMesh != null)
-            {
-                if (Application.isPlaying) Destroy(sceneryMesh);
-                else DestroyImmediate(sceneryMesh);
-            }
-            sceneryMesh = next;
+            int index = (int)theme;
+            // Generate only on first visit; later switching reuses the same small
+            // GPU/CPU buffers. Only one theme is displayed by the single renderer.
+            if (themeMeshes[index] == null)
+                themeMeshes[index] = CreateSceneryMesh(theme);
+            sceneryMesh = themeMeshes[index];
+            if (sceneryFilter != null) sceneryFilter.sharedMesh = sceneryMesh;
+            ThemeChanged?.Invoke(theme);
         }
 
         public static Mesh CreateSceneryMesh(EnvironmentTheme theme)
@@ -260,11 +266,14 @@ namespace FruitTree
 
         private void OnDestroy()
         {
-            if (sceneryMesh != null)
+            for (int i = 0; i < themeMeshes.Length; i++)
             {
-                if (Application.isPlaying) Destroy(sceneryMesh);
-                else DestroyImmediate(sceneryMesh);
+                if (themeMeshes[i] == null) continue;
+                if (Application.isPlaying) Destroy(themeMeshes[i]);
+                else DestroyImmediate(themeMeshes[i]);
+                themeMeshes[i] = null;
             }
+            sceneryMesh = null;
             if (sceneryMaterial != null)
             {
                 if (Application.isPlaying) Destroy(sceneryMaterial);
