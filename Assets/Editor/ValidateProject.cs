@@ -93,14 +93,15 @@ namespace FruitTree.Editor
 
             var soundObject = GameObject.Find("Orchard Sounds");
             var sound = soundObject != null ? soundObject.GetComponent<OrchardAudio>() : null;
-            if (sound == null || sound.tree != tree || sound.soundStatusText == null)
+            if (sound == null || sound.tree != tree || sound.environment != environment ||
+                sound.soundStatusText == null)
                 errors.Add("Orchard audio has missing references");
 
             if (hudObject != null)
             {
                 var buttons = hudObject.GetComponentsInChildren<Button>(true);
                 if (buttons.Length < 32)
-                    errors.Add("Expected at least 26 functional buttons across home, gameplay, pause and settings");
+                    errors.Add("Expected at least 32 functional buttons across home, gameplay, pause and settings");
                 foreach (var button in buttons)
                 {
                     if (button.GetComponent<ParentHoldGate>() != null) continue;
