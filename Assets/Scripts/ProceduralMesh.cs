@@ -271,5 +271,56 @@ namespace FruitTree
             return mesh;
         }
 
+
+        /// <summary>
+        /// Gently heart-shaped, with a small natural longitudinal peach seam.
+        /// Shares apple topology and therefore reuses the existing optimized mesh path.
+        /// </summary>
+        public static Mesh Peach()
+        {
+            var mesh = Apple();
+            mesh.name = "Soft Peach Fruit";
+            var verts = mesh.vertices;
+            for (int i = 0; i < verts.Length; i++)
+            {
+                Vector3 v = verts[i];
+                float angle = Mathf.Atan2(v.z, v.x);
+                float latitude = Mathf.Clamp01((v.y + .18f) / .38f);
+                float seam = Mathf.Pow(Mathf.Abs(Mathf.Sin(angle)), 26f);
+                float seamDepth = .012f * seam * Mathf.Sin(latitude * Mathf.PI);
+                float taper = Mathf.Lerp(1.045f, .94f, latitude);
+                verts[i] = new Vector3(v.x * taper - seamDepth * Mathf.Cos(angle),
+                    v.y * .96f, v.z * taper - seamDepth * Mathf.Sin(angle));
+            }
+            mesh.vertices = verts;
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            return mesh;
+        }
+
+        /// <summary>
+        /// Round citrus fruit with a subtle flattened pole and tiny radial pores.
+        /// A compact 12x16 cherry topology is enough for mobile-size oranges.
+        /// </summary>
+        public static Mesh Orange()
+        {
+            var mesh = Cherry();
+            mesh.name = "Round Citrus Fruit";
+            var verts = mesh.vertices;
+            for (int i = 0; i < verts.Length; i++)
+            {
+                Vector3 v = verts[i];
+                float angle = Mathf.Atan2(v.z, v.x);
+                float t = Mathf.Clamp01((v.y + .15f) / .30f);
+                float ribbing = 1f + .012f * Mathf.Cos(angle * 10f) *
+                    Mathf.Pow(Mathf.Abs(2f * t - 1f), 2f);
+                verts[i] = new Vector3(v.x * 1.06f * ribbing,
+                    v.y * .99f, v.z * 1.06f * ribbing);
+            }
+            mesh.vertices = verts;
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            return mesh;
+        }
     }
 }
