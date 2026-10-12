@@ -16,7 +16,12 @@ namespace FruitTree
             {
                 name = species == "pear" ? "Pear Skin" :
                     species == "peach" ? "Peach Skin" :
-                    species == "orange" ? "Citrus Skin" : "Cherry Skin",
+                    species == "orange" ? "Citrus Skin" :
+                    species == "apricot" ? "Apricot Skin" :
+                    species == "plum" ? "Plum Bloom" :
+                    species == "lemon" ? "Lemon Skin" :
+                    species == "mandarin" ? "Mandarin Skin" :
+                    species == "pomegranate" ? "Pomegranate Skin" : "Cherry Skin",
                 wrapMode = TextureWrapMode.Repeat,
                 filterMode = FilterMode.Trilinear
             };
@@ -57,6 +62,48 @@ namespace FruitTree
                         pixels[y * size + x] = new Color(
                             Mathf.Clamp01(tone), Mathf.Clamp01(.96f * tone),
                             Mathf.Clamp01(.89f * tone));
+                    }
+                    else if (species == "apricot")
+                    {
+                        float warmth = Mathf.SmoothStep(.28f, .79f, mottling);
+                        float tone = .88f + .12f * mottling;
+                        pixels[y * size + x] = new Color(
+                            Mathf.Clamp01(tone), Mathf.Clamp01(tone * (.96f - warmth * .10f)),
+                            Mathf.Clamp01(tone * (.75f - warmth * .14f)));
+                    }
+                    else if (species == "plum")
+                    {
+                        // Delicate powdery bloom over the deep-purple material tint.
+                        float dust = freckles > .66f ? .068f : 0f;
+                        float tone = .91f + mottling * .09f + dust;
+                        pixels[y * size + x] = new Color(
+                            Mathf.Clamp01(tone * .96f), Mathf.Clamp01(tone),
+                            Mathf.Clamp01(tone * 1.07f));
+                    }
+                    else if (species == "lemon")
+                    {
+                        float pores = freckles > .70f ? .055f : 0f;
+                        float tone = .90f + .12f * mottling - pores;
+                        pixels[y * size + x] = new Color(
+                            Mathf.Clamp01(tone), Mathf.Clamp01(tone * .99f),
+                            Mathf.Clamp01(tone * .84f));
+                    }
+                    else if (species == "mandarin")
+                    {
+                        float pores = freckles > .72f ? .063f : 0f;
+                        float tone = .87f + .15f * mottling - pores;
+                        pixels[y * size + x] = new Color(
+                            Mathf.Clamp01(tone), Mathf.Clamp01(tone * .95f),
+                            Mathf.Clamp01(tone * .86f));
+                    }
+                    else if (species == "pomegranate")
+                    {
+                        float blush = Mathf.SmoothStep(.3f, .78f, mottling);
+                        float dots = freckles > .79f ? .035f : 0f;
+                        float tone = .89f + .1f * blush + dots;
+                        pixels[y * size + x] = new Color(
+                            Mathf.Clamp01(tone), Mathf.Clamp01(tone * .88f),
+                            Mathf.Clamp01(tone * .82f));
                     }
                     else
                     {
