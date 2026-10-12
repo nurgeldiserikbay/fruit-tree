@@ -14,12 +14,17 @@ namespace FruitTree
         public CanvasGroup[] glints;
 
         private readonly Vector2[] starts = new Vector2[3];
+        private readonly RectTransform[] glintRects = new RectTransform[3];
         private float elapsed;
 
         public bool IsAnimating { get; private set; }
 
         private void Start()
         {
+            if (glints != null && glints.Length == glintRects.Length)
+                for (int i = 0; i < glintRects.Length; i++)
+                    if (glints[i] != null)
+                        glintRects[i] = glints[i].GetComponent<RectTransform>();
             if (tree != null) tree.FruitPicked += Show;
             Hide();
         }
@@ -44,7 +49,7 @@ namespace FruitTree
                 starts[i] = center + new Vector2((i - 1) * 17f,
                     i == 1 ? 9f : -4f);
                 glints[i].transform.localScale = Vector3.one;
-                glints[i].GetComponent<RectTransform>().anchoredPosition = starts[i];
+                if (glintRects[i] != null) glintRects[i].anchoredPosition = starts[i];
                 glints[i].alpha = 0.65f;
             }
             elapsed = 0f;
@@ -62,8 +67,9 @@ namespace FruitTree
                 if (glints == null || i >= glints.Length || glints[i] == null)
                     continue;
                 glints[i].alpha = Opacity(t) * .65f;
-                glints[i].GetComponent<RectTransform>().anchoredPosition =
-                    starts[i] + new Vector2((i - 1) * 12f * t,
+                if (glintRects[i] != null)
+                    glintRects[i].anchoredPosition =
+                        starts[i] + new Vector2((i - 1) * 12f * t,
                         (25f + (i % 2) * 12f) * t);
             }
             if (t >= 1f) Hide();
