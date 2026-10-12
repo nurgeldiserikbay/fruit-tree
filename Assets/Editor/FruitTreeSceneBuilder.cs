@@ -237,6 +237,7 @@ namespace FruitTree.Editor
             pauseController.screenFlow = screenFlow;
             pauseController.panel = menu;
             pauseController.hud = hud;
+            orchard.pauseController = pauseController;
 
             MakeLabel("Paused Title", menu.transform, "PAUSED", 70, Color.white,
                 new Vector2(.17f, .78f), new Vector2(.83f, .87f));
@@ -341,6 +342,14 @@ namespace FruitTree.Editor
             UnityEventTools.AddPersistentListener(orchard.rebloomButton.onClick, orchard.Rebloom);
             UnityEventTools.AddPersistentListener(collectionBack.onClick, orchard.CloseTreeMenu);
             collection.SetActive(false);
+
+            // An optional last-fruit helper. It turns the view rather than picking.
+            orchard.remainingFruitHintButton = MakeButton("Find Remaining Fruit",
+                gameRoot, "FIND FRUIT", new Vector2(.67f, .145f),
+                new Vector2(.94f, .205f), new Color(.91f, .96f, .82f, .93f));
+            UnityEventTools.AddPersistentListener(orchard.remainingFruitHintButton.onClick,
+                orchard.FindRemainingFruit);
+            orchard.remainingFruitHintButton.gameObject.SetActive(false);
 
             // A calm completion shortcut, never displayed during ordinary harvesting.
             orchard.completionNextButton = MakeButton("Completion Next Tree",

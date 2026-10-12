@@ -19,6 +19,7 @@
 - [x] Non-breaking core: tree definitions, 100%-clear/unlock rules, rebloom, in-memory save DTO and progression EditMode tests (written, not run in Unity).
 - [ ] Disk persistence, stable prefab fruit IDs and connection to Unity gameplay — not implemented.
 - [x] Three-tree playable controller, local per-fruit save repository, unlock on 100%, rebloom and tree selection integrated into generated scene (code committed; NOT YET Unity-tested).
+- [x] Voluntary last-ten-fruit camera guide and collection-switch pause closure (source committed; pending Unity verification).
 - [ ] Verify Unity compilation, actual 120/140/220 harvest, unlock/restore and device performance.
 - [x] First vertical slice species Apple, Pear, Cherry in procedural prototype form (not yet polished or play-tested).
 - [ ] Expand to ten individually authored fruit-tree species after the vertical slice passes.

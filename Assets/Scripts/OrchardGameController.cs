@@ -23,11 +23,14 @@ namespace FruitTree
         public Button nextButton;
         public Button rebloomButton;
         public Button completionNextButton;
+        public Button remainingFruitHintButton;
+        public PauseController pauseController;
 
         private OrchardProgressionService progress;
         private OrchardSaveRepository saves;
         private readonly string[] titles = { "APPLE TREE", "PEAR TREE", "CHERRY TREE" };
         private bool initialized;
+        private int hintCursor = -1;
 
         private static readonly TreeLevelDefinition[] Catalog =
         {
@@ -84,6 +87,7 @@ namespace FruitTree
             tree.Configure(active.Definition.SpeciesId, active.Definition.FruitCount,
                 122 + levelIndex * 197);
             tree.RestorePickedFruits(active.PickedFruitIds);
+            hintCursor = -1;
             // Wait until deferred old objects have been destroyed before computing bounds.
             StartCoroutine(RefitCameraNextFrame());
             RefreshCollectionUI();
@@ -135,14 +139,48 @@ namespace FruitTree
             if (!progress.SelectTree(id)) return;
             SaveProgress();
             DisplayActiveTree();
+            CloseTreeMenu();
+            if (pauseController != null) pauseController.Resume();
         }
 
         public void Rebloom()
         {
             if (!initialized || !progress.TryRebloomActive()) return;
             tree.ResetHarvest();
+            hintCursor = -1;
             SaveProgress();
             RefreshCollectionUI();
+        }
+
+        /// <summary>
+        /// Voluntary and free. No ad, currency, timer or automatic collection.
+        /// Shows only when <=10 fruits remain; repeated presses cycle through them.
+        /// </summary>
+        public void FindRemainingFruit()
+        {
+            if (!initialized || orbitCamera == null || !CanOfferHint()) return;
+            IReadOnlyList<Apple> fruits = tree.Apples;
+            if (fruits == null || fruits.Count == 0) return;
+            for (int step = 0; step < fruits.Count; step++)
+            {
+                hintCursor = (hintCursor + 1) % fruits.Count;
+                Apple fruit = fruits[hintCursor];
+                if (fruit == null || fruit.IsHarvested || !fruit.gameObject.activeInHierarchy)
+                    continue;
+                orbitCamera.LookTowardFruit(fruit.transform.position);
+                if (hud.messageText != null)
+                    hud.messageText.text = "Follow the gentle camera turn to find a fruit";
+                return;
+            }
+        }
+
+        public bool CanOfferHint()
+        {
+            if (!initialized || progress == null) return false;
+            TreeRoundState state = progress.GetTree(progress.ActiveTreeId);
+            if (state == null) return false;
+            int remaining = state.Definition.FruitCount - state.PickedCount;
+            return remaining > 0 && remaining <= 10;
         }
 
         private void RefreshCollectionUI()
@@ -167,6 +205,8 @@ namespace FruitTree
                 nextButton.interactable = index + 1 < Catalog.Length &&
                     progress.IsUnlocked(Catalog[index + 1].Id);
             if (rebloomButton != null) rebloomButton.interactable = active.IsCleared;
+            if (remainingFruitHintButton != null)
+                remainingFruitHintButton.gameObject.SetActive(CanOfferHint());
             if (completionNextButton != null)
                 completionNextButton.gameObject.SetActive(active.IsCleared &&
                     index + 1 < Catalog.Length &&

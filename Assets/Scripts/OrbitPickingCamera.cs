@@ -59,6 +59,22 @@ namespace FruitTree
             distance = framedDistance;
         }
 
+        /// <summary>
+        /// An optional, player-initiated last-fruit guide. It never harvests fruit
+        /// or disables manual 360-degree orbit after the camera reaches the target.
+        /// </summary>
+        public void LookTowardFruit(Vector3 worldPosition)
+        {
+            if (target == null) return;
+            Vector3 offset = worldPosition - target.position;
+            Vector2 radial = new Vector2(offset.x, offset.z);
+            if (radial.sqrMagnitude > .0001f)
+                wantedYaw = Mathf.Atan2(-offset.x, -offset.z) * Mathf.Rad2Deg;
+            wantedFocusHeight = Mathf.Clamp(offset.y, 1.4f, 4.1f);
+            // Move gently closer if the player is far away. Keep user freedom to zoom.
+            wantedDistance = Mathf.Min(wantedDistance, 8.5f);
+        }
+
         private void Update()
         {
             if (target == null || Time.timeScale == 0) return;
