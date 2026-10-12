@@ -11,7 +11,9 @@ namespace FruitTree.Tests
             {
                 new TreeLevelDefinition("tree_001", "apple", 120),
                 new TreeLevelDefinition("tree_002", "pear", 140),
-                new TreeLevelDefinition("tree_003", "cherry", 220)
+                new TreeLevelDefinition("tree_003", "cherry", 220),
+                new TreeLevelDefinition("tree_004", "peach", 130),
+                new TreeLevelDefinition("tree_005", "orange", 160)
             });
         }
 
@@ -84,6 +86,64 @@ namespace FruitTree.Tests
             Assert.IsFalse(game.TryPickActive("fruit_fake"));
             Assert.IsFalse(game.TryPickActive(null));
             Assert.IsFalse(game.IsUnlocked("tree_002"));
+        }
+
+        [Test]
+        public void PeachAndOrangeRequireFullPreviousClearEvenAfterReplay()
+        {
+            var game = NewGame();
+            Assert.IsFalse(game.IsUnlocked("tree_004"));
+            Assert.IsFalse(game.IsUnlocked("tree_005"));
+            foreach (string treeId in new[] { "tree_001", "tree_002", "tree_003" })
+            {
+                Assert.IsTrue(game.SelectTree(treeId));
+                var level = game.GetTree(treeId).Definition;
+                for (int i = 0; i < level.FruitCount - 1; i++)
+                    Assert.IsTrue(game.TryPickActive(level.FruitIdAt(i)));
+                string nextId = treeId == "tree_001" ? "tree_002" :
+                    treeId == "tree_002" ? "tree_003" : "tree_004";
+                Assert.IsFalse(game.IsUnlocked(nextId));
+                Assert.IsTrue(game.TryPickActive(level.FruitIdAt(level.FruitCount - 1)));
+                Assert.IsTrue(game.IsUnlocked(nextId));
+            }
+            Assert.IsTrue(game.SelectTree("tree_004"));
+            Assert.IsFalse(game.IsUnlocked("tree_005"));
+            for (int i = 0; i < 129; i++)
+                Assert.IsTrue(game.TryPickActive("fruit_" + i.ToString("D4")));
+            Assert.IsFalse(game.IsUnlocked("tree_005"));
+            Assert.IsTrue(game.TryPickActive("fruit_0129"));
+            Assert.IsTrue(game.IsUnlocked("tree_005"));
+            Assert.IsTrue(game.SelectTree("tree_001"));
+            Assert.IsTrue(game.TryRebloomActive());
+            Assert.IsTrue(game.IsUnlocked("tree_005"));
+        }
+
+        [Test]
+        public void ExistingThreeTreeSaveUpgradesWithoutGrantingNewLevels()
+        {
+            var previous = new OrchardProgressionService(new[]
+            {
+                new TreeLevelDefinition("tree_001", "apple", 120),
+                new TreeLevelDefinition("tree_002", "pear", 140),
+                new TreeLevelDefinition("tree_003", "cherry", 220)
+            });
+            foreach (string id in new[] { "tree_001", "tree_002" })
+            {
+                Assert.IsTrue(previous.SelectTree(id));
+                var def = previous.GetTree(id).Definition;
+                for (int i = 0; i < def.FruitCount; i++)
+                    Assert.IsTrue(previous.TryPickActive(def.FruitIdAt(i)));
+            }
+            Assert.IsTrue(previous.SelectTree("tree_003"));
+            Assert.IsTrue(previous.TryPickActive("fruit_0007"));
+
+            OrchardSaveData oldSave = previous.ToSave();
+            var updated = new OrchardProgressionService(NewGame().Definitions, oldSave);
+            Assert.AreEqual("tree_003", updated.ActiveTreeId);
+            Assert.AreEqual(1, updated.GetTree("tree_003").PickedCount);
+            Assert.IsTrue(updated.IsUnlocked("tree_003"));
+            Assert.IsFalse(updated.IsUnlocked("tree_004"));
+            Assert.IsFalse(updated.IsUnlocked("tree_005"));
         }
 
         [Test]

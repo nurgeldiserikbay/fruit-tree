@@ -61,6 +61,51 @@ namespace FruitTree.Tests
         }
 
         [Test]
+        public void PeachAndOrangeHaveFiniteDistinctMobileMeshes()
+        {
+            Mesh peach = ProceduralMesh.Peach();
+            Mesh orange = ProceduralMesh.Orange();
+            try
+            {
+                Assert.AreNotEqual(peach.vertexCount, orange.vertexCount);
+                Assert.Less(peach.vertexCount, 500);
+                Assert.Less(orange.vertexCount, 300);
+                Assert.That(peach.bounds.size.x, Is.InRange(.30f, .50f));
+                Assert.That(orange.bounds.size.x, Is.InRange(.30f, .40f));
+                foreach (var mesh in new[] { peach, orange })
+                {
+                    foreach (Vector3 vertex in mesh.vertices)
+                    {
+                        Assert.IsFalse(float.IsNaN(vertex.x) || float.IsNaN(vertex.y) ||
+                            float.IsNaN(vertex.z) || float.IsInfinity(vertex.x) ||
+                            float.IsInfinity(vertex.y) || float.IsInfinity(vertex.z));
+                    }
+                }
+            }
+            finally
+            {
+                Object.DestroyImmediate(peach);
+                Object.DestroyImmediate(orange);
+            }
+        }
+
+        [Test]
+        public void PeachAndOrangeTexturesFitTheExistingLowMemoryBudget()
+        {
+            foreach (string species in new[] { "peach", "orange" })
+            {
+                Texture2D skin = AppleSkinTexture.CreateForSpecies(species);
+                try
+                {
+                    Assert.AreEqual(64, skin.width);
+                    Assert.AreEqual(64, skin.height);
+                    Assert.AreEqual(TextureFormat.RGB24, skin.format);
+                }
+                finally { Object.DestroyImmediate(skin); }
+            }
+        }
+
+        [Test]
         public void CurvedGrassFitsMobileBudgetAndRemainsShort()
         {
             Mesh grass = GroundGenerator.CreateGrassMesh();

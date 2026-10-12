@@ -19,6 +19,8 @@ namespace FruitTree.Tests
                 CheckSpecies(tree, "apple", 120, 122);
                 CheckSpecies(tree, "pear", 140, 319);
                 CheckSpecies(tree, "cherry", 220, 516);
+                CheckSpecies(tree, "peach", 130, 713);
+                CheckSpecies(tree, "orange", 160, 910);
             }
             finally { UnityEngine.Object.DestroyImmediate(root); }
         }
