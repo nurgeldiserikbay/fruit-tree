@@ -73,3 +73,9 @@ The new objects and sound are **temporary procedural art**, not fully profession
 | RAM/VRAM unknown | 60 | Balanced defaults | 2x |
 
 The runtime logs which tier it selected. This changes **graphics quality only**, not the fruit counts, achievements, progression, privacy settings or offline saves. Frame-rate caps are not FPS measurements or guarantees. All thresholds are provisional, need actual GPU timing, thermals and battery measurements before release. Unity Editor remains on its existing settings.
+
+## Soft landscape palette transition
+
+The environment keeps four cached static scenery meshes, but the background **palette** now eases between two theme settings over **one unscaled second**. Sky horizon and zenith, terrain/grass tint, fog, ambient and direct sunlight are interpolated together. The transition continues if Settings is open while the game time scale is zero; rapid changes stop the previous blend and start from the currently displayed colors. This adds only a brief coroutine, not terrain or GameObject rebuilds.
+
+Source tests cover easing limits and a deferred PlayMode scenario with `Time.timeScale = 0`. Real Unity Editor/device rendering is still unverified.

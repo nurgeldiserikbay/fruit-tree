@@ -1,5 +1,16 @@
 # Fruit Tree development state
 
+## Tree silhouettes, touch accessibility and gentle scenery fades (2026-10-12)
+
+- [x] Source: the ten existing `FruitSpeciesProfile` entries now define trunk height, upward branch lift, twig angle and crown-filler extent; pear is more upright and cherry/peach are more spreading.
+- [x] Tree generator uses those parameters for its existing combined wood/leaf meshes. **No new renderers, leaves, fruit meshes or save identifiers** are required.
+- [x] Source: the camera performs a short-radius SphereCast **only if the precise tap ray misses**, helping small fruit on phone screens. The margin is calculated from screen height/camera FOV and capped at 0.12 world units.
+- [x] Source: sky/ground/fog/ambient light and sun colors transition over one second when changing biomes; existing cached decor mesh and audio crossfades remain.
+- [x] Source: a tap-through, four-and-a-half-second optional gold pointer follows a remaining fruit only on explicit FIND FRUIT request. Tree switching and rebloom immediately hide it.
+- [x] Source: EditMode tests for finger-radius bounds, differing ten-species silhouettes, easing and passive guide fades; PlayMode test for scenery transition while Settings/game is paused. **Not yet run in Unity.**
+- [ ] Final Unity/Android checks: readability of the pointer, portrait tapping precision, color fades from the paused Settings menu, visual silhouette uniqueness, 100% fruit reachability and FPS.
+
+
 ## Main-menu and harvest UI comfort pass (2026-10-12)
 
 - [x] Source: the home screen keeps the tree visible behind a lighter veil, with a single rounded hero panel, warmer primary Continue button and quieter typography.

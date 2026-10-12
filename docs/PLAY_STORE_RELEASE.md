@@ -16,7 +16,8 @@
 - [x] Source: first natural-apple mesh/skin pass, distinct lighter round cherry mesh, 64×64 pear/cherry skin maps, smaller fruit proportions, curved short grass and soft clear-tree feedback (not yet Unity-tested).
 - [x] Source: merged blossom animation, species-specific leaf forms/wood tints and startup duplicate-tree optimization (Unity PlayMode QA pending).
 - [ ] Finish final-quality fruit/branch/foliage meshes, terrain and lighting; visually approve four environments in Unity.
-- [ ] Every fruit on every tree reachable and 100% clear achievable without frustration; optional last-fruit assistance.
+- [x] Source: bounded finger-sized tap fallback and voluntary last-fruit guide with short-lived non-blocking marker (not yet tested in Unity).
+- [ ] Every fruit on every tree reachable and 100% clear achievable without frustration; check optional last-fruit assistance on phones.
 - [x] Source: live fruit progress strip and pooled, touch-through 0.42-second harvest glints; new edit-mode tests authored.
 - [ ] Responsive 9:16, 9:20 and cut-out / safe-area UI testing.
 - [ ] Final natural atmosphere recordings (or approved synthesized audio), licensed/owned SFX and final sound mixing; comfort volume/motion settings are in source but not QA-approved.

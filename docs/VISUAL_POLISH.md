@@ -69,3 +69,9 @@ These features are committed to source and have **unexecuted Unity tests**. The 
 - Each new species has a shared 64×64 RGB24 skin texture (golden blush, plum bloom, citrus pores or pomegranate blush) and three shared material tints per tree.
 - Existing first-five IDs, fruit counts and level seed formula were not changed.
 - Editor tests check model bounds and vertex budgets and progression strictness, but **the models have not been reviewed on mobile**. Final art may require further mesh and leaf work.
+
+## Distinct canopy silhouettes and comfortable small-fruit taps
+
+The ten visual profiles now have distinct canopy geometry parameters in addition to species colors. Pear is taller/upright, cherry and peach are lower and broader, and citrus forms are more compact. Existing merged mesh budgets remain unchanged. The deterministic seed and stable `fruit_XXXX` identifiers are preserved, though their world positions may shift because branches were refined.
+
+A bounded, player-initiated touch margin is added only after a precise tap ray misses a fruit. The optional last-fruit helper also places a small gold indicator near the selected unpicked fruit for 4.5 seconds; it never collects anything or blocks gestures. Editor/device tests and real usability evaluation remain pending.
