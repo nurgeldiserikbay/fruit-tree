@@ -85,6 +85,10 @@ namespace FruitTree.Editor
                 screenFlow.environment != environment)
                 errors.Add("Lightweight scenery theme controller and UI wiring are missing");
 
+            var budget = UnityEngine.Object.FindAnyObjectByType<MobilePerformanceBudget>();
+            if (budget == null || environment == null || budget.sun != environment.sun)
+                errors.Add("Android graphics quality budget is not wired to the scene sun");
+
             var completion = UnityEngine.Object.FindAnyObjectByType<CalmCompletionFeedback>();
             if (completion == null || completion.orchard != orchard ||
                 completion.message == null || completion.messageGroup == null ||
