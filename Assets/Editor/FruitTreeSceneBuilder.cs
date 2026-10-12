@@ -110,6 +110,7 @@ namespace FruitTree.Editor
 
             var sound = new GameObject("Orchard Sounds").AddComponent<OrchardAudio>();
             sound.tree = root.GetComponent<TreeGenerator>();
+            sound.environment = environment;
             CreateInterface(root.GetComponent<TreeGenerator>(), sound, purchasing, orchard);
             PlayerSettings.defaultInterfaceOrientation = UIOrientation.Portrait;
             PlayerSettings.productName = "Fruit Tree";
