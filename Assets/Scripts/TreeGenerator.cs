@@ -34,6 +34,7 @@ namespace FruitTree
         private System.Random random;
         private readonly List<UnityEngine.Object> runtimeResources = new List<UnityEngine.Object>();
         private Coroutine rebloomAnimation;
+        private GameObject blossomObject;
         public bool IsReblooming { get; private set; }
 
         private T Track<T>(T resource) where T : UnityEngine.Object
@@ -67,6 +68,7 @@ namespace FruitTree
                 rebloomAnimation = null;
             }
             IsReblooming = false;
+            if (blossomObject != null) blossomObject.SetActive(false);
         }
 
         private void Awake()
@@ -134,6 +136,7 @@ namespace FruitTree
             }
             apples.Clear();
             ReleaseResources();
+            blossomObject = null;
             HarvestedCount = 0;
             if (Application.isPlaying && SystemInfo.systemMemorySize > 0 && SystemInfo.systemMemorySize < 3000)
                 leavesPerCluster = Mathf.Min(leavesPerCluster, 8);
@@ -381,6 +384,8 @@ namespace FruitTree
             }
             for (int i = 0; i < apples.Count; i++)
                 if (apples[i] != null) apples[i].BeginRebloom();
+            if (blossomObject == null) CreateBlossoms();
+            if (blossomObject != null) blossomObject.SetActive(true);
 
             HarvestedCount = 0;
             HarvestChanged?.Invoke(0, appleCount);
@@ -390,27 +395,63 @@ namespace FruitTree
 
         private System.Collections.IEnumerator AnimateRebloom()
         {
-            const float duration = 1.65f;
+            const float duration = 1.95f;
+            const float flowerTime = .88f;
+            const float growthDelay = .30f;
             const float stagger = .65f;
             const float growDuration = 1.0f;
             float time = 0f;
             while (time < duration)
             {
                 time = Mathf.Min(duration, time + Time.unscaledDeltaTime);
+                if (blossomObject != null && blossomObject.activeSelf != (time < flowerTime))
+                    blossomObject.SetActive(time < flowerTime);
                 for (int i = 0; i < apples.Count; i++)
                 {
                     Apple fruit = apples[i];
                     if (fruit == null) continue;
                     float offset = ((i * 37) % apples.Count) /
                         (float)Mathf.Max(1, apples.Count - 1) * stagger;
-                    fruit.GrowRebloom((time - offset) / growDuration);
+                    fruit.GrowRebloom((time - growthDelay - offset) / growDuration);
                 }
                 yield return null;
             }
             for (int i = 0; i < apples.Count; i++)
                 if (apples[i] != null) apples[i].GrowRebloom(1f);
+            if (blossomObject != null) blossomObject.SetActive(false);
             rebloomAnimation = null;
             IsReblooming = false;
+        }
+
+        private void CreateBlossoms()
+        {
+            // A single merged blossom mesh instead of hundreds of particle
+            // emitters/GameObjects. Kept dormant and reused for further rounds.
+            var flowers = new ProceduralMesh();
+            Color petal = speciesId == "cherry" ?
+                new Color(.97f, .80f, .85f) :
+                speciesId == "pear" ? new Color(.97f, .98f, .92f) :
+                new Color(.98f, .90f, .86f);
+            for (int i = 0; i < apples.Count; i++)
+            {
+                Apple fruit = apples[i];
+                if (fruit == null) continue;
+                Vector3 center = fruit.transform.localPosition + Vector3.up * .03f;
+                for (int j = 0; j < 5; j++)
+                {
+                    float angle = (j * 2f * Mathf.PI / 5f) + i * .11f;
+                    Vector3 direction = new Vector3(Mathf.Cos(angle), .16f,
+                        Mathf.Sin(angle)).normalized;
+                    flowers.Leaf(center, direction, .095f, .065f,
+                        petal * (j % 2 == 0 ? 1f : .94f));
+                }
+            }
+            var material = Track(VertexMaterial("Rebloom Petals", Color.white));
+            if (material.HasProperty("_Wind")) material.SetFloat("_Wind", 0f);
+            if (material.HasProperty("_Cull")) material.SetFloat("_Cull", 0f);
+            blossomObject = MakeMeshObject("Merged Rebloom Flowers",
+                Track(flowers.Build("Rebloom Flower Petals")), material);
+            blossomObject.SetActive(false);
         }
 
         private void OnHarvest(Apple apple)
@@ -432,7 +473,8 @@ namespace FruitTree
                 go.AddComponent<MeshCollider>().sharedMesh = mesh;
             }
             // Avoid dozens of dynamic shadow-casting meshes on constrained phones.
-            if (label == "Merged Leaves" || label.StartsWith("apple ") ||
+            if (label == "Merged Leaves" || label == "Merged Rebloom Flowers" ||
+                label.StartsWith("apple ") ||
                 label.StartsWith("pear ") || label.StartsWith("cherry "))
                 renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             return go;
