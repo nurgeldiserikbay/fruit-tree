@@ -100,6 +100,9 @@ namespace FruitTree.Editor
             environment.skyRenderer = skyRoot != null ? skyRoot.GetComponent<Renderer>() : null;
             environment.sun = light;
             orchard.environment = environment;
+            // Set a fixed, inexpensive quality budget once per launch on Android.
+            var mobileBudget = ground.gameObject.AddComponent<MobilePerformanceBudget>();
+            mobileBudget.sun = light;
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
             RenderSettings.ambientLight = new Color(.68f, .73f, .77f);
             RenderSettings.fog = true;
