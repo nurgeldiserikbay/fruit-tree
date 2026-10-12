@@ -89,8 +89,25 @@ namespace FruitTree.Progression
                 var content = File.ReadAllText(file);
                 var save = JsonUtility.FromJson<OrchardSaveData>(content);
                 if (save == null || save.schemaVersion != 1 ||
-                    save.trees == null || string.IsNullOrEmpty(save.activeTreeId))
+                    save.trees == null || save.trees.Count == 0 ||
+                    string.IsNullOrEmpty(save.activeTreeId))
                     return null;
+
+                // A syntactically valid but truncated JSON object is not a
+                // recoverable game. Reject incomplete tree entries so the
+                // valid previous backup can restore the player's collection.
+                var ids = new System.Collections.Generic.HashSet<string>(
+                    StringComparer.Ordinal);
+                bool containsActive = false;
+                foreach (var tree in save.trees)
+                {
+                    if (tree == null || string.IsNullOrEmpty(tree.treeId) ||
+                        tree.pickedFruitIds == null || tree.roundNumber < 1 ||
+                        tree.timesCleared < 0 || !ids.Add(tree.treeId))
+                        return null;
+                    if (tree.treeId == save.activeTreeId) containsActive = true;
+                }
+                if (!containsActive) return null;
                 return save;
             }
             catch (Exception)
