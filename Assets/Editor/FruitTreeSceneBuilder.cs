@@ -295,7 +295,7 @@ namespace FruitTree.Editor
                 typeof(CanvasRenderer), typeof(Image));
             menu.transform.SetParent(safe.transform, false);
             Anchor(menu.GetComponent<RectTransform>(), Vector2.zero, Vector2.one);
-            menu.GetComponent<Image>().color = new Color(.12f, .17f, .13f, .76f);
+            menu.GetComponent<Image>().color = new Color(.08f, .15f, .12f, .57f);
             var pauseController = canvasObject.AddComponent<PauseController>();
             var screenFlow = canvasObject.AddComponent<FruitTreeScreenFlow>();
             screenFlow.pause = pauseController;
@@ -310,6 +310,8 @@ namespace FruitTree.Editor
             pauseController.hud = hud;
             orchard.pauseController = pauseController;
 
+            MakeDialogSurface("Pause Calm Card", menu.transform,
+                new Vector2(.105f, .07f), new Vector2(.895f, .91f));
             MakeLabel("Paused Title", menu.transform, "PAUSED", 70, Color.white,
                 new Vector2(.17f, .78f), new Vector2(.83f, .87f));
             var resume = MakeButton("Resume", menu.transform, "CONTINUE",
@@ -392,9 +394,11 @@ namespace FruitTree.Editor
                 typeof(CanvasRenderer), typeof(Image));
             collection.transform.SetParent(menu.transform, false);
             Anchor(collection.GetComponent<RectTransform>(), Vector2.zero, Vector2.one);
-            collection.GetComponent<Image>().color = new Color(.14f, .21f, .16f, .97f);
+            collection.GetComponent<Image>().color = new Color(.08f, .15f, .12f, .66f);
             pauseController.treePanel = collection;
             orchard.treeMenuPanel = collection;
+            MakeDialogSurface("Collection Calm Card", collection.transform,
+                new Vector2(.09f, .15f), new Vector2(.91f, .875f));
             MakeLabel("Collection Heading", collection.transform, "MY TREES",
                 66, Color.white, new Vector2(.15f, .73f), new Vector2(.85f, .83f));
             orchard.collectionStatus = MakeLabel("Tree Progress", collection.transform,
@@ -491,7 +495,7 @@ namespace FruitTree.Editor
             var ivory = new Color(.97f, .965f, .89f, 1f);
             var fern = new Color(.82f, .89f, .76f, 1f);
             var white = new Color(.98f, .98f, .95f, 1f);
-            var dim = new Color(.09f, .19f, .13f, .78f);
+            var dim = new Color(.07f, .16f, .12f, .60f);
 
             // The orchard remains visible behind a light darkening veil;
             // only the logo section needs its own translucent reading surface.
@@ -535,6 +539,8 @@ namespace FruitTree.Editor
 
             var options = MakeOverlay("Settings Screen", safe, dim);
             flow.settingsPanel = options;
+            MakeDialogSurface("Settings Calm Card", options.transform,
+                new Vector2(.10f, .07f), new Vector2(.90f, .89f));
             MakeLabel("Settings Title", options.transform, "SETTINGS", 78, white,
                 new Vector2(.12f, .74f), new Vector2(.88f, .84f));
             var sound = MakeButton("Settings Sound", options.transform, "SOUND: ON",
@@ -565,6 +571,8 @@ namespace FruitTree.Editor
 
             var helpScreen = MakeOverlay("How To Play Screen", safe, dim);
             flow.helpPanel = helpScreen;
+            MakeDialogSurface("Help Calm Card", helpScreen.transform,
+                new Vector2(.085f, .11f), new Vector2(.915f, .895f));
             MakeLabel("Help Title", helpScreen.transform, "HOW TO PLAY", 70, white,
                 new Vector2(.10f, .75f), new Vector2(.90f, .86f));
             MakeLabel("Help Content", helpScreen.transform,
@@ -576,6 +584,8 @@ namespace FruitTree.Editor
 
             var privacy = MakeOverlay("Privacy Information Screen", safe, dim);
             flow.privacyPanel = privacy;
+            MakeDialogSurface("Privacy Calm Card", privacy.transform,
+                new Vector2(.065f, .05f), new Vector2(.935f, .91f));
             MakeLabel("Privacy Heading", privacy.transform, "PRIVACY POLICY", 68, white,
                 new Vector2(.09f, .78f), new Vector2(.91f, .88f));
             MakeLabel("Privacy Summary", privacy.transform,
@@ -601,6 +611,21 @@ namespace FruitTree.Editor
             helpScreen.SetActive(false);
             privacy.SetActive(false);
             home.SetActive(true);
+        }
+
+        // A single non-interactive visual surface under each overlay's controls.
+        // A rounded panel uses no sprite, separate texture, or third-party UI asset.
+        private static void MakeDialogSurface(string name, Transform parent,
+            Vector2 min, Vector2 max)
+        {
+            var card = new GameObject(name, typeof(RectTransform),
+                typeof(CanvasRenderer), typeof(RoundedPanel));
+            card.transform.SetParent(parent, false);
+            Anchor(card.GetComponent<RectTransform>(), min, max);
+            var surface = card.GetComponent<RoundedPanel>();
+            surface.CornerRadius = 66f;
+            surface.color = new Color(.12f, .255f, .18f, .86f);
+            surface.raycastTarget = false;
         }
 
         private static Text MakeLabel(string name, Transform parent, string label, int size, Color color,
