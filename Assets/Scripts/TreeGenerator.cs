@@ -354,7 +354,8 @@ namespace FruitTree
             var mat = new Material(shader) { name = label, color = color };
             // Hundreds of fruit share only three materials and a single mesh.
             // Standard's instancing path can reduce draw submissions on GLES3.
-            if (shader != null && shader.supportsInstancing) mat.enableInstancing = true;
+            if (shader != null && shader.name == "Standard" && SystemInfo.supportsInstancing)
+                mat.enableInstancing = true;
             if (mat.HasProperty("_Glossiness")) mat.SetFloat("_Glossiness", smoothness);
             return mat;
         }
