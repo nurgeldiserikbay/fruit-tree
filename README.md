@@ -10,7 +10,7 @@ A relaxing, Android-first 3D fruit-picking game. **Agreed future loop:** fully h
 - 360-degree touch orbit and pinch zoom, mouse support for development.
 - Safe-area HUD, allocation-free fruit-round restart, fruit progress.
 - Parent-area Remove Ads purchase/restore wiring with Unity IAP 5; purchase disabled until a compliant ad provider is connected.
-- Simple synthesized ambience and harvest feedback, sound toggle (placeholder audio).
+- Four quiet procedurally synthesized biome ambiences with smooth crossfades and harvest feedback, sound toggle (placeholder audio, not final mix).
 - Procedural meadow and soft gradient sky, custom rounded HUD, Unity Editor scene generator and Android portrait config.
 
 ## Start
@@ -62,3 +62,7 @@ The fourth and fifth tree species now exist with custom procedural fruit silhoue
 ## Ten-tree content update
 
 The release-content **code** now includes ten species with low-memory procedural meshes, small shared textures and visual profiles. No new backend or large packaged assets were introduced. [Current ten-tree plan and acceptance status](docs/TEN_TREE_ACCEPTANCE.md). This is **not** a claim that Unity or Google Play submission is ready.
+
+### Latest atmosphere and performance update
+
+Four scenery themes now have light distant ridges, park lamps and urban window details, rendered in the existing combined decor mesh. Small scenery meshes and synthetic sound clips are cached by theme, and a 1.5-second crossfade accompanies scenery changes. See [environment system](docs/ENVIRONMENT_SYSTEM.md). Full Unity/device verification and production sound design are still pending.

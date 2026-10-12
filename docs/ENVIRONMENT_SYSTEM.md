@@ -22,13 +22,13 @@ Automatic mode selects the scene based on the current tree index, while explicit
 Themes update three things:
 - Ground/grass material tints (the same pre-generated ground geometry, no reload).
 - Sky shader palette, sun tint and light intensity, fog color and range.
-- A small single renderer containing merged, statically colored decor meshes, regenerated **only on a theme switch**.
+- A small single renderer containing merged, statically colored decor meshes, created **only on the first visit to a theme**, then cached for quick repeated switching.
 
 ## Performance and art rules
 
 - **Exactly one scenery renderer** for theme decor, plus the existing terrain and grass renderers. Individual flowers, buildings, benches, and background trees are *not* GameObjects.
 - No scenery colliders, Rigidbody, particle emitters, Update hooks, separate cameras or large textures.
-- Only one environment mesh exists after switching; the previous mesh is disposed.
+- Up to **four compact cached environment meshes** exist after visiting all themes, while **only one scenery renderer** is active. The meshes are released on scene destruction; repeat switching allocates no new meshes.
 - Source unit tests require each theme decor to remain under **6,000 vertices** and **2,800 triangles** and its vertices to stay outside central 5.1-unit harvesting zone. These budgets are intentionally conservative and test-only until profile data exists.
 - Distant decor and sky use simple shader/material colors and fog; mobile can keep soft shadows focused on the main tree.
 - Trees and fruit are still a bigger cost than these decorations; 120–220 fruit performance must be measured on devices. A good decoration budget does **not** prove the game runs at 30/60 FPS.
@@ -47,3 +47,16 @@ An eventual polish pass should improve stylized landscape models (mountain silho
 4. Unlock Pear (Park) and Cherry (Mountains) and return to previously unlocked trees. Persisted manual selection must override automatic selections.
 5. Run Unity Test Runner → EditMode → `EnvironmentThemeTests`.
 6. Profile on low- and mid-range Android phones, including repeated theme changes, RAM, frame time, battery/temperature.
+
+## Low-cost atmosphere polish (2026-10-12, code only)
+
+- A continuous ring of softly colored distant ridges is added behind Meadow/Park/City Park and as two mountain layers. This adds horizon depth from a freely rotating 360-degree camera without any terrain streaming or extra scene cameras.
+- Park has six tiny static lantern silhouettes along the distant path. City Park buildings now include a few flat, subtle daytime window panels. The mountain skyline has both near and far ridgelines.
+- All new triangles are still part of **the same one static scenery renderer per active theme**, no physics objects, no additional materials or per-frame procedural geometry.
+- A generated, quiet 11,025 Hz mono ambient loop is created **lazily** for each of the four themes. Meadow has more bird chirps; Park features soft wind and a few birds; City Park adds barely audible distant hum; Mountains emphasize slow wind.
+- Switching environments crossfades between two built-in AudioSources over 1.5 seconds. Once visited, a theme's 8-second clip is cached and reused. The sound preference and quiet mode continue to apply; licensed user-supplied ambient recordings override generated placeholders and are played unchanged.
+- The new PlayMode source test verifies scenery mesh reuse, four-theme audio caching and rapid switching. **It has not yet been run with the Unity Test Runner**.
+
+### Outstanding art/audio work
+
+The new objects and sound are **temporary procedural art**, not fully professional scenery models or real-world recordings. Check sound comfort and frequency on speakers/headphones, silhouette quality in portrait, Unity compilation, rendering correctness and real Android CPU/GPU/RAM/heat before release.

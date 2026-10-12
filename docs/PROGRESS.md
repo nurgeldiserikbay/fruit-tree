@@ -1,5 +1,16 @@
 # Fruit Tree development state
 
+## Ambient environment depth and cache (2026-10-12)
+
+- [x] Source: layered distant hills/mountains, park lanterns and subtle city-window details, merged into the existing scenery renderer.
+- [x] Source: lazy cache of up to four small biome meshes, reused on every later theme switch.
+- [x] Source: four distinct low-volume synthesized atmosphere loops (wind/birds/city hum) with a gentle 1.5-second crossfade; all cached and working offline.
+- [x] Source: themed audio wired into the generated scene, source-level PlayMode regression test for sound and mesh reuse, and scene-reference validator updated.
+- [ ] Run Unity EditMode and PlayMode tests and assess real Android FPS, battery, skyline visuals and sound comfort.
+
+See [ENVIRONMENT_SYSTEM.md](ENVIRONMENT_SYSTEM.md).
+
+
 ## Ten-tree content milestone — source code (2026-10-12)
 
 - [x] Catalog contains **10** stable tree IDs and fruit counts: Apple 120, Pear 140, Cherry 220, Peach 130, Orange 160, Apricot 180, Plum 160, Lemon 140, Mandarin 200, Pomegranate 110.

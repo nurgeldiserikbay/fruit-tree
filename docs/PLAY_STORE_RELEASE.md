@@ -12,13 +12,13 @@
 - [ ] Build and play-test every button, Zen Mode, hint and Android Back behaviour in Unity 6000.6.5f1.
 - [x] Source: ten species with unique profile parameters and compact fruit meshes.
 - [ ] Confirm all ten species are visually recognizable and every fruit can be picked on an Android phone; final art and playability not accepted.
-- [x] Source: four switchable low-cost environments — Meadow, Park, City Park, Mountains (not yet visually tested).
+- [x] Source: four switchable low-cost environments — Meadow, Park, City Park, Mountains — now with ridge depth, distant scenery and cached geometry, plus offline per-environment synthesized audio and a gentle crossfade (not yet Unity-tested).
 - [x] Source: first natural-apple mesh/skin pass, distinct lighter round cherry mesh, 64×64 pear/cherry skin maps, smaller fruit proportions, curved short grass and soft clear-tree feedback (not yet Unity-tested).
 - [x] Source: merged blossom animation, species-specific leaf forms/wood tints and startup duplicate-tree optimization (Unity PlayMode QA pending).
 - [ ] Finish final-quality fruit/branch/foliage meshes, terrain and lighting; visually approve four environments in Unity.
 - [ ] Every fruit on every tree reachable and 100% clear achievable without frustration; optional last-fruit assistance.
 - [ ] Responsive 9:16, 9:20 and cut-out / safe-area UI testing.
-- [ ] Real licensed/owned nature SFX and final sound mixing; comfort volume/motion settings are in source but not QA-approved.
+- [ ] Final natural atmosphere recordings (or approved synthesized audio), licensed/owned SFX and final sound mixing; comfort volume/motion settings are in source but not QA-approved.
 - [ ] Kazakh / Russian localization if both languages are declared in the listing (do not falsely claim supported locales).
 - [ ] Graceful offline operation, app switch/pause, interrupted save and progress restore.
 - [ ] Profiling on real low-/mid-range Android phones (FPS, heat, RAM, battery).
