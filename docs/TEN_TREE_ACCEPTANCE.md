@@ -27,7 +27,7 @@ All **fruit IDs** remain local `fruit_0000` through `fruit_(N−1)`. The saved J
 - On each tree, verify no collision or decorative object makes fruit unpickable from full 360° orbit and zoom. Use free last-ten-fruit help; it must not pick fruit automatically.
 - Verify app pause, close, process restart, corrupted primary-save fallback, restored exact per-fruit picked set and rebloom of prior clears. Test upgrading saved states from both three- and five-tree versions.
 - Inspect merged blossom regrowth on all ten trees. No growth-stage fruit is pickable; switching levels cancels stale animation.
-- Visit all four environment themes, including automatic per-level cycling and Settings manual override; measure frame time, RAM, battery and heat on Android devices.
+- Visit all four environment themes, including automatic per-level cycling and Settings manual override; measure frame time, RAM, battery and heat on Android devices. Confirm the Low/Balanced/High startup graphics budget selects the intended tier, and verify 30/60 FPS are caps rather than guaranteed actual performance.
 - Confirm main-menu navigation, Zen Mode, reduced-motion and audio settings, Android Back, accessibility and localization before publishing.
 - Generate production AAB signed with private keystore, verify target SDK and actual Play Console disclosures. Add the final **public Privacy Policy URL** and audited Data safety details at the final release gate.
 

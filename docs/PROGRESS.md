@@ -1,5 +1,13 @@
 # Fruit Tree development state
 
+## Device graphics budget (2026-10-12)
+
+- [x] Source: single-start Android device class for Low/Balanced/High graphics quality, frame-rate caps, shadow distance/type and MSAA.
+- [x] Fallback to balanced tier on unknown device RAM/VRAM readings; no effect on game logic or saves.
+- [x] Added edit-mode tier-decision tests and verified component wiring through scene validator (tests authored but not run).
+- [ ] On-device real FPS, CPU/GPU timings, temperature, memory and image-quality acceptance remains mandatory.
+
+
 ## Ambient environment depth and cache (2026-10-12)
 
 - [x] Source: layered distant hills/mountains, park lanterns and subtle city-window details, merged into the existing scenery renderer.

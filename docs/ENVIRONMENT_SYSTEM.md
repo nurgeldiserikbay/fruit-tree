@@ -60,3 +60,16 @@ An eventual polish pass should improve stylized landscape models (mountain silho
 ### Outstanding art/audio work
 
 The new objects and sound are **temporary procedural art**, not fully professional scenery models or real-world recordings. Check sound comfort and frequency on speakers/headphones, silhouette quality in portrait, Unity compilation, rendering correctness and real Android CPU/GPU/RAM/heat before release.
+
+## Device-dependent Android graphics budget (source added 2026-10-12)
+
+`MobilePerformanceBudget` attaches to the same scene as the environment and runs once at startup on Android. Using `SystemInfo.systemMemorySize` and `SystemInfo.graphicsMemorySize`, it chooses:
+
+| Estimated hardware tier | Target frame-rate cap | Shadow budget | MSAA |
+|---|---:|---|---:|
+| Low (RAM < 3 GB or video RAM < 512 MB) | 30 | Off | Off |
+| Balanced (RAM < 6 GB or VRAM < 1.5 GB) | 60 | 15m hard shadows | 2x |
+| High | 60 | 23m soft shadows | 2x |
+| RAM/VRAM unknown | 60 | Balanced defaults | 2x |
+
+The runtime logs which tier it selected. This changes **graphics quality only**, not the fruit counts, achievements, progression, privacy settings or offline saves. Frame-rate caps are not FPS measurements or guarantees. All thresholds are provisional, need actual GPU timing, thermals and battery measurements before release. Unity Editor remains on its existing settings.

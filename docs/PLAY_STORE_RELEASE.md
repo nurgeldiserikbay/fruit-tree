@@ -21,6 +21,7 @@
 - [ ] Final natural atmosphere recordings (or approved synthesized audio), licensed/owned SFX and final sound mixing; comfort volume/motion settings are in source but not QA-approved.
 - [ ] Kazakh / Russian localization if both languages are declared in the listing (do not falsely claim supported locales).
 - [ ] Graceful offline operation, app switch/pause, interrupted save and progress restore.
+- [x] Source: provisional mobile Low/Balanced/High quality tier selection; unknown hardware safely defaults to Balanced.
 - [ ] Profiling on real low-/mid-range Android phones (FPS, heat, RAM, battery).
 
 ## Play Console and privacy
