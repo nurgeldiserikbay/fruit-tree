@@ -24,6 +24,7 @@ namespace FruitTree
         public TreeGenerator activeTree;
         public EnvironmentController environment;
         public Text sceneryLabel;
+        public Text homeProgressLabel;
         public Text audioLevelLabel;
         public Text motionLabel;
         public Text audioButtonLabel;
@@ -209,6 +210,8 @@ namespace FruitTree
 
         private void RefreshLabels()
         {
+            if (homeProgressLabel != null && orchard != null)
+                homeProgressLabel.text = orchard.HomeSummary();
             if (audioButtonLabel != null && sound != null)
                 audioButtonLabel.text = sound.IsMuted ? "SOUND: OFF" : "SOUND: ON";
             if (sceneryLabel != null && environment != null)
