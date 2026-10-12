@@ -19,6 +19,9 @@ namespace FruitTree
         public OrchardGameController orchard;
         public OrbitPickingCamera orbitCamera;
         public OrchardAudio sound;
+        public TreeGenerator activeTree;
+        public Text audioLevelLabel;
+        public Text motionLabel;
         public Text audioButtonLabel;
         public Text privacyStatusLabel;
         public Button openPublishedPrivacyButton;
@@ -130,6 +133,18 @@ namespace FruitTree
             RefreshLabels();
         }
 
+        public void ToggleQuietAudio()
+        {
+            if (sound != null) sound.ToggleQuietAudio();
+            RefreshLabels();
+        }
+
+        public void ToggleReducedMotion()
+        {
+            if (activeTree != null) activeTree.SetReducedMotion(!activeTree.ReducedMotion);
+            RefreshLabels();
+        }
+
         public void HandleBackButton()
         {
             if (privacyPanel != null && privacyPanel.activeSelf) { ClosePrivacy(); return; }
@@ -160,6 +175,10 @@ namespace FruitTree
         {
             if (audioButtonLabel != null && sound != null)
                 audioButtonLabel.text = sound.IsMuted ? "SOUND: OFF" : "SOUND: ON";
+            if (audioLevelLabel != null && sound != null)
+                audioLevelLabel.text = sound.IsQuietAudio ? "AUDIO: SOFT" : "AUDIO: NORMAL";
+            if (motionLabel != null && activeTree != null)
+                motionLabel.text = activeTree.ReducedMotion ? "MOTION: MINIMAL" : "MOTION: GENTLE";
             bool published = FruitTreePrivacyConfig.IsPublishedUrlValid(
                 FruitTreePrivacyConfig.PublishedPolicyUrl);
             if (openPublishedPrivacyButton != null)

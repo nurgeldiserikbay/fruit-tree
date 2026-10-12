@@ -11,6 +11,7 @@ namespace FruitTree
         [SerializeField, Range(8, 300)] private int appleCount = 30;
         [SerializeField] private string speciesId = "apple";
         public string SpeciesId => speciesId;
+        public bool ReducedMotion { get; private set; }
         [SerializeField, Range(4, 25)] private int leavesPerCluster = 16;
         private readonly List<Apple> apples = new List<Apple>();
         public IReadOnlyList<Apple> Apples => apples;
@@ -42,9 +43,23 @@ namespace FruitTree
 
         private void Awake()
         {
+            ReducedMotion = PlayerPrefs.GetInt("FruitTree.ReducedMotion", 0) == 1;
             // The scene intentionally keeps procedural mesh objects out of serialized scene data.
             // Build them reliably on launch so Android and Editor display the same content.
             if (Application.isPlaying && apples.Count == 0) Generate();
+        }
+
+        public void SetReducedMotion(bool reduce)
+        {
+            ReducedMotion = reduce;
+            PlayerPrefs.SetInt("FruitTree.ReducedMotion", reduce ? 1 : 0);
+            PlayerPrefs.Save();
+            Transform leafObject = transform.Find("Merged Leaves");
+            if (leafObject == null) return;
+            var renderer = leafObject.GetComponent<Renderer>();
+            if (renderer != null && renderer.sharedMaterial != null &&
+                renderer.sharedMaterial.HasProperty("_Wind"))
+                renderer.sharedMaterial.SetFloat("_Wind", reduce ? .008f : .045f);
         }
 
         public void Configure(string species, int fruitCount, int generationSeed)
@@ -80,7 +95,11 @@ namespace FruitTree
             for (int i = transform.childCount - 1; i >= 0; i--)
             {
                 var child = transform.GetChild(i).gameObject;
-                if (Application.isPlaying) Destroy(child);
+                if (Application.isPlaying)
+                {
+                    child.SetActive(false); // old fruit cannot be tapped during scene switch
+                    Destroy(child);
+                }
                 else DestroyImmediate(child);
             }
             apples.Clear();
@@ -206,7 +225,8 @@ namespace FruitTree
             if (barkMaterial.HasProperty("_MainTex")) barkMaterial.SetTexture("_MainTex", Track(BarkTexture.Create()));
             MakeMeshObject("Merged Wood", Track(wood.Build("Wood")), barkMaterial);
             var leafMaterial = Track(VertexMaterial("Leaves", Color.white));
-            if (leafMaterial.HasProperty("_Wind")) leafMaterial.SetFloat("_Wind", .045f);
+            if (leafMaterial.HasProperty("_Wind"))
+                leafMaterial.SetFloat("_Wind", ReducedMotion ? .008f : .045f);
             if (leafMaterial.HasProperty("_AmbientLight")) leafMaterial.SetFloat("_AmbientLight", .72f);
             if (leafMaterial.HasProperty("_Cull")) leafMaterial.SetFloat("_Cull", 0f);
             MakeMeshObject("Merged Leaves", Track(foliage.Build("Leaves")), leafMaterial);

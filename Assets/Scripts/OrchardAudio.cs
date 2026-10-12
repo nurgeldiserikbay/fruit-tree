@@ -14,6 +14,7 @@ namespace FruitTree
         private AudioSource ambience, effects;
         private AudioClip collect;
         public bool IsMuted => muted;
+        public bool IsQuietAudio { get; private set; }
         private bool muted;
         private bool ownsAmbientClip;
         private bool ownsPickClip;
@@ -33,6 +34,7 @@ namespace FruitTree
             ambience.clip = ownsAmbientClip ? CreateAmbient() : ambientRecording;
             collect = ownsPickClip ? CreateCollect() : pickRecording;
             muted = PlayerPrefs.GetInt("FruitTree.Muted", 0) == 1;
+            IsQuietAudio = PlayerPrefs.GetInt("FruitTree.QuietAudio", 1) == 1;
             ApplyVolume();
         }
 
@@ -66,6 +68,14 @@ namespace FruitTree
             ApplyVolume();
             UpdateStatusText();
         }
+        public void ToggleQuietAudio()
+        {
+            IsQuietAudio = !IsQuietAudio;
+            PlayerPrefs.SetInt("FruitTree.QuietAudio", IsQuietAudio ? 1 : 0);
+            PlayerPrefs.Save();
+            ApplyVolume();
+        }
+
         private void UpdateStatusText()
         {
             if (soundStatusText != null) soundStatusText.text = muted ? "SOUND OFF" : "SOUND ON";
@@ -74,6 +84,8 @@ namespace FruitTree
         {
             ambience.mute = muted;
             effects.mute = muted;
+            ambience.volume = IsQuietAudio ? .09f : .18f;
+            effects.volume = IsQuietAudio ? .22f : .4f;
         }
 
         private static AudioClip CreateCollect()

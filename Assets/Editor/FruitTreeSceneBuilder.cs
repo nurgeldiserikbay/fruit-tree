@@ -233,6 +233,7 @@ namespace FruitTree.Editor
             screenFlow.orchard = orchard;
             screenFlow.orbitCamera = orchard.orbitCamera;
             screenFlow.sound = sound;
+            screenFlow.activeTree = tree;
             screenFlow.gameplayControls = gameLayer;
             pauseController.screenFlow = screenFlow;
             pauseController.panel = menu;
@@ -413,15 +414,23 @@ namespace FruitTree.Editor
             MakeLabel("Settings Title", options.transform, "SETTINGS", 78, white,
                 new Vector2(.12f, .74f), new Vector2(.88f, .84f));
             var sound = MakeButton("Settings Sound", options.transform, "SOUND: ON",
-                new Vector2(.20f, .57f), new Vector2(.80f, .65f), ivory);
+                new Vector2(.20f, .65f), new Vector2(.80f, .72f), ivory);
             flow.audioButtonLabel = sound.GetComponentInChildren<Text>();
+            var softAudio = MakeButton("Settings Quiet Audio", options.transform,
+                "AUDIO: SOFT", new Vector2(.20f, .555f), new Vector2(.80f, .625f), ivory);
+            flow.audioLevelLabel = softAudio.GetComponentInChildren<Text>();
+            var motion = MakeButton("Settings Motion", options.transform,
+                "MOTION: GENTLE", new Vector2(.20f, .46f), new Vector2(.80f, .53f), ivory);
+            flow.motionLabel = motion.GetComponentInChildren<Text>();
             var policy = MakeButton("Settings Privacy", options.transform, "PRIVACY POLICY",
-                new Vector2(.20f, .46f), new Vector2(.80f, .54f), ivory);
+                new Vector2(.20f, .365f), new Vector2(.80f, .435f), ivory);
             var controls = MakeButton("Settings Controls", options.transform, "HOW TO PLAY",
-                new Vector2(.20f, .35f), new Vector2(.80f, .43f), ivory);
+                new Vector2(.20f, .27f), new Vector2(.80f, .34f), ivory);
             var back = MakeButton("Settings Back", options.transform, "BACK",
-                new Vector2(.27f, .20f), new Vector2(.73f, .28f), fern);
+                new Vector2(.27f, .155f), new Vector2(.73f, .225f), fern);
             UnityEventTools.AddPersistentListener(sound.onClick, flow.ToggleSound);
+            UnityEventTools.AddPersistentListener(softAudio.onClick, flow.ToggleQuietAudio);
+            UnityEventTools.AddPersistentListener(motion.onClick, flow.ToggleReducedMotion);
             UnityEventTools.AddPersistentListener(policy.onClick, flow.OpenPrivacy);
             UnityEventTools.AddPersistentListener(controls.onClick, flow.OpenHelp);
             UnityEventTools.AddPersistentListener(back.onClick, flow.CloseSettings);
