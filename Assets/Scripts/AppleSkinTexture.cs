@@ -14,7 +14,9 @@ namespace FruitTree
             const int size = 64;
             var texture = new Texture2D(size, size, TextureFormat.RGB24, true)
             {
-                name = species == "pear" ? "Pear Skin" : "Cherry Skin",
+                name = species == "pear" ? "Pear Skin" :
+                    species == "peach" ? "Peach Skin" :
+                    species == "orange" ? "Citrus Skin" : "Cherry Skin",
                 wrapMode = TextureWrapMode.Repeat,
                 filterMode = FilterMode.Trilinear
             };
@@ -36,6 +38,25 @@ namespace FruitTree
                         pixels[y * size + x] = new Color(
                             Mathf.Clamp01(tone + speck), Mathf.Clamp01(tone * .96f +
                             speck * .65f), Mathf.Clamp01(tone * .66f));
+                    }
+                    else if (species == "peach")
+                    {
+                        // A pale velvety peach blush and a soft orange-gold side.
+                        float blush = Mathf.SmoothStep(.33f, .78f, mottling);
+                        float tone = .89f + .11f * mottling;
+                        pixels[y * size + x] = new Color(
+                            Mathf.Clamp01(tone), Mathf.Clamp01(.88f * tone -
+                            .14f * blush), Mathf.Clamp01(.78f * tone -
+                            .18f * blush));
+                    }
+                    else if (species == "orange")
+                    {
+                        // Very small pores: no large normal map or shiny citrus shader.
+                        float pores = freckles > .74f ? .075f : 0f;
+                        float tone = .9f + .12f * mottling - pores;
+                        pixels[y * size + x] = new Color(
+                            Mathf.Clamp01(tone), Mathf.Clamp01(.96f * tone),
+                            Mathf.Clamp01(.89f * tone));
                     }
                     else
                     {
