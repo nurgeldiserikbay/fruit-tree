@@ -14,7 +14,8 @@ namespace FruitTree
         public bool EntitlementChecked { get; private set; }
         public bool OwnsRemoveAds { get; private set; }
         public bool HasAdProvider => provider != null && provider.FamiliesConfigurationApproved;
-        public bool CanRequestAds => EntitlementChecked && !OwnsRemoveAds && HasAdProvider;
+        public bool CanRequestAds => FruitTreeReleaseConfig.AdvertisingEnabled &&
+            EntitlementChecked && !OwnsRemoveAds && HasAdProvider;
         public event Action StateChanged;
 
         public void AttachProvider(IFamilySafeAdProvider certifiedProvider)

@@ -31,6 +31,14 @@ namespace FruitTree
 
         private void Start()
         {
+            if (!FruitTreeReleaseConfig.PurchasesEnabled ||
+                !FruitTreeReleaseConfig.AdvertisingEnabled)
+            {
+                if (adsPolicy != null) adsPolicy.MarkEntitlementUnknown();
+                SetStatus("This version has no ads or purchases.");
+                RefreshControls();
+                return;
+            }
             if (adsPolicy == null)
             {
                 Debug.LogError("RemoveAdsPurchaser requires AdsAccessPolicy.");
@@ -156,7 +164,7 @@ namespace FruitTree
             // Never take money for removing ads when no ads SDK is configured.
             if (shuttingDown || controller == null || !connected || !inventoryFetched ||
                 product == null || transactionActive || adsPolicy.OwnsRemoveAds ||
-                !adsPolicy.HasAdProvider) return;
+                !FruitTreeReleaseConfig.CanOfferRemoveAds(adsPolicy.HasAdProvider)) return;
             transactionActive = true;
             SetStatus("Opening Google Play...");
             RefreshControls();
@@ -216,7 +224,8 @@ namespace FruitTree
         {
             bool owned = adsPolicy != null && adsPolicy.OwnsRemoveAds;
             bool canBuy = connected && inventoryFetched && !transactionActive &&
-                product != null && !owned && adsPolicy != null && adsPolicy.HasAdProvider;
+                product != null && !owned && adsPolicy != null &&
+                FruitTreeReleaseConfig.CanOfferRemoveAds(adsPolicy.HasAdProvider);
             if (buyButton != null) buyButton.interactable = canBuy;
             if (restoreButton != null)
                 restoreButton.interactable = connected && !transactionActive;

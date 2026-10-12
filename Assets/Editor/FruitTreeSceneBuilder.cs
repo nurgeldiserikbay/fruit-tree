@@ -64,6 +64,9 @@ namespace FruitTree.Editor
             var adsPolicy = app.AddComponent<AdsAccessPolicy>();
             var purchasing = app.AddComponent<RemoveAdsPurchaser>();
             purchasing.adsPolicy = adsPolicy;
+            // Ad-free English launch: do not contact Google Play Billing while
+            // there is no advertisement to remove.
+            purchasing.enabled = FruitTreeReleaseConfig.PurchasesEnabled;
 
             var root = new GameObject("Apple Tree");
             var treeBuilder = root.AddComponent<TreeGenerator>();
@@ -412,6 +415,10 @@ namespace FruitTree.Editor
             buy.interactable = false; // Ad SDK not installed: never charge for zero ads.
             restore.interactable = false;
             parentPanel.SetActive(false);
+            // Hide the entire parent-store entry for this ad-free release.
+            // Leave references in the scene for a future audited integration.
+            parentButton.gameObject.SetActive(
+                FruitTreeReleaseConfig.CanOfferRemoveAds(false));
 
             // A dedicated collection overlay keeps the ordinary pause menu small.
             var collection = new GameObject("Tree Collection", typeof(RectTransform),
