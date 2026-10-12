@@ -237,25 +237,43 @@ namespace FruitTree
             Material appleMaterial = Track(LitMaterial("Fruit " + speciesId, fruitColor, .38f));
             if (speciesId == "apple" && appleMaterial.HasProperty("_MainTex"))
                 appleMaterial.SetTexture("_MainTex", Track(AppleSkinTexture.Create()));
+            // Just three shared skin variants per species: natural color variation
+            // without allocating an individual material for every fruit.
+            var skins = new Material[3];
+            skins[0] = appleMaterial;
+            for (int variant = 1; variant < skins.Length; variant++)
+            {
+                var tone = new Material(appleMaterial) { name = "Fruit Skin Variant " + variant };
+                tone.color = speciesId == "apple" ?
+                    (variant == 1 ? new Color(1f, .90f, .86f) :
+                        new Color(.89f, 1f, .86f)) :
+                    speciesId == "pear" ?
+                    (variant == 1 ? new Color(.92f, 1f, .88f) :
+                        new Color(1f, .93f, .76f)) :
+                    (variant == 1 ? new Color(.88f, .89f, 1f) :
+                        new Color(1f, .82f, .85f));
+                skins[variant] = Track(tone);
+            }
             Material stemMaterial = Track(LitMaterial("Stem", new Color(.28f,.19f,.095f), .12f));
             for (int i = 0; i < appleCount; i++)
             {
                 Vector3 attachment = fruitAnchors[i * fruitAnchors.Count / appleCount];
                 Vector3 outward = new Vector3(attachment.x, 0f, attachment.z).normalized;
-                // A slight hanging drop gives every fruit a visible attachment to a twig.
-                // Keep a few deeper in the crown, and most near its reachable surface.
-                Vector3 at = attachment + Vector3.down * Between(.24f, .32f) +
-                    outward * (i % 4 == 0 ? .035f : .14f) +
-                    new Vector3(Between(-.07f, .07f), 0f, Between(-.07f, .07f));
-                var fruit = MakeMeshObject(speciesId + " " + (i + 1), appleMesh, appleMaterial);
+                // Smaller fruit tuck underneath twig ends and leaves rather than
+                // sitting like large red spheres on the outside of the crown.
+                Vector3 at = attachment + Vector3.down * Between(.19f, .26f) +
+                    outward * (i % 4 == 0 ? .025f : .105f) +
+                    new Vector3(Between(-.05f, .05f), 0f, Between(-.05f, .05f));
+                var fruit = MakeMeshObject(speciesId + " " + (i + 1), appleMesh,
+                    skins[i % skins.Length]);
                 fruit.transform.localPosition = at;
-                // More believable apple-to-tree proportions than the first screenshot.
-                float fruitScale = speciesId == "cherry" ? Between(.48f, .61f) :
-                    speciesId == "pear" ? Between(.88f, 1f) : Between(.79f, .9f);
+                // Gentle size variety with ~30% smaller apples than the early prototype.
+                float fruitScale = speciesId == "cherry" ? Between(.43f, .53f) :
+                    speciesId == "pear" ? Between(.70f, .80f) : Between(.54f, .64f);
                 fruit.transform.localScale = Vector3.one * fruitScale;
                 fruit.transform.localRotation = Quaternion.Euler(Between(-10, 10), Between(0, 360), Between(-10, 10));
                 fruit.AddComponent<SphereCollider>().radius =
-                    speciesId == "cherry" ? .29f : .25f;
+                    speciesId == "cherry" ? .29f : .27f;
                 var component = fruit.AddComponent<Apple>();
                 component.Initialize(i);
                 component.Harvested += OnHarvest;
@@ -267,7 +285,7 @@ namespace FruitTree
                 // Attach the end of the stem to the exact twig anchor, rather than
                 // letting apples appear to float when viewed from behind.
                 Vector3 top = fruit.transform.TransformPoint(new Vector3(0f,
-                    speciesId == "pear" ? .25f : .175f, 0f));
+                    speciesId == "pear" ? .29f : .155f, 0f));
                 Vector3 twig = transform.TransformPoint(attachment);
                 Vector3 axis = twig - top;
                 stem.transform.position = (top + twig) * .5f;
