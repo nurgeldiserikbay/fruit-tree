@@ -25,6 +25,11 @@ namespace FruitTree.Editor
             var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
             var errors = new List<string>();
 
+            var version = UnityEngine.Object.FindAnyObjectByType<FruitTreeSceneVersion>();
+            if (version == null || !version.IsCurrent)
+                errors.Add("Generated scene is outdated. Stop Play and use " +
+                    "Fruit Tree > Refresh Visuals (Back Up Scene), then validate again.");
+
             var root = GameObject.Find("Apple Tree");
             var tree = root != null ? root.GetComponent<TreeGenerator>() : null;
             if (tree == null) errors.Add("Apple Tree or TreeGenerator is missing");
