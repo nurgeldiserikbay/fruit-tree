@@ -128,8 +128,12 @@ namespace FruitTree
             var wood = new ProceduralMesh();
             var foliage = new ProceduralMesh();
             var fruitAnchors = new List<Vector3>();
-            var brown = new Color(.86f, .81f, .74f);
-            var branchColor = new Color(.9f, .81f, .72f);
+            var brown = speciesId == "pear" ? new Color(.72f, .71f, .65f) :
+                speciesId == "cherry" ? new Color(.69f, .60f, .57f) :
+                new Color(.78f, .73f, .67f);
+            var branchColor = speciesId == "pear" ? new Color(.77f, .73f, .66f) :
+                speciesId == "cherry" ? new Color(.73f, .63f, .60f) :
+                new Color(.83f, .76f, .67f);
             // A slight bend in the trunk and irregularly-spaced limbs avoid the
             // artificial radial symmetry of the first prototype.
             Vector3 trunkBase = Vector3.zero;
@@ -146,7 +150,10 @@ namespace FruitTree
             for (int i = 0; i < majorBranches; i++)
             {
                 float elevation = i / (float)(majorBranches - 1);
-                float height = Mathf.Lerp(1.36f, 3.55f, elevation) + Between(-.13f, .13f);
+                float height = (speciesId == "cherry" ?
+                    Mathf.Lerp(1.22f, 3.32f, elevation) :
+                    speciesId == "pear" ? Mathf.Lerp(1.47f, 3.74f, elevation) :
+                    Mathf.Lerp(1.36f, 3.55f, elevation)) + Between(-.13f, .13f);
                 float angle = goldenAngle * i + Between(-.18f, .18f);
                 Vector3 radial = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle));
                 Vector3 sideways = new Vector3(-radial.z, 0f, radial.x);
@@ -202,7 +209,9 @@ namespace FruitTree
                             if (speciesId == "cherry") leafColor = new Color(.27f+tint, .53f+tint, .18f);
                             foliage.Leaf(center + offset * .75f, direction,
                                 speciesId == "cherry" ? Between(.15f,.22f) : Between(.21f,.32f),
-                                speciesId == "pear" ? Between(.11f,.16f) : Between(.16f,.22f), leafColor);
+                                speciesId == "pear" ? Between(.11f,.16f) : Between(.16f,.22f),
+                                leafColor, speciesId == "pear" ? .93f :
+                                    speciesId == "cherry" ? .12f : .58f);
                         }
                     }
                 }
@@ -308,7 +317,12 @@ namespace FruitTree
                 Vector3 axis = twig - top;
                 stem.transform.position = (top + twig) * .5f;
                 stem.transform.rotation = Quaternion.FromToRotation(Vector3.up, axis.normalized);
-                stem.transform.localScale = new Vector3(.012f, axis.magnitude * .5f, .012f);
+                // The stem is a child of a scaled fruit. Compensate for that
+                // parent scale so its world-space ends actually meet the twig.
+                float inverseFruitScale = 1f / fruitScale;
+                stem.transform.localScale = new Vector3(.012f * inverseFruitScale,
+                    axis.magnitude * .5f * inverseFruitScale,
+                    .012f * inverseFruitScale);
                 stem.GetComponent<Renderer>().sharedMaterial = stemMaterial;
                 if (Application.isPlaying) Destroy(stem.GetComponent<Collider>());
                 else DestroyImmediate(stem.GetComponent<Collider>());

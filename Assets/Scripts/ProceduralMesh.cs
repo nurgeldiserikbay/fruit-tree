@@ -100,8 +100,14 @@ namespace FruitTree
         /// six triangles are sufficient for a readable mobile-sized canopy.
         /// UV.y gradually increases to bend only the leaf tip in the wind.
         /// </summary>
-        public void Leaf(Vector3 center, Vector3 outward, float length, float width, Color color)
+        public void Leaf(Vector3 center, Vector3 outward, float length, float width,
+            Color color, float ovalness = .5f)
         {
+            // Pear: fuller oval leaves, Cherry: slimmer pointed leaves.
+            // Eight vertices and six triangles remain fixed for mobile budgets.
+            float shape = Mathf.Clamp01(ovalness);
+            float widestAt = Mathf.Lerp(.41f, .57f, shape);
+            float maxWidth = Mathf.Lerp(.60f, .83f, shape);
             Vector3 axis = outward.sqrMagnitude < .0001f ? Vector3.up : outward.normalized;
             Vector3 side = Vector3.Cross(axis, Mathf.Abs(Vector3.Dot(axis, Vector3.up)) > .9f
                 ? Vector3.forward : Vector3.up).normalized;
@@ -111,8 +117,8 @@ namespace FruitTree
                 center,
                 center + axis * (length * .19f) - side * (width * .50f) + camber * .3f,
                 center + axis * (length * .19f) + side * (width * .50f) + camber * .3f,
-                center + axis * (length * .50f) - side * (width * .70f) + camber,
-                center + axis * (length * .50f) + side * (width * .70f) + camber,
+                center + axis * (length * widestAt) - side * (width * maxWidth) + camber,
+                center + axis * (length * widestAt) + side * (width * maxWidth) + camber,
                 center + axis * (length * .81f) - side * (width * .43f) + camber * .6f,
                 center + axis * (length * .81f) + side * (width * .43f) + camber * .6f,
                 center + axis * length
@@ -121,7 +127,7 @@ namespace FruitTree
             {
                 new Vector2(.5f, 0f),
                 new Vector2(0f, .19f), new Vector2(1f, .19f),
-                new Vector2(0f, .50f), new Vector2(1f, .50f),
+                new Vector2(0f, widestAt), new Vector2(1f, widestAt),
                 new Vector2(.2f, .81f), new Vector2(.8f, .81f),
                 new Vector2(.5f, 1f)
             };
