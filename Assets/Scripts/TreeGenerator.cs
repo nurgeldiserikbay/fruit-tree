@@ -10,6 +10,18 @@ namespace FruitTree
         [SerializeField] private int seed = 122;
         [SerializeField, Range(8, 300)] private int appleCount = 30;
         [SerializeField] private string speciesId = "apple";
+        [SerializeField] private bool generateAutomatically = true;
+
+        /// <summary>
+        /// The generated orchard scene configures the correct species at Start.
+        /// Disabling the initial 30-fruit generation avoids a costly duplicate.
+        /// Standalone procedural tree scenes keep the previous default behavior.
+        /// </summary>
+        public void SetAutomaticGeneration(bool enabled)
+        {
+            generateAutomatically = enabled;
+        }
+
         public string SpeciesId => speciesId;
         public bool ReducedMotion { get; private set; }
         [SerializeField, Range(4, 25)] private int leavesPerCluster = 16;
@@ -62,7 +74,8 @@ namespace FruitTree
             ReducedMotion = PlayerPrefs.GetInt("FruitTree.ReducedMotion", 0) == 1;
             // The scene intentionally keeps procedural mesh objects out of serialized scene data.
             // Build them reliably on launch so Android and Editor display the same content.
-            if (Application.isPlaying && apples.Count == 0) Generate();
+            if (Application.isPlaying && generateAutomatically && apples.Count == 0)
+                Generate();
         }
 
         public void SetReducedMotion(bool reduce)

@@ -66,7 +66,8 @@ namespace FruitTree.Editor
             purchasing.adsPolicy = adsPolicy;
 
             var root = new GameObject("Apple Tree");
-            root.AddComponent<TreeGenerator>();
+            var treeBuilder = root.AddComponent<TreeGenerator>();
+            treeBuilder.SetAutomaticGeneration(false); // Orchard.Start supplies saved species.
             var orchard = app.AddComponent<OrchardGameController>();
             orchard.tree = root.GetComponent<TreeGenerator>();
 
