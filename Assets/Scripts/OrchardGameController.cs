@@ -55,6 +55,9 @@ namespace FruitTree
             new TreeLevelDefinition("tree_010", "pomegranate", 110)
         };
 
+        // Single source of truth for the Editor's all-species reachability audit.
+        public static IReadOnlyList<TreeLevelDefinition> LevelDefinitions => Catalog;
+
         private void Start()
         {
             if (tree == null || hud == null)
