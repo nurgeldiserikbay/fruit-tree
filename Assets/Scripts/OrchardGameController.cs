@@ -9,7 +9,7 @@ namespace FruitTree
 {
     /// <summary>
     /// Connects saved multi-tree progress to the existing tree, camera, sound and HUD.
-    /// Apple -> pear -> cherry; each successive tree requires a complete 100% harvest.
+    /// Apple -> pear -> cherry -> peach -> orange; each tree requires 100% harvest.
     /// </summary>
     [DefaultExecutionOrder(-150)]
     public sealed class OrchardGameController : MonoBehaviour
@@ -32,7 +32,10 @@ namespace FruitTree
 
         private OrchardProgressionService progress;
         private OrchardSaveRepository saves;
-        private readonly string[] titles = { "APPLE TREE", "PEAR TREE", "CHERRY TREE" };
+        private readonly string[] titles =
+        {
+            "APPLE TREE", "PEAR TREE", "CHERRY TREE", "PEACH TREE", "ORANGE TREE"
+        };
         private bool initialized;
         private int hintCursor = -1;
 
@@ -40,7 +43,9 @@ namespace FruitTree
         {
             new TreeLevelDefinition("tree_001", "apple", 120),
             new TreeLevelDefinition("tree_002", "pear", 140),
-            new TreeLevelDefinition("tree_003", "cherry", 220)
+            new TreeLevelDefinition("tree_003", "cherry", 220),
+            new TreeLevelDefinition("tree_004", "peach", 130),
+            new TreeLevelDefinition("tree_005", "orange", 160)
         };
 
         private void Start()
