@@ -1,5 +1,16 @@
 # Fruit Tree development state
 
+## Lightweight living environments (2026-10-12)
+
+- [x] Source: Meadow, Park, City Park, Mountains 3D themed scenery in one merged decor mesh per environment.
+- [x] Source: dynamic sky/sun/fog and ground tint presets for each environment; manual Settings cycling with persistent user preference and AUTO per-tree default.
+- [x] EditMode tests for geometry budgets, center clearance and deterministic theme names/defaults (authored, NOT run in Unity).
+- [ ] Unity compile, actual screenshots, scene switching, device frame-time profiling and art polish.
+- [ ] Additional biomes (lake, autumn, evening) after the four launch themes are approved.
+
+See [ENVIRONMENT_SYSTEM.md](ENVIRONMENT_SYSTEM.md).
+
+
 ## Front-end and Google Play (2026-10-12)
 
 - [x] Source: main menu with Continue / My Trees / Settings / How to Play.

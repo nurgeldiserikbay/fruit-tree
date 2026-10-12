@@ -33,6 +33,13 @@ For later automated local verification, see [PowerShell verification script](too
 
 To update an existing Unity scene and see the new tree collection: [Three-tree playtest instructions](docs/PLAYTEST_THREE_TREES.md). Stop Play and choose **Fruit Tree > Refresh Visuals (Back Up Scene)** after pulling main.
 
+## Environment themes
+
+- Four procedural, static, merged-mesh landscapes: Meadow, Park, City Park and Mountains, with themed sky, sun, fog and ground tint.
+- Settings → SCENERY cycles themes and saves a manual choice; AUTO follows tree progression.
+- Background geometry has no colliders and stays outside the central fruit-picking radius. [Details & tests](docs/ENVIRONMENT_SYSTEM.md).
+- Unity visual/device performance verification is still outstanding.
+
 ## App front-end / Google Play preparation
 
 The scene generator now creates **FRUIT TREE** home menu, **CONTINUE**, **MY TREES**, **SETTINGS**, **HOW TO PLAY**, **PRIVACY POLICY** and Pause → **MAIN MENU** navigation.

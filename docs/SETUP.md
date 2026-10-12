@@ -84,3 +84,6 @@ After all graphics/content work and Play Store prerequisites are implemented:
 - Check Android Back navigation, Unity EditMode/PlayMode tests, performance on phones, IAP and published privacy policy before release.
 
 This is a verification plan. The newest features have **not** been compiled or run in Unity in the authoring environment.
+
+## Four environment themes
+After a scene refresh, Settings → **SCENERY** cycles automatic / Meadow / Park / City Park / Mountains. No scenery has physics colliders. Detailed implementation and future test checklist: [ENVIRONMENT_SYSTEM.md](ENVIRONMENT_SYSTEM.md). The new scenery code has not been tested in Unity or on Android yet.
