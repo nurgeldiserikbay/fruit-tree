@@ -1,5 +1,18 @@
 # Fruit Tree development state
 
+## Fruit / landscape / completion polish (2026-10-12)
+
+- [x] Source: natural apple shoulder/lobe silhouette, softer 128×128 apple-skin freckles and three color variants per species.
+- [x] Source: smaller Apple/Pear/Cherry fruit with closer twig attachment, preserved stable picked-fruit IDs.
+- [x] Source: softer short curved grass and subtle terrain tinting within existing mesh budgets.
+- [x] Source: gentle nonblocking complete-harvest fade only after last real pick; no restore celebration.
+- [x] Source: optional instancing for shared Standard fruit/stem materials, guarded by device support.
+- [x] Added regression tests for fruit mesh, grass size and completion fade (authored, not run in Unity).
+- [ ] Final Unity screenshots, visually approved apple/pear/cherry meshes, performance profiling and on-device test.
+
+Details: [VISUAL_POLISH.md](VISUAL_POLISH.md).
+
+
 ## Lightweight living environments (2026-10-12)
 
 - [x] Source: Meadow, Park, City Park, Mountains 3D themed scenery in one merged decor mesh per environment.

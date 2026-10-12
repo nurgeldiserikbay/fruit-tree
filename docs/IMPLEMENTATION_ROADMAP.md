@@ -27,10 +27,10 @@ Move from an already working 30-apple Unity prototype to a multi-species calming
 
 ### Milestone C — serenity and visual distinction
 
-- [ ] Replace or substantially upgrade current procedural foliage, bark and fruit materials.
+- [ ] Finish premium procedural foliage, bark and fruit materials. First apple mesh/skin proportions and ground comfort pass committed (Unity visual review outstanding).
 - [ ] Each species must have distinguishable branches, leaves, fruit shape and coloring.
 - [ ] Natural atmospheric audio and subtle varied harvesting SFX; independent mute/level.
-- [ ] Subtle completion/rebloom transition, no noisy confetti/pressure.
+- [x] Source: subtle actual-full-clear UI fade, no noisy confetti/pressure. Rebloom animation still pending.
 - [x] Source: minimal Zen Mode, persistent soft audio and reduced wind motion settings; acceptance test pending.
 - [x] Source: gentle voluntary last-ten-fruit camera guide (Unity/on-device QA still pending).
 - [ ] Mobile 9:16 and 9:20 visual QA screenshots.
