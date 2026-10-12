@@ -20,10 +20,11 @@
 - [x] Source: **Fruit Tree → Audit All Ten Tree Species** checks sampled 360-degree camera raycasts for every fruit and fails a signed AAB build if any are unreachable (not run in Unity).
 - [ ] Every fruit on every tree reachable and 100% clear achievable without frustration; run the Editor audit and verify the optional last-fruit assistance on real phones.
 - [x] Source: live fruit progress strip and pooled, touch-through 0.42-second harvest glints; new edit-mode tests authored.
+- [x] Source: Reduced Motion suppresses or immediately finishes fruit/hint/scene animations, including mid-animation setting changes (PlayMode tests authored, not run).
 - [ ] Responsive 9:16, 9:20 and cut-out / safe-area UI testing.
 - [ ] Final natural atmosphere recordings (or approved synthesized audio), licensed/owned SFX and final sound mixing; comfort volume/motion settings are in source but not QA-approved.
 - [x] **English-only UI and Play listing.** No Kazakh/Russian language selector or localization promised.
-- [x] Source: reject invalid/duplicate saved tree records and authored offline backup/interrupted-write recovery tests (not yet run).
+- [x] Source: reject invalid/duplicate saved tree records **on both read and write**, preserving a previous valid file; authored offline backup/interrupted-write recovery tests (not yet run).
 - [ ] Graceful offline operation, app switch/pause, interrupted save and progress restore confirmed on real Android devices.
 - [x] Source: provisional mobile Low/Balanced/High quality tier selection; unknown hardware safely defaults to Balanced.
 - [ ] Profiling on real low-/mid-range Android phones (FPS, heat, RAM, battery).

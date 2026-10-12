@@ -25,7 +25,7 @@ All **fruit IDs** remain local `fruit_0000` through `fruit_(N−1)`. The saved J
 - Render all ten procedural fruit meshes; inspect normals, texture seams, leaf coverage, position, stem attachment and whether the fruit is discernible at 9:16 and 9:20.
 - New game: only tree_001 unlocked. At N−1 fruits, tree_(N+1) remains locked for each of the first nine species. Picking the final fruit opens *exactly* the next species.
 - Run **Fruit Tree → Audit All Ten Tree Species**; it must find no unreachable fruit across ten source-level catalogs before the AAB builder can run. On each tree, verify no collision or decorative object makes fruit unpickable from full 360° orbit and zoom. The small screen-scaled tap margin must not select distant fruit. The free last-ten-fruit help now shows a short-lived, noninteractive gold marker and must not pick fruit automatically.
-- Verify app pause, close, process restart, corrupted primary-save fallback, restored exact per-fruit picked set and rebloom of prior clears. Execute `OrchardSaveRecoveryTests` with all other EditMode tests. Test upgrading saved states from both three- and five-tree versions.
+- Verify app pause, close, process restart, corrupted primary-save fallback, restored exact per-fruit picked set and rebloom of prior clears. Test invalid in-memory saves cannot overwrite valid data. Execute `OrchardSaveRecoveryTests` with all other EditMode tests. Test upgrading saved states from both three- and five-tree versions.
 - Inspect merged blossom regrowth on all ten trees. No growth-stage fruit is pickable; switching levels cancels stale animation.
 - Visit all four environment themes, including automatic per-level cycling and Settings manual override; verify the new one-second sun/sky/terrain/fog color fade completes even while paused. Measure frame time, RAM, battery and heat on Android devices. Confirm the Low/Balanced/High startup graphics budget selects the intended tier, and verify 30/60 FPS are caps rather than guaranteed actual performance.
 - Confirm main-menu navigation, Zen Mode, reduced-motion and audio settings, Android Back and accessibility before publishing. **English is the only supported game language.** Check no KZ/RU selector or labels appear. Verify rounded home/overlay panels, saved-tree home summary, event-driven progress strip and pooled visual tap glints remain readable and touch-through at 9:16 and 9:20.
@@ -41,3 +41,7 @@ All **fruit IDs** remain local `fruit_0000` through `fruit_(N−1)`. The saved J
 ## Remaining work
 
 Final art direction/polish, production-quality sound, UI localization, real fruit reachability, Unity build/test runner and signed Google Play release are not complete. Do not describe the project as released or fully production-ready.
+
+## Accessibility acceptance
+
+Verify the **Reduced Motion** toggle while a tree is actively reblooming: the animation must stop, every fruit become full size and selectable, and the saved round remains correct. New rebloom actions must have no blossom/growth animation. A reduced-motion tap must not show moving glints, the last-fruit marker must not pulse, and changing scenery in Settings must update colors without a slow fade. All remain English-only.

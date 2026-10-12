@@ -99,3 +99,7 @@ After the user publishes the real Google Docs Privacy Policy and configures its 
 ## 100% fruit accessibility release audit
 
 The signed bundle command automatically runs **Fruit Tree → Audit All Ten Tree Species** after validating the generated scene. The audit creates a temporary isolated tree for each species and uses the actual saved level counts and seeds. Sampled camera positions must be able to raycast to **every fruit** at least once. Any failures block the AAB, with species names and missing fruit objects in the error message. This tool is not a substitute for final fingertip tests at real screen sizes, and it has not yet been executed in Unity.
+
+## Reduced Motion and offline saves
+
+The Settings → MOTION option changes fruit bloom, tap effects, guide-marker pulsing and scenery color fades as well as leaf wind. In reduced-motion mode, fruit becomes fully available immediately after rebloom. Orchard save snapshots are validated before replacement; corrupt/truncated/duplicate-entry records cannot overwrite the prior valid file. Unity EditMode/PlayMode regression tests exist but have not yet been executed.

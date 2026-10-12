@@ -1,5 +1,14 @@
 # Fruit Tree development state
 
+## Additional safety and accessibility fixes (2026-10-12)
+
+- [x] Offline save repository now uses the same structural validation for both loading and writing. Malformed snapshots are rejected **before** touching a previous valid on-disk save.
+- [x] `OrchardSaveRecoveryTests` expanded with a case verifying an invalid in-memory snapshot cannot overwrite a correct one (test authored, not executed).
+- [x] `Reduced Motion` now applies consistently to fruit rebloom, the fruit-pick pulse, the optional hint marker, and sky/fog/landscape color transitions. Turning it on during active rebloom finishes that animation safely and makes fruit tappable immediately.
+- [x] PlayMode tests authored for instant reduced-motion rebloom and toggling during a blossom animation; not yet run.
+- [ ] Final Unity 6000.6.5f1 compilation, automated EditMode/PlayMode suite, ten-tree reachability and real Android device checks remain outstanding.
+
+
 ## Offline save-integrity recovery (2026-10-12)
 
 - [x] Source: reject syntactically valid but incomplete local save files (empty tree list, null picked-ID collection, negative counters, duplicate saved tree IDs, or missing active-tree record).
