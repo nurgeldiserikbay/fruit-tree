@@ -61,3 +61,11 @@ These features are committed to source and have **unexecuted Unity tests**. The 
 - Peach and Orange have different canopy spreads, major-branch counts, foliage proportions/colors and bark shades. Their meshes remain merged for mobile cost control.
 - Peach: **130** fruits; Orange: **160**. Previous IDs, exact tree counts and JSON schema stay stable, so existing players' earlier progress should survive the catalog extension.
 - Mesh, fruit-count, stable-ID, strict 100% unlock and save-extension tests have been authored. **No Unity Editor/Android run has taken place.**
+
+## Ten distinct species profiles (2026-10-12)
+
+- `FruitSpeciesProfile` defines all ten trees' major branch counts, crown width and height, bark/wood/leaf colors, leaf proportions, fruit scales and hit radii in one immutable lookup.
+- The new fruit shapes include a small apricot, oval plum, tapered lemon, flattened mandarin and red pomegranate with five integrated crown sepals opposite its stem. They derive from the existing compact procedural meshes, without new individual mesh allocations per fruit.
+- Each new species has a shared 64×64 RGB24 skin texture (golden blush, plum bloom, citrus pores or pomegranate blush) and three shared material tints per tree.
+- Existing first-five IDs, fruit counts and level seed formula were not changed.
+- Editor tests check model bounds and vertex budgets and progression strictness, but **the models have not been reviewed on mobile**. Final art may require further mesh and leaf work.

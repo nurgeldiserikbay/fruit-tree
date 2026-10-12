@@ -18,7 +18,7 @@ Rotate each tree, look between its branches and gently collect ripe fruit at you
 
 Take your time. The garden can wait.
 
-**Before publication:** adjust text to actual tested tree count, audio quality, UI features and accessible languages. Do not market ten trees while only three are implemented. Do not promise no advertising if a future compliant ad SDK is enabled.
+**Before publication:** adjust text to actual tested tree count, audio quality, UI features and accessible languages. Do not advertise ten fully polished trees until the ten source-level species have been visually reviewed, tested and verified as playable. Do not promise no advertising if a future compliant ad SDK is enabled.
 
 ## Қазақша қысқаша сипаттама (жоба)
 

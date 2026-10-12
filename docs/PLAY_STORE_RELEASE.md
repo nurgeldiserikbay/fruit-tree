@@ -4,13 +4,14 @@
 
 ## Gameplay / UX acceptance
 
-- [x] Source: Apple (120), Pear (140), Cherry (220), Peach (130), Orange (160) five-tree progression prototype (source only, unverified Unity integration).
+- [x] Source: ten-species code catalog and procedurally modeled fruit collection (not yet compiled or visually accepted in Unity).
 - [x] Source: local saved progress, 100%-clear tree unlock and rebloom.
 - [x] Source: main menu, CONTINUE, MY TREES, SETTINGS, HOW TO PLAY, Pause → Main Menu, privacy summary and link configuration (committed; awaiting first Unity scene refresh).
 - [x] Source: voluntary last-ten-fruit camera guide, Zen Mode (HUD-free), soft audio/motion preferences and collection switch close/resume.
 - [x] Source: regression tests for Zen Mode and last-fruit hint thresholds (not run in Unity).
 - [ ] Build and play-test every button, Zen Mode, hint and Android Back behaviour in Unity 6000.6.5f1.
-- [ ] Finish at least 10 individually recognizable tree species (first-release content target); 5 source-level species exist, 5+ remain.
+- [x] Source: ten species with unique profile parameters and compact fruit meshes.
+- [ ] Confirm all ten species are visually recognizable and every fruit can be picked on an Android phone; final art and playability not accepted.
 - [x] Source: four switchable low-cost environments — Meadow, Park, City Park, Mountains (not yet visually tested).
 - [x] Source: first natural-apple mesh/skin pass, distinct lighter round cherry mesh, 64×64 pear/cherry skin maps, smaller fruit proportions, curved short grass and soft clear-tree feedback (not yet Unity-tested).
 - [x] Source: merged blossom animation, species-specific leaf forms/wood tints and startup duplicate-tree optimization (Unity PlayMode QA pending).
@@ -59,7 +60,7 @@
 1. Full new home/settings/privacy interface has been committed but **not compiled or visually verified by the user**.
 2. Policy URL, contact email and final Google Docs publication are missing.
 3. SDK data audit, AAB signature and Play Console setup not done.
-4. App currently has only 3 species, and visual assets need a substantial artistic upgrade.
+4. Ten species exist as unverified procedural source models; final visual assets, fruit accessibility and Android performance require substantial work.
 5. Purchase flows and final-fruit reachability require on-device tests.
 
 References:

@@ -1,5 +1,17 @@
 # Fruit Tree development state
 
+## Ten-tree content milestone — source code (2026-10-12)
+
+- [x] Catalog contains **10** stable tree IDs and fruit counts: Apple 120, Pear 140, Cherry 220, Peach 130, Orange 160, Apricot 180, Plum 160, Lemon 140, Mandarin 200, Pomegranate 110.
+- [x] Five new procedural low-poly fruit meshes, distinct leaf/crown/wood profiles and shared 64×64 RGB24 swatches.
+- [x] Source refactor moves branch/foliage/fruit dimensions and shades into `FruitSpeciesProfile` so adding species does not require expanding long `TreeGenerator` condition chains.
+- [x] Existing `tree_001`–`tree_005` IDs and fruit counts preserved. Strict full-clear progression and schema-v1 saved state continue to apply.
+- [x] Source tests authored for ten stable per-fruit ID sets, all ten level unlock gates, five-tree-save expansion, geometry and texture budgets.
+- [ ] Tests need executing with Unity Test Runner. All ten trees must pass 100%-reachability and visual review on real phones; source-level content is **not** Google Play release acceptance.
+
+See [TEN_TREE_ACCEPTANCE.md](TEN_TREE_ACCEPTANCE.md).
+
+
 ## Five-tree collection expansion (2026-10-12)
 
 - [x] Source: Peach 130 (`tree_004`) and Orange 160 (`tree_005`) following existing Apple 120, Pear 140, Cherry 220.
