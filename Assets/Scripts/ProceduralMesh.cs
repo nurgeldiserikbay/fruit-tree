@@ -228,18 +228,42 @@ namespace FruitTree
 
         public static Mesh Cherry()
         {
-            var mesh = Apple();
-            mesh.name = "Round Cherry";
-            var vertices = mesh.vertices;
-            for (int i = 0; i < vertices.Length; i++)
+            // True compact cherry silhouette rather than a reduced apple with
+            // five exaggerated shoulders. A smaller mesh helps dense cherry trees.
+            var mesh = new Mesh { name = "Round Cherry Fruit" };
+            const int latitude = 12, longitude = 16;
+            var verts = new List<Vector3>((latitude + 1) * (longitude + 1));
+            var tris = new List<int>(latitude * longitude * 6);
+            var uvs = new List<Vector2>(verts.Capacity);
+            for (int y = 0; y <= latitude; y++)
             {
-                Vector3 v = vertices[i];
-                vertices[i] = new Vector3(v.x * .96f, v.y * .9f, v.z * .96f);
+                float t = y / (float)latitude;
+                float radius = .16f * Mathf.Max(0f, Mathf.Sin(t * Mathf.PI));
+                float dimple = .014f * Mathf.Pow(t, 14f);
+                float height = -.15f + .30f * t - dimple;
+                for (int x = 0; x <= longitude; x++)
+                {
+                    float angle = x * Mathf.PI * 2f / longitude;
+                    verts.Add(new Vector3(radius * Mathf.Cos(angle), height,
+                        radius * Mathf.Sin(angle)));
+                    uvs.Add(new Vector2(x / (float)longitude, t));
+                }
             }
-            mesh.vertices = vertices;
+            for (int y = 0; y < latitude; y++)
+                for (int x = 0; x < longitude; x++)
+                {
+                    int a = y * (longitude + 1) + x;
+                    int b = a + longitude + 1;
+                    tris.Add(a); tris.Add(b); tris.Add(a + 1);
+                    tris.Add(a + 1); tris.Add(b); tris.Add(b + 1);
+                }
+            mesh.SetVertices(verts);
+            mesh.SetUVs(0, uvs);
+            mesh.SetTriangles(tris, 0);
             mesh.RecalculateNormals();
             mesh.RecalculateBounds();
             return mesh;
         }
+
     }
 }
