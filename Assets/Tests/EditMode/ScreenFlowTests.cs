@@ -59,6 +59,44 @@ namespace FruitTree.Tests
         }
 
         [Test]
+        public void ZenModeHidesTheHudAndRestoresItWhenLeaving()
+        {
+            var root = new GameObject("Zen Mode Test");
+            var hud = new GameObject("Game HUD");
+            var exitButtonLayer = new GameObject("Exit Zen");
+            hud.transform.SetParent(root.transform);
+            exitButtonLayer.transform.SetParent(root.transform);
+            try
+            {
+                var flow = root.AddComponent<FruitTreeScreenFlow>();
+                flow.gameplayControls = hud;
+                flow.zenExitPanel = exitButtonLayer;
+                flow.EnterZenMode();
+                Assert.IsTrue(flow.IsZenMode);
+                Assert.IsTrue(flow.IsPlaying);
+                Assert.IsFalse(hud.activeSelf);
+                Assert.IsTrue(exitButtonLayer.activeSelf);
+                flow.HandleBackButton();
+                Assert.IsFalse(flow.IsZenMode);
+                Assert.IsTrue(flow.IsPlaying);
+                Assert.IsTrue(hud.activeSelf);
+                Assert.IsFalse(exitButtonLayer.activeSelf);
+            }
+            finally { Object.DestroyImmediate(root); }
+        }
+
+        [TestCase(-1, false)]
+        [TestCase(0, false)]
+        [TestCase(1, true)]
+        [TestCase(5, true)]
+        [TestCase(10, true)]
+        [TestCase(11, false)]
+        public void HelpOnlyAppearsForLastTenFruits(int remaining, bool expected)
+        {
+            Assert.AreEqual(expected, OrchardGameController.ShouldOfferHint(remaining));
+        }
+
+        [Test]
         public void OnlyPublishedGoogleDocsHttpsLinksAreAllowed()
         {
             Assert.IsTrue(FruitTreePrivacyConfig.IsPublishedUrlValid(
