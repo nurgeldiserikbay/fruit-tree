@@ -277,8 +277,11 @@ namespace FruitTree.Tests
                 policy.AttachProvider(provider);
                 Assert.IsFalse(policy.CanRequestAds);
                 policy.SetStoreEntitlement(false);
-                Assert.IsTrue(policy.CanRequestAds);
-                Assert.IsTrue(provider.LastEnabled);
+                // English-only first release includes no advertising or billing.
+                Assert.IsFalse(FruitTreeReleaseConfig.AdvertisingEnabled);
+                Assert.IsFalse(FruitTreeReleaseConfig.PurchasesEnabled);
+                Assert.IsFalse(policy.CanRequestAds);
+                Assert.IsFalse(provider.LastEnabled);
                 policy.SetStoreEntitlement(true);
                 Assert.IsFalse(policy.CanRequestAds);
                 Assert.IsFalse(provider.LastEnabled);
