@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 namespace FruitTree
@@ -23,6 +24,45 @@ namespace FruitTree
         private MeshFilter sceneryFilter;
         private int treeIndex;
         private int overrideIndex = -1;
+        private Coroutine paletteTransition;
+        private Palette displayedPalette;
+        private bool paletteInitialized;
+
+        // This immutable value bundle changes only when a theme is selected.
+        private struct Palette
+        {
+            public Color ground, grass, horizon, zenith, sun, ambient;
+            public float sunIntensity;
+
+            public static Palette FromTheme(EnvironmentTheme theme)
+            {
+                Color horizon = EnvironmentThemes.Horizon(theme);
+                return new Palette
+                {
+                    ground = EnvironmentThemes.GroundTint(theme),
+                    grass = EnvironmentThemes.GrassTint(theme),
+                    horizon = horizon,
+                    zenith = EnvironmentThemes.Zenith(theme),
+                    sun = EnvironmentThemes.Sun(theme),
+                    ambient = Color.Lerp(horizon, Color.white, .14f),
+                    sunIntensity = theme == EnvironmentTheme.CityPark ? .96f : 1.08f
+                };
+            }
+
+            public static Palette Lerp(Palette from, Palette to, float t)
+            {
+                return new Palette
+                {
+                    ground = Color.Lerp(from.ground, to.ground, t),
+                    grass = Color.Lerp(from.grass, to.grass, t),
+                    horizon = Color.Lerp(from.horizon, to.horizon, t),
+                    zenith = Color.Lerp(from.zenith, to.zenith, t),
+                    sun = Color.Lerp(from.sun, to.sun, t),
+                    ambient = Color.Lerp(from.ambient, to.ambient, t),
+                    sunIntensity = Mathf.Lerp(from.sunIntensity, to.sunIntensity, t)
+                };
+            }
+        }
 
         public EnvironmentTheme CurrentTheme { get; private set; }
         public bool IsAutomatic => overrideIndex < 0;
@@ -99,28 +139,22 @@ namespace FruitTree
                 throw new ArgumentOutOfRangeException(nameof(theme));
             if (sceneryMesh != null && CurrentTheme == theme) return;
             CurrentTheme = theme;
-            if (ground != null)
-                ground.SetPalette(EnvironmentThemes.GroundTint(theme),
-                    EnvironmentThemes.GrassTint(theme));
-            if (skyMaterial != null)
+            if (paletteTransition != null)
             {
-                if (skyMaterial.HasProperty("_Horizon"))
-                    skyMaterial.SetColor("_Horizon", EnvironmentThemes.Horizon(theme));
-                if (skyMaterial.HasProperty("_Zenith"))
-                    skyMaterial.SetColor("_Zenith", EnvironmentThemes.Zenith(theme));
+                StopCoroutine(paletteTransition);
+                paletteTransition = null;
             }
-            if (sun != null)
-            {
-                sun.color = EnvironmentThemes.Sun(theme);
-                sun.intensity = theme == EnvironmentTheme.CityPark ? .96f : 1.08f;
-            }
+            Palette destination = Palette.FromTheme(theme);
             RenderSettings.fog = true;
             RenderSettings.fogMode = FogMode.Linear;
-            RenderSettings.fogColor = EnvironmentThemes.Horizon(theme);
             RenderSettings.fogStartDistance = 19f;
             RenderSettings.fogEndDistance = 45f;
-            RenderSettings.ambientLight = Color.Lerp(EnvironmentThemes.Horizon(theme),
-                Color.white, .14f);
+            // Initial scene preparation must be immediate (including Editor tests).
+            // Subsequent theme selections gently blend color over one second.
+            if (!paletteInitialized || !Application.isPlaying || !isActiveAndEnabled)
+                ApplyPalette(destination);
+            else
+                paletteTransition = StartCoroutine(BlendPalette(displayedPalette, destination));
 
             int index = (int)theme;
             // Generate only on first visit; later switching reuses the same small
@@ -130,6 +164,51 @@ namespace FruitTree
             sceneryMesh = themeMeshes[index];
             if (sceneryFilter != null) sceneryFilter.sharedMesh = sceneryMesh;
             ThemeChanged?.Invoke(theme);
+        }
+
+        /// <summary>
+        /// A gentle change of light, sky, fog and grass without new meshes.
+        /// Always uses unscaled time: Settings can be open while the game is paused.
+        /// </summary>
+        private IEnumerator BlendPalette(Palette beginning, Palette ending)
+        {
+            const float duration = 1f;
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed = Mathf.Min(duration, elapsed + Time.unscaledDeltaTime);
+                ApplyPalette(Palette.Lerp(beginning, ending,
+                    TransitionWeight(elapsed / duration)));
+                yield return null;
+            }
+            ApplyPalette(ending);
+            paletteTransition = null;
+        }
+
+        public static float TransitionWeight(float progress)
+        {
+            return Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(progress));
+        }
+
+        private void ApplyPalette(Palette palette)
+        {
+            displayedPalette = palette;
+            paletteInitialized = true;
+            if (ground != null) ground.SetPalette(palette.ground, palette.grass);
+            if (skyMaterial != null)
+            {
+                if (skyMaterial.HasProperty("_Horizon"))
+                    skyMaterial.SetColor("_Horizon", palette.horizon);
+                if (skyMaterial.HasProperty("_Zenith"))
+                    skyMaterial.SetColor("_Zenith", palette.zenith);
+            }
+            if (sun != null)
+            {
+                sun.color = palette.sun;
+                sun.intensity = palette.sunIntensity;
+            }
+            RenderSettings.fogColor = palette.horizon;
+            RenderSettings.ambientLight = palette.ambient;
         }
 
         public static Mesh CreateSceneryMesh(EnvironmentTheme theme)
@@ -315,6 +394,7 @@ namespace FruitTree
 
         private void OnDestroy()
         {
+            if (paletteTransition != null) StopCoroutine(paletteTransition);
             for (int i = 0; i < themeMeshes.Length; i++)
             {
                 if (themeMeshes[i] == null) continue;
