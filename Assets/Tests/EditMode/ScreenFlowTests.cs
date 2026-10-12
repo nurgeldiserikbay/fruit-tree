@@ -97,6 +97,39 @@ namespace FruitTree.Tests
         }
 
         [Test]
+        public void RemainingFruitGuideIsOptionalAndItsFadeEndsCleanly()
+        {
+            Assert.AreEqual(0f, RemainingFruitGuide.Visibility(-1f));
+            Assert.AreEqual(0f, RemainingFruitGuide.Visibility(0f));
+            Assert.That(RemainingFruitGuide.Visibility(.25f), Is.EqualTo(1f).Within(.001f));
+            Assert.That(RemainingFruitGuide.Visibility(3f), Is.EqualTo(1f).Within(.001f));
+            Assert.That(RemainingFruitGuide.Visibility(4.05f),
+                Is.InRange(.45f, .55f));
+            Assert.AreEqual(0f, RemainingFruitGuide.Visibility(4.5f));
+            Assert.AreEqual(0f, RemainingFruitGuide.Visibility(8f));
+        }
+
+        [Test]
+        public void FruitPointerNeverCollectsOrChangesASelectedFruit()
+        {
+            var root = new GameObject("Last Fruit Guide Test");
+            var fruitObject = new GameObject("Unpicked Fruit", typeof(SphereCollider));
+            fruitObject.transform.SetParent(root.transform);
+            try
+            {
+                var fruit = fruitObject.AddComponent<Apple>();
+                fruit.Initialize(7);
+                var guide = root.AddComponent<RemainingFruitGuide>();
+                // Without UI/camera the optional pointer does nothing.
+                guide.PointAt(fruit);
+                Assert.IsFalse(guide.IsVisible);
+                Assert.IsFalse(fruit.IsHarvested);
+                Assert.IsTrue(fruit.GetComponent<Collider>().enabled);
+            }
+            finally { Object.DestroyImmediate(root); }
+        }
+
+        [Test]
         public void OnlyPublishedGoogleDocsHttpsLinksAreAllowed()
         {
             Assert.IsTrue(FruitTreePrivacyConfig.IsPublishedUrlValid(
