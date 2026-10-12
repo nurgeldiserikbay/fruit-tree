@@ -1,5 +1,17 @@
 # Fruit Tree development state
 
+## Gentle rebloom and distinct tree shape (2026-10-12)
+
+- [x] Source: cleared trees can rebloom through a **single shared coroutine**, with pale flower petals and staggered growth of all existing fruit instances.
+- [x] Source: each blossom group uses **one merged static 3D mesh**, not 120–220 particle systems, with mesh/material reused on subsequent rounds.
+- [x] Source: growing fruits keep colliders disabled; direct Pick calls also reject them until fully grown.
+- [x] Source: save before visual regrowth, keep stable fruit IDs, hide old blossoms/cancel animation during a tree change, and close the collection menu on rebloom.
+- [x] Source: Orchard scene no longer makes a redundant 30-fruit default tree before loading the saved 120/140/220-fruit species.
+- [x] Source: pear/apple/cherry have distinct leaf profiles, canopy placement and bark tones; smaller-fruit stems now correctly connect in world space.
+- [x] PlayMode/EditMode tests authored for rebloom timing, interruption, collision gates, world-space stems and leaf mesh budgets. **Tests have not been executed in Unity.**
+- [ ] Visually approve blossom and bark/foliage treatment and measure initial-scene/Android frame-time improvements.
+
+
 ## Fruit / landscape / completion polish (2026-10-12)
 
 - [x] Source: natural apple shoulder/lobe silhouette, softer 128×128 apple-skin freckles, real round cherry geometry, shared 64×64 pear/cherry skins and three color variants per species.

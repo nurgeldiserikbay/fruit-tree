@@ -50,3 +50,7 @@ The scene generator now creates **FRUIT TREE** home menu, **CONTINUE**, **MY TRE
 - [Store listing text draft](docs/STORE_LISTING_DRAFT.md)
 
 **The Privacy link is intentionally unavailable online until a real published Google Docs URL is configured.** See `Assets/Scripts/FruitTreePrivacyConfig.cs`. Do not publish an AAB to Google Play without this and the other release prerequisites.
+
+### Latest rebloom and tree-shape refinement
+
+Completed trees now have a lightweight flower-to-fruit regrowth animation, cached in one merged blossom mesh and one coroutine. Apple, pear and cherry have more distinct foliage/crown forms, and the generated scene avoids wasteful double tree generation. See [visual polish notes](docs/VISUAL_POLISH.md). **Unity and Android playtesting remain pending.**
