@@ -72,3 +72,15 @@ Backend-free remove-ads entitlement logic is implemented, but remains untested a
 6. After contact and data-safety review, use the steps in [PRIVACY_POLICY_GOOGLE_DOCS.md](PRIVACY_POLICY_GOOGLE_DOCS.md). Run **Fruit Tree → Validate Project** and all EditMode/PlayMode tests.
 
 The screen code is committed but was **not yet executed in Unity or on an Android phone** at authoring time.
+
+## Final-game acceptance (deferred until the user wants to test the complete game)
+
+After all graphics/content work and Play Store prerequisites are implemented:
+- Open the refreshed Unity scene and verify the home scene shows an actual tree behind the menu.
+- Harvest down to 10 fruits: **FIND FRUIT** appears; it rotates the camera towards a remaining fruit without picking it, and disappears when none remain.
+- From Pause choose **ZEN MODE**: all standard HUD elements disappear and **EXIT ZEN** remains accessible; normal fruit collection still works and continues saving.
+- From Settings toggle **AUDIO: SOFT/NORMAL**, **SOUND: ON/OFF**, **MOTION: GENTLE/MINIMAL**; close and reopen the app, confirm persisted preferences.
+- Tree Collection → NEXT/PREVIOUS now closes Pause as the new tree loads, and previously picked fruit stays saved.
+- Check Android Back navigation, Unity EditMode/PlayMode tests, performance on phones, IAP and published privacy policy before release.
+
+This is a verification plan. The newest features have **not** been compiled or run in Unity in the authoring environment.

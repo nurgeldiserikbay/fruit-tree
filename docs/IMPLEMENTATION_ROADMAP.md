@@ -31,7 +31,8 @@ Move from an already working 30-apple Unity prototype to a multi-species calming
 - [ ] Each species must have distinguishable branches, leaves, fruit shape and coloring.
 - [ ] Natural atmospheric audio and subtle varied harvesting SFX; independent mute/level.
 - [ ] Subtle completion/rebloom transition, no noisy confetti/pressure.
-- [ ] Gentle voluntary last-10-fruit discovery assist.
+- [x] Source: minimal Zen Mode, persistent soft audio and reduced wind motion settings; acceptance test pending.
+- [x] Source: gentle voluntary last-ten-fruit camera guide (Unity/on-device QA still pending).
 - [ ] Mobile 9:16 and 9:20 visual QA screenshots.
 
 **Acceptance:** the first 3 trees are recognizable as different species even when fruit has been fully picked. No forced timers, streaks, ads or energy.

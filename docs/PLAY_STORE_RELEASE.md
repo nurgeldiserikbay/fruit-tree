@@ -7,12 +7,14 @@
 - [x] Source: Apple (120), Pear (140), Cherry (220) progression prototype.
 - [x] Source: local saved progress, 100%-clear tree unlock and rebloom.
 - [x] Source: main menu, CONTINUE, MY TREES, SETTINGS, HOW TO PLAY, Pause → Main Menu, privacy summary and link configuration (committed; awaiting first Unity scene refresh).
-- [ ] Build and play-test every button and Android Back behaviour in Unity 6000.6.5f1.
+- [x] Source: voluntary last-ten-fruit camera guide, Zen Mode (HUD-free), soft audio/motion preferences and collection switch close/resume.
+- [x] Source: regression tests for Zen Mode and last-fruit hint thresholds (not run in Unity).
+- [ ] Build and play-test every button, Zen Mode, hint and Android Back behaviour in Unity 6000.6.5f1.
 - [ ] Finish at least 10 individually recognizable tree species (first-release content target).
 - [ ] Improve fruit meshes, proportions, branch attachment, foliage, terrain and atmospheric lighting.
 - [ ] Every fruit on every tree reachable and 100% clear achievable without frustration; optional last-fruit assistance.
 - [ ] Responsive 9:16, 9:20 and cut-out / safe-area UI testing.
-- [ ] Real licensed/owned nature SFX and comfort settings; no unpleasant sudden loudness.
+- [ ] Real licensed/owned nature SFX and final sound mixing; comfort volume/motion settings are in source but not QA-approved.
 - [ ] Kazakh / Russian localization if both languages are declared in the listing (do not falsely claim supported locales).
 - [ ] Graceful offline operation, app switch/pause, interrupted save and progress restore.
 - [ ] Profiling on real low-/mid-range Android phones (FPS, heat, RAM, battery).

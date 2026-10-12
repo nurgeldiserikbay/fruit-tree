@@ -10,7 +10,7 @@
 - [x] Source: in-app privacy summary, safe published-Google-Docs URL configuration and disable-on-missing-link logic.
 - [x] Draft Google Docs Privacy Policy, Play listing text and release-readiness checklist.
 - [x] EditMode tests for navigation and Privacy URL validation (not yet executed).
-- [ ] User Unity 6000.6.5f1 compilation and portrait visual tests of new screens.
+- [ ] User Unity 6000.6.5f1 compilation and portrait visual tests of new screens, Zen Mode, hint, settings and menu switching — deferred to final acceptance as requested.
 - [ ] Publish real privacy policy, replace contact placeholders, complete SDK data audit, add verified public URL.
 - [ ] Android release AAB, API 36, store assets, 10 distinct trees, localization and real-device tests.
 
