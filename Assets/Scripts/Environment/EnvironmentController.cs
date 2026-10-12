@@ -174,6 +174,10 @@ namespace FruitTree
 
         private static void BuildMeadow(EnvironmentMeshBuilder mesh)
         {
+            mesh.RidgeBand(27f, -.12f, 1.35f, 40, .3f,
+                new Color(.60f, .74f, .59f));
+            mesh.RidgeBand(32f, -.12f, 2.0f, 36, 1.5f,
+                new Color(.68f, .79f, .67f));
             Wildflowers(mesh, 58, 171, 5.7f, 15f, new Color(.96f, .83f, .56f));
             Wildflowers(mesh, 24, 208, 8f, 17f, new Color(.90f, .84f, .92f));
             for (int i = 0; i < 9; i++)
@@ -197,11 +201,31 @@ namespace FruitTree
                 new Color(.39f, .40f, .36f));
         }
 
+        private static void ParkLantern(EnvironmentMeshBuilder mesh, float x, float z)
+        {
+            // Static silhouette: narrow pillar and one pale lantern head.
+            // It is deliberately away from the central picking/orbit space.
+            mesh.Box(new Vector3(x, 1.25f, z), new Vector3(.09f, 2.5f, .09f),
+                new Color(.39f, .43f, .38f));
+            mesh.Box(new Vector3(x, 2.53f, z), new Vector3(.27f, .30f, .27f),
+                new Color(.93f, .89f, .71f));
+            mesh.Cone(new Vector3(x, 2.69f, z), .19f, .16f, 5,
+                new Color(.42f, .46f, .39f));
+        }
+
         private static void BuildPark(EnvironmentMeshBuilder mesh)
         {
+            mesh.RidgeBand(28f, -.11f, 1.15f, 36, 1f,
+                new Color(.58f, .73f, .58f));
             mesh.RingPath(9.6f, .65f, 48, new Color(.78f, .73f, .59f));
             Bench(mesh, -12.2f, 2.5f, 0f);
             Bench(mesh, 12.2f, -2.5f, 0f);
+            for (int i = 0; i < 6; i++)
+            {
+                float a = i * 2f * Mathf.PI / 6f + .35f;
+                ParkLantern(mesh, Mathf.Cos(a) * 13.8f,
+                    Mathf.Sin(a) * 13.8f);
+            }
             Wildflowers(mesh, 46, 992, 10.6f, 17f, new Color(.94f, .74f, .75f));
             for (int i = 0; i < 12; i++)
             {
@@ -213,6 +237,8 @@ namespace FruitTree
 
         private static void BuildCityPark(EnvironmentMeshBuilder mesh)
         {
+            mesh.RidgeBand(33f, -.15f, 1.45f, 40, .15f,
+                new Color(.73f, .77f, .75f));
             mesh.RingPath(9.8f, .7f, 48, new Color(.72f, .71f, .67f));
             Wildflowers(mesh, 24, 285, 10.7f, 16f, new Color(.92f, .84f, .65f));
             Bench(mesh, -12.2f, 3.3f, 0f);
@@ -226,9 +252,28 @@ namespace FruitTree
                 float a = (i + .1f) * Mathf.PI * 2f / 17f;
                 float radius = 24f + (i % 3) * .5f;
                 float height = 3f + (i % 5) * 1.05f;
-                mesh.Box(new Vector3(Mathf.Cos(a) * radius, height * .5f,
-                    Mathf.Sin(a) * radius), new Vector3(1.8f, height, 1.85f),
-                    blocks[i % blocks.Length]);
+                Vector3 basePosition = new Vector3(Mathf.Cos(a) * radius,
+                    0f, Mathf.Sin(a) * radius);
+                mesh.Box(basePosition + Vector3.up * (height * .5f),
+                    new Vector3(1.8f, height, 1.85f), blocks[i % blocks.Length]);
+                // Three decorative windows on the wall facing the park;
+                // vertices are part of the same mesh as the skyline.
+                Vector3 tangent = new Vector3(-Mathf.Sin(a), 0f, Mathf.Cos(a));
+                Vector3 inside = new Vector3(-Mathf.Cos(a), 0f, -Mathf.Sin(a));
+                for (int floor = 0; floor < 3; floor++)
+                {
+                    float y = .9f + floor * .85f;
+                    if (y >= height - .25f) continue;
+                    Vector3 window = basePosition + inside * 1.35f +
+                        Vector3.up * y;
+                    float halfWidth = .22f, halfHeight = .16f;
+                    mesh.Quad(window - tangent * halfWidth - Vector3.up * halfHeight,
+                        window + tangent * halfWidth - Vector3.up * halfHeight,
+                        window + tangent * halfWidth + Vector3.up * halfHeight,
+                        window - tangent * halfWidth + Vector3.up * halfHeight,
+                        floor % 2 == 0 ? new Color(.84f, .88f, .79f) :
+                            new Color(.67f, .78f, .84f));
+                }
             }
             for (int i = 0; i < 8; i++)
             {
@@ -240,6 +285,10 @@ namespace FruitTree
 
         private static void BuildMountains(EnvironmentMeshBuilder mesh)
         {
+            mesh.RidgeBand(33f, -.2f, 7.2f, 44, .6f,
+                new Color(.69f, .79f, .80f));
+            mesh.RidgeBand(28f, -.15f, 4.45f, 40, 1.3f,
+                new Color(.56f, .71f, .69f));
             Wildflowers(mesh, 45, 439, 5.9f, 16f, new Color(.92f, .84f, .68f));
             for (int i = 0; i < 20; i++)
             {
