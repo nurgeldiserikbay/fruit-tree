@@ -26,6 +26,7 @@ namespace FruitTree
         public Button rebloomButton;
         public Button completionNextButton;
         public Button remainingFruitHintButton;
+        public RemainingFruitGuide remainingFruitGuide;
         public PauseController pauseController;
         public event Action TreeCleared;
         public event Action TreeDisplayed;
@@ -99,6 +100,7 @@ namespace FruitTree
 
         private void DisplayActiveTree()
         {
+            if (remainingFruitGuide != null) remainingFruitGuide.Hide();
             TreeRoundState active = progress.GetTree(progress.ActiveTreeId);
             int levelIndex = LevelIndex();
             tree.Configure(active.Definition.SpeciesId, active.Definition.FruitCount,
@@ -180,6 +182,7 @@ namespace FruitTree
         {
             if (!initialized || !progress.TryRebloomActive()) return;
             // Persist round number and empty picked set BEFORE any new fruits appear.
+            if (remainingFruitGuide != null) remainingFruitGuide.Hide();
             SaveProgress();
             tree.ResetHarvestAnimated();
             hintCursor = -1;
@@ -204,6 +207,7 @@ namespace FruitTree
                 if (fruit == null || fruit.IsHarvested || !fruit.gameObject.activeInHierarchy)
                     continue;
                 orbitCamera.LookTowardFruit(fruit.transform.position);
+                if (remainingFruitGuide != null) remainingFruitGuide.PointAt(fruit);
                 if (hud.messageText != null)
                     hud.messageText.text = "Follow the gentle camera turn to find a fruit";
                 return;
