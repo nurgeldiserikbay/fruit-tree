@@ -25,6 +25,42 @@ namespace FruitTree.Tests
         }
 
         [Test]
+        public void CherryUsesSmallerRoundMeshInsteadOfAppleMesh()
+        {
+            Mesh cherry = ProceduralMesh.Cherry();
+            Mesh apple = ProceduralMesh.Apple();
+            try
+            {
+                Assert.Less(cherry.vertexCount, apple.vertexCount);
+                Assert.That(cherry.bounds.size.x, Is.InRange(.29f, .34f));
+                Assert.That(cherry.bounds.size.y, Is.InRange(.25f, .32f));
+                Assert.Less(cherry.vertexCount, 300);
+            }
+            finally
+            {
+                Object.DestroyImmediate(cherry);
+                Object.DestroyImmediate(apple);
+            }
+        }
+
+        [Test]
+        public void PearAndCherrySkinsShareSmallMipmapBudget()
+        {
+            foreach (string species in new[] { "pear", "cherry" })
+            {
+                Texture2D skin = AppleSkinTexture.CreateForSpecies(species);
+                try
+                {
+                    Assert.AreEqual(64, skin.width);
+                    Assert.AreEqual(64, skin.height);
+                    Assert.AreEqual(TextureFormat.RGB24, skin.format);
+                    Assert.Greater(skin.mipmapCount, 1);
+                }
+                finally { Object.DestroyImmediate(skin); }
+            }
+        }
+
+        [Test]
         public void CurvedGrassFitsMobileBudgetAndRemainsShort()
         {
             Mesh grass = GroundGenerator.CreateGrassMesh();
