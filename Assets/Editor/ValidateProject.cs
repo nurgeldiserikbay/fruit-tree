@@ -85,6 +85,12 @@ namespace FruitTree.Editor
                 screenFlow.environment != environment)
                 errors.Add("Lightweight scenery theme controller and UI wiring are missing");
 
+            var completion = UnityEngine.Object.FindAnyObjectByType<CalmCompletionFeedback>();
+            if (completion == null || completion.orchard != orchard ||
+                completion.message == null || completion.messageGroup == null ||
+                completion.messageGroup.blocksRaycasts)
+                errors.Add("Non-blocking harvest completion feedback is not wired");
+
             var soundObject = GameObject.Find("Orchard Sounds");
             var sound = soundObject != null ? soundObject.GetComponent<OrchardAudio>() : null;
             if (sound == null || sound.tree != tree || sound.soundStatusText == null)
