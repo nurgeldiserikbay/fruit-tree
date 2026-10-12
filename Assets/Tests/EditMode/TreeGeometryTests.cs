@@ -157,6 +157,55 @@ namespace FruitTree.Tests
 
 
         [Test]
+        public void SmallFruitStemsStillMeetTheirFruitTopAfterScaling()
+        {
+            var root = new GameObject("Fruit Attachment Test");
+            try
+            {
+                var tree = root.AddComponent<TreeGenerator>();
+                tree.Configure("apple", 30, 122);
+                for (int i = 0; i < 8; i++)
+                {
+                    Apple fruit = tree.Apples[i];
+                    Transform stem = fruit.transform.Find("Stem");
+                    Assert.IsNotNull(stem);
+                    Vector3 fruitTop = fruit.transform.TransformPoint(
+                        new Vector3(0f, .155f, 0f));
+                    // Cylinder height is 2 units; its lower end must touch the apple.
+                    Vector3 lowerEnd = stem.position - stem.up * stem.lossyScale.y;
+                    Assert.Less(Vector3.Distance(lowerEnd, fruitTop), .012f,
+                        "Stem floats away from its fruit after the visual scale reduction");
+                }
+            }
+            finally { Object.DestroyImmediate(root); }
+        }
+
+        [Test]
+        public void LeafProfilesHaveDistinctShapesWithoutExtraTriangles()
+        {
+            var narrow = new ProceduralMesh();
+            var rounded = new ProceduralMesh();
+            narrow.Leaf(Vector3.zero, Vector3.up, .3f, .2f, Color.green, .12f);
+            rounded.Leaf(Vector3.zero, Vector3.up, .3f, .2f, Color.green, .93f);
+            Mesh cherryLeaf = narrow.Build("Cherry Leaf");
+            Mesh pearLeaf = rounded.Build("Pear Leaf");
+            try
+            {
+                Assert.AreEqual(8, cherryLeaf.vertexCount);
+                Assert.AreEqual(8, pearLeaf.vertexCount);
+                Assert.AreEqual(18, cherryLeaf.triangles.Length);
+                Assert.AreEqual(18, pearLeaf.triangles.Length);
+                Assert.Greater(Vector3.Distance(cherryLeaf.vertices[3],
+                    pearLeaf.vertices[3]), .015f);
+            }
+            finally
+            {
+                Object.DestroyImmediate(cherryLeaf);
+                Object.DestroyImmediate(pearLeaf);
+            }
+        }
+
+        [Test]
         public void PortraitCameraAutomaticallyFramesGeneratedTree()
         {
             var root = new GameObject("Camera Fit Test");
