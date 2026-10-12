@@ -27,6 +27,11 @@ namespace FruitTree
         public float FruitScaleLow { get; private set; }
         public float FruitScaleHigh { get; private set; }
         public float HitRadius { get; private set; }
+        public float BranchRise { get; private set; }
+        public float TwigUpwardFactor { get; private set; }
+        public float TrunkHeight { get; private set; }
+        public float FillerTopHeight { get; private set; }
+        public float FillerSpread { get; private set; }
 
         private FruitSpeciesProfile(string id, int branches, float spread,
             float low, float high, Color trunk, Color wood, Color foliage,
@@ -50,6 +55,57 @@ namespace FruitTree
             FruitScaleLow = scaleLow;
             FruitScaleHigh = scaleHigh;
             HitRadius = hitRadius;
+            // Shape the outline without increasing any mesh or leaf counts.
+            // Upright pear, broader cherry/peach and more compact citrus.
+            switch (id)
+            {
+                case "pear":
+                    BranchRise = .72f; TwigUpwardFactor = 1.15f;
+                    TrunkHeight = 4.22f; FillerTopHeight = 4.38f;
+                    FillerSpread = .80f;
+                    break;
+                case "cherry":
+                    BranchRise = .19f; TwigUpwardFactor = .75f;
+                    TrunkHeight = 3.78f; FillerTopHeight = 3.92f;
+                    FillerSpread = 1.12f;
+                    break;
+                case "peach":
+                    BranchRise = .22f; TwigUpwardFactor = .79f;
+                    TrunkHeight = 3.84f; FillerTopHeight = 4.05f;
+                    FillerSpread = 1.1f;
+                    break;
+                case "orange":
+                case "mandarin":
+                    BranchRise = .34f; TwigUpwardFactor = .95f;
+                    TrunkHeight = 3.8f; FillerTopHeight = 3.97f;
+                    FillerSpread = .9f;
+                    break;
+                case "pomegranate":
+                    BranchRise = .27f; TwigUpwardFactor = .9f;
+                    TrunkHeight = 3.85f; FillerTopHeight = 4f;
+                    FillerSpread = .92f;
+                    break;
+                case "lemon":
+                    BranchRise = .46f; TwigUpwardFactor = 1.05f;
+                    TrunkHeight = 3.94f; FillerTopHeight = 4.12f;
+                    FillerSpread = .91f;
+                    break;
+                case "plum":
+                    BranchRise = .55f; TwigUpwardFactor = 1.05f;
+                    TrunkHeight = 4.10f; FillerTopHeight = 4.3f;
+                    FillerSpread = .92f;
+                    break;
+                case "apricot":
+                    BranchRise = .33f; TwigUpwardFactor = .92f;
+                    TrunkHeight = 3.94f; FillerTopHeight = 4.12f;
+                    FillerSpread = 1.03f;
+                    break;
+                default:
+                    BranchRise = .48f; TwigUpwardFactor = 1f;
+                    TrunkHeight = 4.02f; FillerTopHeight = 4.25f;
+                    FillerSpread = 1f;
+                    break;
+            }
         }
 
         private static readonly Dictionary<string, FruitSpeciesProfile> All =
