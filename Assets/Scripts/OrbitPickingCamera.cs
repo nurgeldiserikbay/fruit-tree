@@ -13,6 +13,7 @@ namespace FruitTree
         public float pitch = 13f;
         public float focusHeight = 2.65f;
         public float sensitivity = .2f;
+        public const float MinimumCameraHeight = .85f;
         private float wantedYaw, wantedPitch, wantedDistance, wantedFocusHeight;
         private Vector2 pointerDown, lastPointer;
         private int activeFinger = -1;
@@ -52,7 +53,9 @@ namespace FruitTree
             float radial = Mathf.Max(bounds.extents.x, bounds.extents.z);
             float framedDistance = Mathf.Max(radial / horizontalTan, bounds.extents.y / verticalTan);
             // Margins leave room for a gentle wind sway and avoid cut branches.
-            framedDistance = Mathf.Clamp(framedDistance * 1.12f + .5f, 7f, 18f);
+            // The old 18-unit fit made the fruit tree tiny on 9:20 phones.
+            // Allow slight crown margins to be inspected by orbit/zoom instead.
+            framedDistance = Mathf.Clamp(framedDistance * .98f + .4f, 7f, 15f);
             wantedFocusHeight = Mathf.Clamp(bounds.center.y, 1.4f, 4.1f);
             focusHeight = wantedFocusHeight;
             wantedDistance = framedDistance;
@@ -97,6 +100,12 @@ namespace FruitTree
             distance = Mathf.Lerp(distance, wantedDistance, 1f - Mathf.Exp(-12f * Time.unscaledDeltaTime));
             focusHeight = Mathf.Lerp(focusHeight, wantedFocusHeight,
                 1f - Mathf.Exp(-10f * Time.unscaledDeltaTime));
+            // Pitch below this angle would move the camera under the meadow.
+            // Enforce on both the target and the smoothed actual camera pose.
+            float safePitch = GroundSafeMinimumPitch(distance, focusHeight);
+            pitch = Mathf.Max(pitch, safePitch);
+            wantedPitch = Mathf.Max(wantedPitch,
+                GroundSafeMinimumPitch(wantedDistance, wantedFocusHeight));
         }
 
         private void LateUpdate() { ApplyCameraTransform(); }
@@ -136,9 +145,18 @@ namespace FruitTree
                 Mathf.Abs(local.x) <= verticalLimit * aspectRatio;
         }
 
+        /// <summary>Minimum downward pitch that keeps the lens over the lawn.</summary>
+        public static float GroundSafeMinimumPitch(float orbitDistance, float orbitFocusHeight)
+        {
+            float ratio = (MinimumCameraHeight - orbitFocusHeight) /
+                Mathf.Max(2.8f, orbitDistance);
+            return Mathf.Asin(Mathf.Clamp(ratio, -1f, 1f)) * Mathf.Rad2Deg;
+        }
+
         private void ApplyCameraTransform()
         {
             if (target == null) return;
+            pitch = Mathf.Max(pitch, GroundSafeMinimumPitch(distance, focusHeight));
             Vector3 focus = target.position + Vector3.up * focusHeight;
             transform.position = OrbitPosition(target.position, distance,
                 yaw, pitch, focusHeight);
