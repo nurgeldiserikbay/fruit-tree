@@ -225,7 +225,15 @@ namespace FruitTree
                 sceneryLabel.text = environment.IsAutomatic ?
                     "SCENERY: AUTO" : "SCENERY: " + EnvironmentThemes.DisplayName(environment.CurrentTheme);
             if (musicButtonLabel != null && sound != null)
-                musicButtonLabel.text = sound.IsMusicMuted ? "MUSIC: OFF" : "MUSIC: ON";
+            {
+                // Do not advertise playable music until the publisher has
+                // assigned a licensed recording for this particular scenery.
+                bool hasMusic = sound.HasMusicForCurrentTheme;
+                musicButtonLabel.text = !hasMusic ? "MUSIC: NOT AVAILABLE" :
+                    sound.IsMusicMuted ? "MUSIC: OFF" : "MUSIC: ON";
+                Button musicButton = musicButtonLabel.GetComponentInParent<Button>();
+                if (musicButton != null) musicButton.interactable = hasMusic;
+            }
             if (audioLevelLabel != null && sound != null)
                 audioLevelLabel.text = sound.IsQuietAudio ? "AUDIO: SOFT" : "AUDIO: NORMAL";
             if (motionLabel != null && activeTree != null)
