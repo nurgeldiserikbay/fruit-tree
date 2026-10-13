@@ -33,6 +33,16 @@
 Unity Editor, Android devices and Unity's own C# assemblies are not available to ChatGPT in this session. The project code was authored and reviewed but **has not been compiled in Unity, played on a phone, or verified as release-ready**. Test the prototype in Unity before publishing.
 
 ## Platform checks
+## Camera/ground visual troubleshooting — source revision 7
+
+The 2026-10-13 Unity screenshot showed the camera viewing from below the terrain, making the lower part of the portrait screen look like an empty blue band. The code now constrains the camera lens above the meadow, gives the tree a closer initial composition, and adds finer/dense grass with a softer crown.
+
+1. Stop Unity Play mode and pull the latest `main` branch.
+2. Select **Fruit Tree > Refresh Visuals (Back Up Scene)** to preserve your previous scene and apply the latest serialized tree defaults (scene revision **7**). This affects scene visuals only, not harvested-fruit saves.
+3. In the Game tab test 9:16 and **9:20** portrait. Drag the orbit to the lowest pitch and zoom out fully. The camera must stay above the terrain; no blue empty ground band should appear. Zoom in and orbit fully 360°; check that the UI doesn't hide fruit.
+4. Observe the trunk root, under-tree shade, grass blades and leaf readability. The foliage is still procedural low-poly, not final detailed production-quality art.
+5. Run `Fruit Tree > Validate Project` and the EditMode/PlayMode and ten-species reachability audits. Real Android FPS and touch accuracy are still mandatory.
+
 ## Latest mobile and offline release safeguards (source only)
 
 - After pinching to zoom, keep one finger down and drag: the tree should continue orbiting. Lifting the surviving finger must **not** collect any fruit. Retry after opening/closing Settings and after returning from Home.
