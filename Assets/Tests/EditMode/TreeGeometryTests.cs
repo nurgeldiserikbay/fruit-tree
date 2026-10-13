@@ -234,7 +234,7 @@ namespace FruitTree.Tests
                 orbit.target = root.transform;
                 orbit.FitTreeInPortrait();
                 Assert.Greater(orbit.distance, 5f);
-                Assert.LessOrEqual(orbit.distance, 18f);
+                Assert.LessOrEqual(orbit.distance, 15f);
                 Assert.That(orbit.focusHeight, Is.InRange(1.4f, 4.1f));
             }
             finally
@@ -318,7 +318,8 @@ namespace FruitTree.Tests
             try
             {
                 Assert.Less(terrain.vertexCount, 5000);
-                Assert.Less(grass.vertexCount, 2000);
+                Assert.Less(grass.vertexCount, 5500);
+                Assert.Greater(grass.vertexCount, 3500);
                 Assert.Greater(terrain.triangles.Length, 1000);
                 Assert.Greater(grass.triangles.Length, 100);
             }
