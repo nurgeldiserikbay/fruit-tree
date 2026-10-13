@@ -8,7 +8,7 @@ namespace FruitTree
     /// </summary>
     public sealed class FruitTreeSceneVersion : MonoBehaviour
     {
-        public const int Current = 7;
+        public const int Current = 8;
 
         [SerializeField] private int generatedVersion;
         public int GeneratedVersion => generatedVersion;
