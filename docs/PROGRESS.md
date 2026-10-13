@@ -1,5 +1,15 @@
 # Fruit Tree development state
 
+## Android touch, low-memory and release verification safeguards (2026-10-13)
+
+- [x] Two-finger pinch now hands off to a continued one-finger orbit without requiring both fingers to lift. The surviving finger is never interpreted as a fruit tap. Disabling the orbit component clears any active touch state.
+- [x] Added EditMode touch-phase regression cases for the pinch-to-drag transition.
+- [x] Published Google Docs link validation now requires a real HTTPS `docs.google.com/document/d/e/{id}/pub` path; incomplete, unpublished, nonstandard-port and extra-path links are rejected. Regression cases added.
+- [x] Low-memory Android devices remain on Low graphics even when VRAM is unreported. Fixed an obsolete four-theme count assertion and added new hardware-profile test cases.
+- [x] Unity's quick APK build restores the original AAB preference even when the build fails.
+- [x] Local `tools/verify-unity.ps1` deletes stale test XML, requires all tests to pass without skips/inconclusive outcomes, and invokes the all-ten-tree fruit reachability audit.
+- [ ] All changes remain **source-level only** until Unity 6000.6.5f1 and low-/mid-range Android device QA runs. Actual reachability, memory/FPS, UI comfort, and Play Console compliance have not been certified.
+
 ## Main-branch scene and music release safeguards (2026-10-13)
 
 - [x] PRs #1–#3 were merged into `main` before this pass. All follow-up changes for this pass were committed directly to `main`.
