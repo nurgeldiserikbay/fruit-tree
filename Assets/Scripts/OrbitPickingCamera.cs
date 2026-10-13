@@ -101,12 +101,47 @@ namespace FruitTree
 
         private void LateUpdate() { ApplyCameraTransform(); }
 
+        /// <summary>
+        /// One source of truth for orbit geometry, shared with the Editor's
+        /// portrait fruit-reachability audit. View controls never need a
+        /// separate, approximate camera model.
+        /// </summary>
+        public static Vector3 OrbitPosition(Vector3 pivot, float orbitDistance,
+            float orbitYaw, float orbitPitch, float orbitFocusHeight)
+        {
+            Vector3 focus = pivot + Vector3.up * orbitFocusHeight;
+            Quaternion rotation = Quaternion.Euler(orbitPitch, orbitYaw, 0f);
+            return focus + rotation * (Vector3.back * orbitDistance);
+        }
+
+        /// <summary>
+        /// True only when a point can be aimed at within the tighter 9:20
+        /// portrait view, with a small margin around the screen edges.
+        /// Does not test wood or other physical occluders.
+        /// </summary>
+        public static bool IsInsidePortraitView(Vector3 cameraPosition,
+            Vector3 lookAt, Vector3 worldPoint, float verticalFov = 47f,
+            float aspectRatio = .45f)
+        {
+            Vector3 aim = lookAt - cameraPosition;
+            if (aim.sqrMagnitude < .000001f ||
+                verticalFov <= 0f || verticalFov >= 180f || aspectRatio <= 0f)
+                return false;
+            Quaternion rotation = Quaternion.LookRotation(aim, Vector3.up);
+            Vector3 local = Quaternion.Inverse(rotation) * (worldPoint - cameraPosition);
+            if (local.z <= .001f) return false;
+            float verticalLimit = Mathf.Tan(verticalFov * Mathf.Deg2Rad * .5f) *
+                local.z * .95f;
+            return Mathf.Abs(local.y) <= verticalLimit &&
+                Mathf.Abs(local.x) <= verticalLimit * aspectRatio;
+        }
+
         private void ApplyCameraTransform()
         {
             if (target == null) return;
             Vector3 focus = target.position + Vector3.up * focusHeight;
-            Quaternion rot = Quaternion.Euler(pitch, yaw, 0f);
-            transform.position = focus + rot * (Vector3.back * distance);
+            transform.position = OrbitPosition(target.position, distance,
+                yaw, pitch, focusHeight);
             transform.rotation = Quaternion.LookRotation(focus - transform.position, Vector3.up);
         }
 

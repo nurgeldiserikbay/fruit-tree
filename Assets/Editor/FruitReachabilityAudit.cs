@@ -6,8 +6,9 @@ using UnityEngine;
 namespace FruitTree.Editor
 {
     /// <summary>
-    /// Checks that ripe fruit can be selected from viewpoints around the tree.
-    /// Leaf cards intentionally have no colliders; real branch and apple colliders do.
+    /// Checks whether ripe fruit are visible and hittable from the actual
+    /// portrait orbit camera's allowed positions. Leaf cards have no colliders,
+    /// but real branch and fruit colliders may block a harvest.
     /// </summary>
     public static class FruitReachabilityAudit
     {
@@ -41,7 +42,7 @@ namespace FruitTree.Editor
         }
 
         /// <summary>
-        /// Release gate: scans all ten loaded species from sampled viewpoints
+        /// Release gate: scans all ten loaded species from real orbit viewpoints
         /// without consuming saved progress or touching the real game scene.
         /// Run in the Editor before signing an Android App Bundle.
         /// </summary>
@@ -84,37 +85,68 @@ namespace FruitTree.Editor
             if (tree == null) throw new System.ArgumentNullException(nameof(tree));
             if (angleSteps < 4 || heightSteps < 1)
                 throw new System.ArgumentOutOfRangeException("Sampling grid too small.");
+            // The old scan used arbitrary camera heights and always assumed
+            // a fruit was visible if a ray could hit it. That can pass fruit
+            // which are actually outside a narrow portrait screen.
+            // Sample reachable orbit/zoom/focus states from the real camera.
+            float[] pitches = { -20f, 13f, 38f, 58f };
+            float[] zooms = { 7f, 12f, 18f };
+            int totalViews = angleSteps * heightSteps * pitches.Length * zooms.Length;
+            var samplePositions = new Vector3[totalViews];
+            var sampleTargets = new Vector3[totalViews];
+            int cursor = 0;
+            Vector3 pivot = tree.transform.position;
+            for (int height = 0; height < heightSteps; height++)
+            {
+                float focusHeight = Mathf.Lerp(1.4f, 4.1f,
+                    heightSteps == 1 ? .5f : height / (float)(heightSteps - 1));
+                Vector3 focus = pivot + Vector3.up * focusHeight;
+                foreach (float pitch in pitches)
+                {
+                    foreach (float zoom in zooms)
+                    {
+                        for (int angle = 0; angle < angleSteps; angle++)
+                        {
+                            float yaw = angle * 360f / angleSteps;
+                            samplePositions[cursor] = OrbitPickingCamera.OrbitPosition(
+                                pivot, zoom, yaw, pitch, focusHeight);
+                            sampleTargets[cursor] = focus;
+                            cursor++;
+                        }
+                    }
+                }
+            }
+
             var inaccessible = new List<string>();
             Physics.SyncTransforms();
             foreach (var apple in tree.Apples)
             {
                 if (apple == null || apple.IsHarvested) continue;
-                Vector3 target = apple.transform.position;
+                Vector3 fruitPoint = apple.transform.position;
                 bool reachable = false;
-                for (int y = 0; y < heightSteps && !reachable; y++)
+                for (int view = 0; view < totalViews; view++)
                 {
-                    float cameraY = Mathf.Lerp(1.25f, 4.8f, heightSteps == 1 ? .5f :
-                        y / (float)(heightSteps - 1));
-                    for (int a = 0; a < angleSteps; a++)
+                    Vector3 camera = samplePositions[view];
+                    // Audit against the narrower 9:20 portrait aspect and
+                    // the generated 47-degree camera FOV.
+                    if (!OrbitPickingCamera.IsInsidePortraitView(
+                            camera, sampleTargets[view], fruitPoint))
+                        continue;
+                    Vector3 difference = fruitPoint - camera;
+                    float distance = difference.magnitude;
+                    if (distance <= .001f || distance > 30f) continue;
+                    if (Physics.Raycast(camera, difference / distance,
+                            out RaycastHit hit, distance + .25f,
+                            Physics.DefaultRaycastLayers,
+                            QueryTriggerInteraction.Ignore) &&
+                        hit.collider.GetComponentInParent<Apple>() == apple)
                     {
-                        float angle = a * Mathf.PI * 2f / angleSteps;
-                        var camera = tree.transform.position + new Vector3(
-                            Mathf.Cos(angle) * 9f, cameraY, Mathf.Sin(angle) * 9f);
-                        Vector3 difference = target - camera;
-                        float distance = difference.magnitude;
-                        if (distance <= .001f) continue;
-                        if (!Physics.Raycast(camera, difference / distance, out RaycastHit hit,
-                                distance + .25f, Physics.DefaultRaycastLayers,
-                                QueryTriggerInteraction.Ignore))
-                            continue;
-                        if (hit.collider.GetComponentInParent<Apple>() == apple)
-                        {
-                            reachable = true;
-                            break;
-                        }
+                        reachable = true;
+                        break;
                     }
                 }
-                if (!reachable) inaccessible.Add(apple.name);
+                if (!reachable)
+                    inaccessible.Add(apple.name + " [" + apple.StableFruitId + "]");
             }
             return inaccessible;
         }

@@ -1,5 +1,13 @@
 # Fruit Tree development state
 
+## Portrait-reachability audit fidelity (2026-10-13, source only)
+
+- [x] The editor's all-species raycast diagnostic now builds viewpoints from the same `OrbitPickingCamera.OrbitPosition` function used by gameplay.
+- [x] The audit samples legal pitch/focus/zoom combinations around 360 degrees and only accepts direct fruit-collider hits when the fruit center lies within a 9:20, 47-degree portrait viewport.
+- [x] Failure labels now include stable `fruit_####` IDs for targeted placement fixes.
+- [x] Five EditMode regression tests authored for yaw geometry, vertical pitch, screen-edge rejection, narrow vs. wide phones, and degenerate camera states.
+- [ ] Unity 6000.6.5f1 Test Runner and **Fruit Tree > Audit All Ten Tree Species** execution are still required. A diagnostic pass cannot guarantee that all fruit are intuitive to find and tap on real devices.
+
 ## Complete interrupted-save recovery (source update, 2026-10-12)
 
 - [x] On startup, recover a structurally valid, more recently written `.tmp` snapshot even if the previous primary is still valid; this avoids losing the latest successful temporary write after a shutdown between write and replace.
