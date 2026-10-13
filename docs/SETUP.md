@@ -33,6 +33,15 @@
 Unity Editor, Android devices and Unity's own C# assemblies are not available to ChatGPT in this session. The project code was authored and reviewed but **has not been compiled in Unity, played on a phone, or verified as release-ready**. Test the prototype in Unity before publishing.
 
 ## Platform checks
+## Latest mobile and offline release safeguards (source only)
+
+- After pinching to zoom, keep one finger down and drag: the tree should continue orbiting. Lifting the surviving finger must **not** collect any fruit. Retry after opening/closing Settings and after returning from Home.
+- Small-memory Android phones now select Low graphics even when the driver reports an unknown GPU memory size.
+- The Privacy Policy validator accepts only the actual public HTTPS Google Docs `/document/d/e/{id}/pub` format. Publishing must still be done by the owner and the real published URL remains unset.
+- The local verification script clears old EditMode/PlayMode reports, treats skips and inconclusive tests as failures, then audits every fruit on all ten trees.
+- Run `./tools/verify-unity.ps1 -UnityEditor 'C:\\Program Files\\Unity\\Hub\\Editor\\6000.6.5f1\\Editor\\Unity.exe'` with the actual local Editor path; optionally add `-BuildApk` after Android support is installed.
+- These checks are not evidence of a successful Unity or Android run until executed on an installed Unity editor.
+
 - First launch does the tree appear with green leaf crown and red pickable apples?
 - Can you orbit through 360 degrees and zoom in/out without clipping?
 - Does tapping apples increment the counter once each?
