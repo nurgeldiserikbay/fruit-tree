@@ -34,21 +34,34 @@ function Assert-TestResults {
     $run = $report.SelectSingleNode('/test-run')
     if ($null -eq $run) { throw "Unexpected Unity test report format: $file" }
     $total = [int] $run.GetAttribute('total')
+    $passed = [int] $run.GetAttribute('passed')
     $failed = [int] $run.GetAttribute('failed')
-    if ($total -le 0 -or $failed -gt 0) {
-        throw "Unity test check failed: total=$total failed=$failed (see $file)"
+    $skipped = [int] $run.GetAttribute('skipped')
+    $inconclusive = [int] $run.GetAttribute('inconclusive')
+    $result = $run.GetAttribute('result')
+    if ($result -ne 'Passed' -or $total -le 0 -or $passed -ne $total -or
+        $failed -gt 0 -or $skipped -gt 0 -or $inconclusive -gt 0) {
+        throw "Unity tests incomplete: result=$result passed=$passed total=$total failed=$failed skipped=$skipped inconclusive=$inconclusive (see $file)"
     }
-    Write-Host "Tests passed: $total total / $failed failures"
+    Write-Host "Tests passed: $passed / $total in $FileName"
 }
 
 Invoke-Unity -Arguments @('-executeMethod', 'FruitTree.Editor.ValidateProject.Run') -LogName 'scene-validation.log'
 
+# Never allow an old successful XML report to mask a missing test run.
+Remove-Item (Join-Path $logs 'editmode-results.xml') -Force -ErrorAction SilentlyContinue
 Invoke-Unity -Arguments @('-runTests', '-testPlatform', 'EditMode',
     '-testResults', (Join-Path $logs 'editmode-results.xml')) -LogName 'editmode.log'
 Assert-TestResults 'editmode-results.xml'
+Remove-Item (Join-Path $logs 'playmode-results.xml') -Force -ErrorAction SilentlyContinue
 Invoke-Unity -Arguments @('-runTests', '-testPlatform', 'PlayMode',
     '-testResults', (Join-Path $logs 'playmode-results.xml')) -LogName 'playmode.log'
 Assert-TestResults 'playmode-results.xml'
+
+# A tree cannot unlock the next species unless every fruit is harvestable.
+# This release gate validates all ten species, not only the initial apple tree.
+Invoke-Unity -Arguments @('-executeMethod',
+    'FruitTree.Editor.FruitReachabilityAudit.AuditAllSpecies') -LogName 'all-fruits-audit.log'
 
 if ($BuildApk) {
     Invoke-Unity -Arguments @('-buildTarget', 'Android',
