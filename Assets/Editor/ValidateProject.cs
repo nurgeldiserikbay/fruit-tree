@@ -94,7 +94,7 @@ namespace FruitTree.Editor
                 screenFlow.pause != pause || screenFlow.orchard != orchard ||
                 pause.screenFlow != screenFlow ||
                 screenFlow.openPublishedPrivacyButton == null ||
-                screenFlow.homeProgressLabel == null ||
+                screenFlow.homeProgressLabel == null || screenFlow.homePlayLabel == null ||
                 screenFlow.audioLevelLabel == null || screenFlow.musicButtonLabel == null ||
                 screenFlow.motionLabel == null ||
                 screenFlow.sceneryLabel == null || screenFlow.environment == null ||
