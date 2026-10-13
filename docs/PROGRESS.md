@@ -1,5 +1,13 @@
 # Fruit Tree development state
 
+## Backup freshness and fruit-ID save integrity (2026-10-13)
+
+- [x] `OrchardSaveRepository` rejects saved picked-fruit lists containing duplicated, null, truncated or malformed `fruit_####` identifiers. The last valid primary is left untouched on an invalid write.
+- [x] For corrupted primary saves, the loader compares the valid `.tmp` and `.bak` modification times, preferring the more recent recovery source. A stale interrupted temp file no longer takes precedence over a fresher known-good backup.
+- [x] Added EditMode regressions for malformed/duplicate picked IDs, corrupt-primary fallback, stale-temp versus newer-backup and newer-temp versus stale-backup.
+- [x] Corrected an older backup-recovery integration test that tried to save a structurally invalid second snapshot before expecting a valid backup to exist.
+- [ ] Unity EditMode test runner and Android force-close/restart testing are required to confirm correctness on-device. Save version and existing `tree_001`–`tree_010` IDs were left unchanged.
+
 ## Android touch, low-memory and release verification safeguards (2026-10-13)
 
 - [x] Two-finger pinch now hands off to a continued one-finger orbit without requiring both fingers to lift. The surviving finger is never interpreted as a fruit tap. Disabling the orbit component clears any active touch state.
