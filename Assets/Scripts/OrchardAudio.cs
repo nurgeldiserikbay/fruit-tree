@@ -16,6 +16,15 @@ namespace FruitTree
         private AudioSource music;
         private bool musicMuted;
         public bool IsMusicMuted => musicMuted;
+        public bool HasMusicForCurrentTheme
+        {
+            get
+            {
+                int index = (int)activeTheme;
+                return themeMusic != null && index >= 0 &&
+                    index < themeMusic.Length && themeMusic[index] != null;
+            }
+        }
         public AudioClip pickRecording;
         public UnityEngine.UI.Text soundStatusText;
         private AudioSource ambience, alternateAmbience, effects;
