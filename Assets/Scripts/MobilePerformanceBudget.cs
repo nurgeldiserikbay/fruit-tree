@@ -21,13 +21,14 @@ namespace FruitTree
 
         public static MobilePerformanceTier Recommend(int systemRamMb, int graphicsRamMb)
         {
-            // Some Android drivers report zero instead of actual video memory.
-            // Never assume unknown hardware should run the highest settings.
-            if (systemRamMb <= 0 || graphicsRamMb <= 0)
-                return MobilePerformanceTier.Balanced;
+            // Never ignore a known low-memory signal just because the
+            // other metric is unavailable (Android often reports VRAM as 0).
             if ((systemRamMb > 0 && systemRamMb < 3000) ||
                 (graphicsRamMb > 0 && graphicsRamMb < 512))
                 return MobilePerformanceTier.Low;
+            // An unknown metric cannot safely justify the highest tier.
+            if (systemRamMb <= 0 || graphicsRamMb <= 0)
+                return MobilePerformanceTier.Balanced;
             if ((systemRamMb > 0 && systemRamMb < 6000) ||
                 (graphicsRamMb > 0 && graphicsRamMb < 1500))
                 return MobilePerformanceTier.Balanced;
