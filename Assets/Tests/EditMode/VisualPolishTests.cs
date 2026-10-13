@@ -111,7 +111,8 @@ namespace FruitTree.Tests
             Mesh grass = GroundGenerator.CreateGrassMesh();
             try
             {
-                Assert.Less(grass.vertexCount, 2000);
+                Assert.Less(grass.vertexCount, 5500);
+                Assert.Greater(grass.vertexCount, 3500);
                 Assert.Greater(grass.triangles.Length, 1000);
                 Assert.Less(grass.bounds.max.y, .24f);
                 Assert.Greater(grass.bounds.size.x, 7f);
