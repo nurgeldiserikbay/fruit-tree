@@ -554,7 +554,7 @@ namespace FruitTree.Editor
             flow.homeProgressLabel = MakeLabel("Home Saved Harvest", home.transform,
                 "TREE 1 / 10     0 / 120 FRUITS", 31, white,
                 new Vector2(.10f, .565f), new Vector2(.90f, .623f));
-            var play = MakeButton("Home Play", home.transform, "CONTINUE",
+            var play = MakeButton("Home Play", home.transform, "PLAY",
                 new Vector2(.18f, .47f), new Vector2(.82f, .55f),
                 new Color(.97f, .86f, .61f, 1f));
             var collection = MakeButton("Home Collection", home.transform, "MY TREES",
@@ -566,6 +566,7 @@ namespace FruitTree.Editor
             MakeLabel("Home Footer", home.transform,
                 "10 FRUIT TREES  •  8 PEACEFUL LANDSCAPES", 29, white,
                 new Vector2(.07f, .06f), new Vector2(.93f, .11f));
+            flow.homePlayLabel = play.GetComponentInChildren<Text>();
             UnityEventTools.AddPersistentListener(play.onClick, flow.Play);
             UnityEventTools.AddPersistentListener(collection.onClick,
                 flow.OpenCollectionFromHome);
