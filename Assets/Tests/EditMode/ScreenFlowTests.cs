@@ -6,6 +6,17 @@ namespace FruitTree.Tests
     public sealed class ScreenFlowTests
     {
         [Test]
+        public void EmptyAutosaveStillShowsNewGameState()
+        {
+            var empty = new Progression.OrchardSaveData();
+            empty.trees.Add(new Progression.TreeSaveData { treeId = "tree_001" });
+            Assert.IsFalse(OrchardGameController.HasMeaningfulProgress(null));
+            Assert.IsFalse(OrchardGameController.HasMeaningfulProgress(empty));
+            empty.trees[0].pickedFruitIds.Add("fruit_0000");
+            Assert.IsTrue(OrchardGameController.HasMeaningfulProgress(empty));
+        }
+
+        [Test]
         public void PlayAndReturnHomePreserveNavigationState()
         {
             var root = new GameObject("Screen Flow Test");
