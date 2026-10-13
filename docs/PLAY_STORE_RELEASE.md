@@ -3,6 +3,12 @@
 **Status (2026-10-12): Not ready for production. English-only, ad-free first release.** This is a checklist and evidence plan; do not mark a feature complete merely because C# code is committed.
 
 ## Gameplay / UX acceptance
+### Screenshot-driven visual defects under review (2026-10-13)
+
+- [x] Source mitigation: prevent the camera looking from below the ground; improve initial portrait tree framing, terrain contact shade, fine grass density and canopy softness.
+- [x] Source tests: enforce camera ground clearance at extreme zoom/pitch and update batched-grass geometry limits. Scene revision is now 7, so older generated scenes must be refreshed with backup.
+- [ ] Validate these changes on fresh 9:16/9:20 Unity screenshots and physical Android devices. The user's screenshot reported clear problems with flat scenery and overly angular foliage, so **do not approve the current art as final** without visual comparison and additional iteration.
+
 ### Recent release safeguard improvements (source, 2026-10-13)
 
 - [x] Eight scenery themes now exist in source; the four new locations are Japanese Garden, Chinese Garden, Lakeside and Evening Garden. The MUSIC button is disabled if no licensed clip is assigned.
