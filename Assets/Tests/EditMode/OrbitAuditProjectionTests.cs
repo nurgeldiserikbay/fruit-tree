@@ -61,6 +61,18 @@ namespace FruitTree.Tests
                 camera, focus, fruit, 47f, 9f / 16f));
         }
 
+        [TestCase(TouchPhase.Began, true)]
+        [TestCase(TouchPhase.Moved, true)]
+        [TestCase(TouchPhase.Stationary, true)]
+        [TestCase(TouchPhase.Ended, false)]
+        [TestCase(TouchPhase.Canceled, false)]
+        public void PinchHandoffOnlyContinuesWithAnActiveFinger(
+            TouchPhase phase, bool canResume)
+        {
+            Assert.AreEqual(canResume,
+                OrbitPickingCamera.CanResumeOrbitAfterPinch(phase));
+        }
+
         [Test]
         public void DegenerateAuditViewCannotMarkFruitAsVisible()
         {
