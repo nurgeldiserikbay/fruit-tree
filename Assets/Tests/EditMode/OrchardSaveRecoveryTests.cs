@@ -135,6 +135,40 @@ namespace FruitTree.Tests
         }
 
         [Test]
+        public void NewerBackupWinsOverStaleTemporaryWhenPrimaryIsCorrupt()
+        {
+            Assert.IsTrue(repository.Save(Create(3)));
+            Assert.IsTrue(repository.Save(Create(9)));
+            string primary = Path.Combine(folder, "fruit-tree-orchard.json");
+            string backup = primary + ".bak";
+            string temporary = primary + ".tmp";
+            File.WriteAllText(temporary, UnityEngine.JsonUtility.ToJson(Create(1)));
+            File.SetLastWriteTimeUtc(temporary, DateTime.UtcNow.AddMinutes(-20));
+            File.SetLastWriteTimeUtc(backup, DateTime.UtcNow.AddMinutes(-10));
+            File.WriteAllText(primary, "corrupt");
+
+            Assert.AreEqual(3, repository.Load().trees[0].pickedFruitIds.Count,
+                "An obsolete temp cannot roll back a newer known-good backup.");
+        }
+
+        [Test]
+        public void NewerTemporaryWinsOverBackupWhenPrimaryIsCorrupt()
+        {
+            Assert.IsTrue(repository.Save(Create(3)));
+            Assert.IsTrue(repository.Save(Create(9)));
+            string primary = Path.Combine(folder, "fruit-tree-orchard.json");
+            string backup = primary + ".bak";
+            string temporary = primary + ".tmp";
+            File.WriteAllText(temporary, UnityEngine.JsonUtility.ToJson(Create(14)));
+            File.SetLastWriteTimeUtc(backup, DateTime.UtcNow.AddMinutes(-20));
+            File.SetLastWriteTimeUtc(temporary, DateTime.UtcNow.AddMinutes(-10));
+            File.WriteAllText(primary, "corrupt");
+
+            Assert.AreEqual(14, repository.Load().trees[0].pickedFruitIds.Count,
+                "A complete, newer interrupted harvest must be preserved.");
+        }
+
+        [Test]
         public void NewerCompleteTemporaryIsRecoveredEvenIfPrimaryIsValid()
         {
             Assert.IsTrue(repository.Save(Create(3)));
