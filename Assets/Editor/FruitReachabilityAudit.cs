@@ -127,6 +127,10 @@ namespace FruitTree.Editor
                 for (int view = 0; view < totalViews; view++)
                 {
                     Vector3 camera = samplePositions[view];
+                    // Reject impossible views that would go through the ground:
+                    // gameplay now enforces this same physical height limit.
+                    if (camera.y < OrbitPickingCamera.MinimumCameraHeight)
+                        continue;
                     // Audit against the narrower 9:20 portrait aspect and
                     // the generated 47-degree camera FOV.
                     if (!OrbitPickingCamera.IsInsidePortraitView(
