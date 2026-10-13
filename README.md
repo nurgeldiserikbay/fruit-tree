@@ -10,7 +10,7 @@ A relaxing, Android-first 3D fruit-picking game. **Agreed future loop:** fully h
 - 360-degree touch orbit and pinch zoom, mouse support for development.
 - Safe-area HUD, allocation-free fruit-round restart, fruit progress.
 - **English-only, ad-free first release**; dormant Remove Ads / Unity IAP scaffolding is hidden and never starts Play Billing.
-- Four quiet procedurally synthesized biome ambiences with smooth crossfades and harvest feedback, sound toggle (placeholder audio, not final mix).
+- Eight quiet procedurally synthesized biome ambiences with soft crossfades, harvest feedback, and separate optional licensed-music controls (audio still requires final production approval).
 - Procedural meadow and soft gradient sky, custom rounded HUD, Unity Editor scene generator and Android portrait config.
 
 ## Start
@@ -35,9 +35,9 @@ To update an existing Unity scene and see the new tree collection: [Ten-tree fin
 
 ## Environment themes
 
-- Four procedural, static, merged-mesh landscapes: Meadow, Park, City Park and Mountains, with themed sky, sun, fog and ground tint.
+- Eight procedural, static, merged-mesh landscapes: Meadow, Park, City Park, Mountains, Japanese Garden, Chinese Garden, Lakeside and Evening Garden, with themed sky, sun, fog and ground tint.
 - Settings → SCENERY cycles themes and saves a manual choice; AUTO follows tree progression.
-- Background geometry has no colliders and stays outside the central fruit-picking radius. [Details & tests](docs/ENVIRONMENT_SYSTEM.md).
+- Background geometry has no colliders and stays outside the central fruit-picking radius. [Details & tests](docs/ENVIRONMENT_SYSTEM.md) and [eight-theme acceptance](docs/EIGHT_THEME_ACCEPTANCE.md).
 - Unity visual/device performance verification is still outstanding.
 
 ## App front-end / Google Play preparation
@@ -65,7 +65,7 @@ The release-content **code** now includes ten species with low-memory procedural
 
 ### Latest atmosphere and performance update
 
-Four scenery themes now have light distant ridges, park lamps and urban window details, rendered in the existing combined decor mesh. Small scenery meshes and synthetic sound clips are cached by theme, and a 1.5-second crossfade accompanies scenery changes. See [environment system](docs/ENVIRONMENT_SYSTEM.md). Full Unity/device verification and production sound design are still pending.
+Eight scenery themes are available in source: the original four plus Japanese Garden, Chinese Garden, Lakeside and Evening Garden. Decor remains a combined mesh. Small scenery meshes and synthetic sound clips are cached by theme, and a 1.5-second crossfade accompanies scenery changes. See [environment system](docs/ENVIRONMENT_SYSTEM.md). Full Unity/device verification and production sound design are still pending.
 
 ## Latest home and touch-feedback polish (code integrated)
 
