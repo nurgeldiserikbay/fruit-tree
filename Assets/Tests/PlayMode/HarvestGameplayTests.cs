@@ -340,6 +340,8 @@ namespace FruitTree.Tests
         [UnityTest]
         public IEnumerator ThemeAudioAndSceneryMeshReuseOnRepeatedSwitching()
         {
+            int previousScenery = PlayerPrefs.GetInt("FruitTree.EnvironmentTheme", -1);
+            PlayerPrefs.SetInt("FruitTree.EnvironmentTheme", -1);
             var root = new GameObject("Environment Audio Integration Test");
             var scenery = new GameObject("Test Scenery");
             scenery.transform.SetParent(root.transform);
@@ -373,13 +375,18 @@ namespace FruitTree.Tests
                 environment.UseForTree(3);
                 Assert.AreEqual(4, sound.CachedThemeClipCount);
                 Assert.AreEqual(EnvironmentTheme.CityPark, sound.CurrentAmbientTheme);
+                for (int index = 4; index < EnvironmentThemes.Count; index++)
+                    environment.UseForTree(index);
+                Assert.AreEqual(EnvironmentThemes.Count, sound.CachedThemeClipCount);
+                Assert.AreEqual(EnvironmentTheme.EveningGarden, sound.CurrentAmbientTheme);
                 Assert.AreEqual(1, scenery.GetComponentsInChildren<MeshRenderer>().Length,
                     "Only one combined decorative mesh renderer should be active.");
                 yield return new WaitForSecondsRealtime(1.6f);
-                Assert.AreEqual(EnvironmentTheme.CityPark, sound.CurrentAmbientTheme);
+                Assert.AreEqual(EnvironmentTheme.EveningGarden, sound.CurrentAmbientTheme);
             }
             finally
             {
+                PlayerPrefs.SetInt("FruitTree.EnvironmentTheme", previousScenery);
                 Object.Destroy(root);
             }
             yield return null;
