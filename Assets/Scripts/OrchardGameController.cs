@@ -39,6 +39,7 @@ namespace FruitTree
             "APRICOT TREE", "PLUM TREE", "LEMON TREE", "MANDARIN TREE", "POMEGRANATE TREE"
         };
         private bool initialized;
+        public bool HasPreviousSave { get; private set; }
         private int hintCursor = -1;
 
         private static readonly TreeLevelDefinition[] Catalog =
@@ -67,7 +68,9 @@ namespace FruitTree
             }
 
             saves = new OrchardSaveRepository(Application.persistentDataPath);
-            progress = new OrchardProgressionService(Catalog, saves.Load());
+            OrchardSaveData loadedSave = saves.Load();
+            HasPreviousSave = loadedSave != null;
+            progress = new OrchardProgressionService(Catalog, loadedSave);
             hud.OrchardMode = true;
             tree.FruitPicked += OnFruitPicked;
             initialized = true;
