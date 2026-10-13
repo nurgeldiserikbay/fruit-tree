@@ -6,6 +6,34 @@ namespace FruitTree.Tests
     public sealed class TreeGeometryTests
     {
         [Test]
+        public void GeneratedFoliageOccludesPickingRays()
+        {
+            var root = new GameObject("Leaf Occlusion Test");
+            bool oldBackfaces = Physics.queriesHitBackfaces;
+            try
+            {
+                var tree = root.AddComponent<TreeGenerator>();
+                tree.SetAutomaticGeneration(false);
+                tree.Configure("apple", 30, 122);
+                var foliage = root.transform.Find("Merged Leaves");
+                Assert.IsNotNull(foliage);
+                var collider = foliage.GetComponent<MeshCollider>();
+                Assert.IsNotNull(collider,
+                    "Merged leaves must block touches on fruit behind the canopy.");
+                Assert.IsFalse(collider.convex);
+                Physics.queriesHitBackfaces = true;
+                Physics.SyncTransforms();
+                // All foliage is one collider, rather than a collider for each leaf.
+                Assert.AreEqual(1, foliage.GetComponents<MeshCollider>().Length);
+            }
+            finally
+            {
+                Physics.queriesHitBackfaces = oldBackfaces;
+                Object.DestroyImmediate(root);
+            }
+        }
+
+        [Test]
         public void DetailedAppleKeepsMergedRenderersAndMobileGeometryBudget()
         {
             var root = new GameObject("Detailed Apple Geometry");
