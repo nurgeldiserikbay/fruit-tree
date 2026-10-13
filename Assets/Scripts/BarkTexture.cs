@@ -21,10 +21,16 @@ namespace FruitTree
                 for (int x = 0; x < width; x++)
                 {
                     float u = x / (float)width, v = y / (float)height;
-                    float longRidges = Mathf.PerlinNoise(u * 13f, v * 2.5f);
-                    float grain = Mathf.PerlinNoise(u * 43f + 17f, v * 5.3f);
-                    float crack = Mathf.Pow(1f - Mathf.Abs(2f * longRidges - 1f), 12f);
-                    float tone = Mathf.Clamp01(.5f + .34f * longRidges + .17f * grain - .38f * crack);
+                    // Warped vertical fibers and branching hairline cracks keep the
+                    // bark directional without an expensive normal map.
+                    float warp = (Mathf.PerlinNoise(u * 3.5f + 17f, v * 1.8f) - .5f) * .12f;
+                    float fiber = Mathf.PerlinNoise((u + warp) * 19f, v * 1.8f);
+                    float grain = Mathf.PerlinNoise((u + warp) * 63f + 17f, v * 8.3f);
+                    float coarse = Mathf.PerlinNoise(u * 5.1f, v * 5.6f);
+                    float fissure = Mathf.Pow(1f - Mathf.Abs(2f * fiber - 1f), 18f);
+                    float shortCrack = Mathf.Pow(1f - Mathf.Abs(2f * coarse - 1f), 20f);
+                    float tone = Mathf.Clamp01(.42f + .31f * fiber + .17f * grain +
+                        .12f * coarse - .34f * fissure - .12f * shortCrack);
                     byte r = (byte)Mathf.RoundToInt(170f * tone);
                     byte g = (byte)Mathf.RoundToInt(122f * tone);
                     byte b = (byte)Mathf.RoundToInt(75f * tone);
