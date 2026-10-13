@@ -3,6 +3,15 @@
 **Status (2026-10-12): Not ready for production. English-only, ad-free first release.** This is a checklist and evidence plan; do not mark a feature complete merely because C# code is committed.
 
 ## Gameplay / UX acceptance
+### Recent release safeguard improvements (source, 2026-10-13)
+
+- [x] Eight scenery themes now exist in source; the four new locations are Japanese Garden, Chinese Garden, Lakeside and Evening Garden. The MUSIC button is disabled if no licensed clip is assigned.
+- [x] Android pinch-to-one-finger orbit handoff prevents ghost fruit picks; an Editor touch-phase regression test is authored.
+- [x] Unknown VRAM on a known low-RAM phone keeps the Low graphics tier instead of Balanced.
+- [x] Privacy Policy URL must match an actual Google Docs Publish-to-web HTTPS document path; a mock edit URL is still not accepted.
+- [x] Local Unity verification runner now checks all ten trees and rejects stale test result XML, skipped and inconclusive tests.
+- [ ] Run the full updated Unity Editor suites, ten-tree reachability audit and the real Android acceptance before signing. Authored tests have not been executed here.
+
 
 - [x] Source: ten-species code catalog and procedurally modeled fruit collection (not yet compiled or visually accepted in Unity).
 - [x] Source: local saved progress, 100%-clear tree unlock and rebloom.
@@ -12,10 +21,10 @@
 - [ ] Build and play-test every button, Zen Mode, hint and Android Back behaviour in Unity 6000.6.5f1.
 - [x] Source: ten species with unique profile parameters and compact fruit meshes.
 - [ ] Confirm all ten species are visually recognizable and every fruit can be picked on an Android phone; final art and playability not accepted.
-- [x] Source: four switchable low-cost environments — Meadow, Park, City Park, Mountains — now with ridge depth, distant scenery and cached geometry, plus offline per-environment synthesized audio and a gentle crossfade (not yet Unity-tested).
+- [x] Source: eight switchable low-cost environments — Meadow, Park, City Park, Mountains — now with ridge depth, distant scenery and cached geometry, plus offline per-environment synthesized audio and a gentle crossfade (not yet Unity-tested).
 - [x] Source: first natural-apple mesh/skin pass, distinct lighter round cherry mesh, 64×64 pear/cherry skin maps, smaller fruit proportions, curved short grass and soft clear-tree feedback (not yet Unity-tested).
 - [x] Source: merged blossom animation, species-specific leaf forms/wood tints and startup duplicate-tree optimization (Unity PlayMode QA pending).
-- [ ] Finish final-quality fruit/branch/foliage meshes, terrain and lighting; visually approve four environments in Unity.
+- [ ] Finish final-quality fruit/branch/foliage meshes, terrain and lighting; visually approve eight environments in Unity.
 - [x] Source: bounded finger-sized tap fallback and voluntary last-fruit guide with short-lived non-blocking marker (not yet tested in Unity).
 - [x] Source: **Fruit Tree → Audit All Ten Tree Species** checks sampled 360-degree camera raycasts for every fruit and fails a signed AAB build if any are unreachable (not run in Unity).
 - [ ] Every fruit on every tree reachable and 100% clear achievable without frustration; run the Editor audit and verify the optional last-fruit assistance on real phones.
