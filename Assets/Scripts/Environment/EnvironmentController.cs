@@ -5,7 +5,7 @@ using UnityEngine;
 namespace FruitTree
 {
     /// <summary>
-    /// Switches four low-cost environments in one scene, with no extra cameras,
+    /// Switches eight low-cost environments in one scene, with no extra cameras,
     /// colliders, particle systems or per-frame allocation.
     /// </summary>
     [DefaultExecutionOrder(-30)]
@@ -45,7 +45,8 @@ namespace FruitTree
                     zenith = EnvironmentThemes.Zenith(theme),
                     sun = EnvironmentThemes.Sun(theme),
                     ambient = Color.Lerp(horizon, Color.white, .14f),
-                    sunIntensity = theme == EnvironmentTheme.CityPark ? .96f : 1.08f
+                    sunIntensity = theme == EnvironmentTheme.EveningGarden ? .66f :
+                        theme == EnvironmentTheme.CityPark ? .96f : 1.08f
                 };
             }
 
@@ -112,7 +113,7 @@ namespace FruitTree
 
         public void CycleScenery()
         {
-            // Automatic -> Meadow -> Park -> City Park -> Mountains -> Automatic.
+            // Automatic -> eight themes -> Automatic; old saved values retain meaning.
             overrideIndex = overrideIndex == EnvironmentThemes.Count - 1 ?
                 -1 : overrideIndex + 1;
             PlayerPrefs.SetInt(PreferenceKey, overrideIndex);
@@ -222,6 +223,10 @@ namespace FruitTree
                 case EnvironmentTheme.Park: BuildPark(mesh); break;
                 case EnvironmentTheme.CityPark: BuildCityPark(mesh); break;
                 case EnvironmentTheme.Mountains: BuildMountains(mesh); break;
+                case EnvironmentTheme.JapaneseGarden: EnvironmentGardenBuilder.Japanese(mesh); break;
+                case EnvironmentTheme.ChineseGarden: EnvironmentGardenBuilder.Chinese(mesh); break;
+                case EnvironmentTheme.Lakeside: EnvironmentGardenBuilder.Lakeside(mesh); break;
+                case EnvironmentTheme.EveningGarden: EnvironmentGardenBuilder.Evening(mesh); break;
                 default: BuildMeadow(mesh); break;
             }
             return mesh.Build("Merged Scenery - " + theme);
