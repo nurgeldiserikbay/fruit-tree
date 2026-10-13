@@ -111,17 +111,20 @@ namespace FruitTree
             Vector3 axis = outward.sqrMagnitude < .0001f ? Vector3.up : outward.normalized;
             Vector3 side = Vector3.Cross(axis, Mathf.Abs(Vector3.Dot(axis, Vector3.up)) > .9f
                 ? Vector3.forward : Vector3.up).normalized;
-            Vector3 camber = Vector3.Cross(axis, side).normalized * (width * .12f);
+            Vector3 surface = Vector3.Cross(axis, side).normalized;
+            Vector3 camber = surface * (width * .22f);
+            // A gentle midrib fold gives both sides a readable silhouette
+            // without adding vertices, triangles, materials or draw calls.
             var positions = new[]
             {
                 center,
-                center + axis * (length * .19f) - side * (width * .50f) + camber * .3f,
-                center + axis * (length * .19f) + side * (width * .50f) + camber * .3f,
-                center + axis * (length * widestAt) - side * (width * maxWidth) + camber,
-                center + axis * (length * widestAt) + side * (width * maxWidth) + camber,
-                center + axis * (length * .81f) - side * (width * .43f) + camber * .6f,
-                center + axis * (length * .81f) + side * (width * .43f) + camber * .6f,
-                center + axis * length
+                center + axis * (length * .19f) - side * (width * .46f) + camber * .18f,
+                center + axis * (length * .19f) + side * (width * .51f) + camber * .18f,
+                center + axis * (length * widestAt) - side * (width * maxWidth * .91f) + camber,
+                center + axis * (length * widestAt) + side * (width * maxWidth * 1.08f) + camber * .85f,
+                center + axis * (length * .81f) - side * (width * .39f) + camber * .64f,
+                center + axis * (length * .81f) + side * (width * .46f) + camber * .58f,
+                center + axis * length + surface * (width * .12f)
             };
             var texcoords = new[]
             {
@@ -136,7 +139,11 @@ namespace FruitTree
             for (int i = 0; i < positions.Length; i++)
             {
                 Color tint = (i == 0 ? color * .84f : i == 7 ? color * 1.08f : color);
-                Vertex(positions[i], normal, tint, texcoords[i]);
+                // Gradual normals provide a subtle curved highlight instead of
+                // one uniformly lit cardboard plane.
+                Vector3 shapedNormal = (normal + side * (i % 2 == 0 ? -.12f : .12f) +
+                    axis * (i == 7 ? .08f : -.04f)).normalized;
+                Vertex(positions[i], shapedNormal, tint, texcoords[i]);
             }
             Tri(first, first+1, first+2);
             Tri(first+1, first+3, first+2);
