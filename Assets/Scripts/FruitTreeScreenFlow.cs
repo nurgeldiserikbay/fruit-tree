@@ -25,6 +25,8 @@ namespace FruitTree
         public EnvironmentController environment;
         public Text sceneryLabel;
         public Text homeProgressLabel;
+        public Text homePlayLabel;
+        private bool startedThisSession;
         public Text audioLevelLabel;
         public Text motionLabel;
         public Text audioButtonLabel;
@@ -52,10 +54,12 @@ namespace FruitTree
             if (privacyPanel != null) privacyPanel.SetActive(false);
             if (pause != null) pause.Resume();
             RefreshLabels();
+            RefreshHomePlayLabel();
         }
 
         public void Play()
         {
+            startedThisSession = true;
             IsPlaying = true;
             IsZenMode = false;
             if (zenExitPanel != null) zenExitPanel.SetActive(false);
@@ -99,6 +103,14 @@ namespace FruitTree
             if (gameplayControls != null) gameplayControls.SetActive(false);
             if (orbitCamera != null) orbitCamera.enabled = false;
             RefreshLabels();
+            RefreshHomePlayLabel();
+        }
+
+        private void RefreshHomePlayLabel()
+        {
+            if (homePlayLabel != null)
+                homePlayLabel.text = startedThisSession ||
+                    (orchard != null && orchard.HasPreviousSave) ? "CONTINUE" : "PLAY";
         }
 
         public void OpenSettingsFromHome()
