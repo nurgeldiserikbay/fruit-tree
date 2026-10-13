@@ -385,5 +385,56 @@ namespace FruitTree.Tests
             yield return null;
         }
 
+        [UnityTest]
+        public IEnumerator MusicResumesWhenSoundIsReenabledAfterSceneryChange()
+        {
+            int previousSound = PlayerPrefs.GetInt("FruitTree.Muted", 0);
+            int previousMusic = PlayerPrefs.GetInt("FruitTree.MusicMuted", 0);
+            PlayerPrefs.SetInt("FruitTree.Muted", 0);
+            PlayerPrefs.SetInt("FruitTree.MusicMuted", 0);
+            var root = new GameObject("Music Resume Test");
+            var environment = root.AddComponent<EnvironmentController>();
+            var soundNode = new GameObject("Audio Source Test");
+            soundNode.transform.SetParent(root.transform, false);
+            var track = AudioClip.Create("Test Music", 44100, 1, 22050, false);
+            var audio = soundNode.AddComponent<OrchardAudio>();
+            audio.environment = environment;
+            audio.themeMusic[(int)EnvironmentTheme.Mountains] = track;
+            audio.themeMusic[(int)EnvironmentTheme.Park] = track;
+
+            try
+            {
+                environment.ApplyThemeDirect(EnvironmentTheme.Mountains);
+                yield return null;
+                Assert.AreEqual(EnvironmentTheme.Mountains, audio.CurrentAmbientTheme);
+                var sources = soundNode.GetComponents<AudioSource>();
+                // The third pooled source is the optional music track.
+                Assert.AreEqual(4, sources.Length);
+                AudioSource music = sources[2];
+                Assert.AreSame(track, music.clip);
+                Assert.IsTrue(music.isPlaying);
+
+                audio.ToggleSound();
+                Assert.IsTrue(audio.IsMuted);
+                environment.ApplyThemeDirect(EnvironmentTheme.Park);
+                Assert.AreEqual(EnvironmentTheme.Park, audio.CurrentAmbientTheme);
+                Assert.IsFalse(music.isPlaying);
+
+                audio.ToggleSound();
+                Assert.IsFalse(audio.IsMuted);
+                Assert.AreSame(track, music.clip);
+                Assert.IsTrue(music.isPlaying,
+                    "The track should restart after a muted theme switch.");
+            }
+            finally
+            {
+                PlayerPrefs.SetInt("FruitTree.Muted", previousSound);
+                PlayerPrefs.SetInt("FruitTree.MusicMuted", previousMusic);
+                Object.Destroy(root);
+                Object.Destroy(track);
+            }
+            yield return null;
+        }
+
     }
 }
