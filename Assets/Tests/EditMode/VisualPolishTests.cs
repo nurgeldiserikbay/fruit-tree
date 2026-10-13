@@ -6,6 +6,22 @@ namespace FruitTree.Tests
     public sealed class VisualPolishTests
     {
         [Test]
+        public void CanopyShaderExposesMobileBacklightControl()
+        {
+            Shader shader = Shader.Find("FruitTree/VertexLit");
+            Assert.IsNotNull(shader);
+            var material = new Material(shader);
+            try
+            {
+                Assert.IsTrue(material.HasProperty("_LeafTranslucency"));
+                material.SetFloat("_LeafTranslucency", .28f);
+                Assert.That(material.GetFloat("_LeafTranslucency"),
+                    Is.EqualTo(.28f).Within(.001f));
+            }
+            finally { Object.DestroyImmediate(material); }
+        }
+
+        [Test]
         public void BarkHasVisibleDetailWithoutIncreasingTextureMemory()
         {
             Texture2D bark = BarkTexture.Create();
