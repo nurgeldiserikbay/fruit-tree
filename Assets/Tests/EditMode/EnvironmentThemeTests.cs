@@ -6,7 +6,7 @@ namespace FruitTree.Tests
     public sealed class EnvironmentThemeTests
     {
         [Test]
-        public void AllFourThemesHaveFiniteSmallStaticGeometry()
+        public void AllEightThemesHaveFiniteSmallStaticGeometry()
         {
             for (int i = 0; i < EnvironmentThemes.Count; i++)
             {
@@ -37,16 +37,23 @@ namespace FruitTree.Tests
         [Test]
         public void ThemesUseStableNamesAndDefaultTreeProgression()
         {
-            Assert.AreEqual(4, EnvironmentThemes.Count);
+            Assert.AreEqual(8, EnvironmentThemes.Count);
             Assert.AreEqual("MEADOW", EnvironmentThemes.DisplayName(EnvironmentTheme.Meadow));
             Assert.AreEqual("CITY PARK", EnvironmentThemes.DisplayName(EnvironmentTheme.CityPark));
+            Assert.AreEqual("JAPANESE GARDEN", EnvironmentThemes.DisplayName(EnvironmentTheme.JapaneseGarden));
+            Assert.AreEqual("CHINESE GARDEN", EnvironmentThemes.DisplayName(EnvironmentTheme.ChineseGarden));
+            Assert.AreEqual("LAKESIDE", EnvironmentThemes.DisplayName(EnvironmentTheme.Lakeside));
+            Assert.AreEqual("EVENING GARDEN", EnvironmentThemes.DisplayName(EnvironmentTheme.EveningGarden));
             Assert.AreEqual(EnvironmentTheme.Meadow, EnvironmentThemes.DefaultForTree(0));
             Assert.AreEqual(EnvironmentTheme.Park, EnvironmentThemes.DefaultForTree(1));
             Assert.AreEqual(EnvironmentTheme.Mountains, EnvironmentThemes.DefaultForTree(2));
             Assert.AreEqual(EnvironmentTheme.CityPark, EnvironmentThemes.DefaultForTree(3));
-            Assert.AreEqual(EnvironmentTheme.Meadow, EnvironmentThemes.DefaultForTree(4));
+            Assert.AreEqual(EnvironmentTheme.JapaneseGarden, EnvironmentThemes.DefaultForTree(4));
+            Assert.AreEqual(EnvironmentTheme.ChineseGarden, EnvironmentThemes.DefaultForTree(5));
+            Assert.AreEqual(EnvironmentTheme.Lakeside, EnvironmentThemes.DefaultForTree(6));
+            Assert.AreEqual(EnvironmentTheme.EveningGarden, EnvironmentThemes.DefaultForTree(7));
             Assert.IsFalse(EnvironmentThemes.IsValid(-1));
-            Assert.IsFalse(EnvironmentThemes.IsValid(4));
+            Assert.IsFalse(EnvironmentThemes.IsValid(8));
         }
 
         [Test]
