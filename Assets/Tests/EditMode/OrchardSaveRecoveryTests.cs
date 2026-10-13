@@ -97,6 +97,44 @@ namespace FruitTree.Tests
             Assert.AreEqual(2, repository.Load().trees[0].pickedFruitIds.Count);
         }
         [Test]
+        public void DuplicateOrMalformedFruitIdCannotOverwriteValidProgress()
+        {
+            Assert.IsTrue(repository.Save(Create(14)));
+            string primary = Path.Combine(folder, "fruit-tree-orchard.json");
+            string before = File.ReadAllText(primary);
+
+            var duplicated = Create(15);
+            duplicated.trees[0].pickedFruitIds.Add("fruit_0000");
+            Assert.IsFalse(repository.Save(duplicated));
+            Assert.AreEqual(before, File.ReadAllText(primary));
+
+            foreach (string invalid in new[]
+                { null, "", "fruit_fake", "fruit_001", "fruit_000x" })
+            {
+                var malformed = Create(15);
+                malformed.trees[0].pickedFruitIds.Add(invalid);
+                Assert.IsFalse(repository.Save(malformed), invalid ?? "<null>");
+                Assert.AreEqual(before, File.ReadAllText(primary));
+            }
+            Assert.AreEqual(14, repository.Load().trees[0].pickedFruitIds.Count);
+        }
+
+        [Test]
+        public void CorruptFruitIdInPrimaryFallsBackToLastValidBackup()
+        {
+            Assert.IsTrue(repository.Save(Create(3)));
+            Assert.IsTrue(repository.Save(Create(9)));
+            var broken = Create(12);
+            broken.trees[0].pickedFruitIds.Add("fruit_0000");
+            string primary = Path.Combine(folder, "fruit-tree-orchard.json");
+            File.WriteAllText(primary, UnityEngine.JsonUtility.ToJson(broken));
+
+            // The last known-good backup is more reliable than a malformed
+            // primary JSON that merely looks structurally complete.
+            Assert.AreEqual(3, repository.Load().trees[0].pickedFruitIds.Count);
+        }
+
+        [Test]
         public void NewerCompleteTemporaryIsRecoveredEvenIfPrimaryIsValid()
         {
             Assert.IsTrue(repository.Save(Create(3)));
