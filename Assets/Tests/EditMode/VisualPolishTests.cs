@@ -6,6 +6,18 @@ namespace FruitTree.Tests
     public sealed class VisualPolishTests
     {
         [Test]
+        public void OrchardContactShadeIsSubtleAndFadesAtDistance()
+        {
+            float center = GroundGenerator.OrchardContactShade(0f, 0f);
+            float near = GroundGenerator.OrchardContactShade(1f, 0f);
+            float far = GroundGenerator.OrchardContactShade(15f, 15f);
+            Assert.That(center, Is.InRange(.15f, .26f));
+            Assert.That(near, Is.GreaterThan(0f));
+            Assert.That(far, Is.EqualTo(0f).Within(.0001f));
+            Assert.Greater(center, near);
+        }
+
+        [Test]
         public void CanopyShaderExposesMobileBacklightControl()
         {
             Shader shader = Shader.Find("FruitTree/VertexLit");
