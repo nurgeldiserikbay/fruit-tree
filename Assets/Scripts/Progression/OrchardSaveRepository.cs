@@ -35,18 +35,22 @@ namespace FruitTree.Progression
                 }
                 return main;
             }
-            if (interrupted != null)
+            var recovered = TryRead(backup);
+            // When the primary is corrupt, a left-over .tmp may predate the
+            // last known-good backup. Choose the newer valid recovery source
+            // rather than blindly prioritizing a stale temporary file.
+            if (interrupted != null &&
+                (recovered == null || IsNewer(temporary, backup)))
             {
                 Debug.LogWarning("Fruit Tree: recovered complete interrupted save.");
                 return interrupted;
             }
-            var recovered = TryRead(backup);
             if (recovered != null)
             {
                 Debug.LogWarning("Fruit Tree: restored prior orchard progress backup.");
                 return recovered;
             }
-            return null;
+            return interrupted;
         }
 
         public bool Save(OrchardSaveData save)
