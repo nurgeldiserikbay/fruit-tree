@@ -6,6 +6,27 @@ namespace FruitTree.Tests
     public sealed class TreeGeometryTests
     {
         [Test]
+        public void DetailedAppleKeepsMergedRenderersAndMobileGeometryBudget()
+        {
+            var root = new GameObject("Detailed Apple Geometry");
+            try
+            {
+                var tree = root.AddComponent<TreeGenerator>();
+                tree.Configure("apple", 120, 122);
+                var foliage = root.transform.Find("Merged Leaves");
+                var wood = root.transform.Find("Merged Wood");
+                Assert.IsNotNull(foliage);
+                Assert.IsNotNull(wood);
+                int leaves = foliage.GetComponent<MeshFilter>().sharedMesh.vertexCount;
+                Assert.Greater(leaves, 45000, "Apple crown should no longer be sparse.");
+                Assert.Less(leaves, 80000, "Keep the merged canopy within a mobile budget.");
+                Assert.Less(wood.GetComponent<MeshFilter>().sharedMesh.vertexCount, 16000);
+                Assert.AreEqual(120, tree.Apples.Count);
+            }
+            finally { Object.DestroyImmediate(root); }
+        }
+
+        [Test]
         public void AppleMeshHasFiniteVerticesAndTriangles()
         {
             Mesh mesh = ProceduralMesh.Apple();
