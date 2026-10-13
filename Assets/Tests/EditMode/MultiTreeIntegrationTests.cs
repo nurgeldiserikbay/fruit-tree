@@ -108,7 +108,17 @@ namespace FruitTree.Tests
                 var first = new OrchardSaveData { activeTreeId = "tree_001" };
                 first.trees.Add(new TreeSaveData { treeId = "tree_001", roundNumber = 1 });
                 Assert.IsTrue(store.Save(first));
-                var second = new OrchardSaveData { activeTreeId = "tree_002" };
+                // The second snapshot must itself be valid; otherwise the
+                // repository correctly rejects it and creates no backup.
+                var second = new OrchardSaveData { activeTreeId = "tree_001" };
+                second.trees.Add(new TreeSaveData
+                {
+                    treeId = "tree_001", roundNumber = 1,
+                    pickedFruitIds = new System.Collections.Generic.List<string>
+                    {
+                        "fruit_0000"
+                    }
+                });
                 Assert.IsTrue(store.Save(second));
                 File.WriteAllText(Path.Combine(folder, "fruit-tree-orchard.json"), "broken");
                 Assert.AreEqual("tree_001", store.Load().activeTreeId);
