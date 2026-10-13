@@ -105,10 +105,17 @@ namespace FruitTree
             if (tree != null) tree.FruitPicked -= OnFruitPicked;
             if (environment != null) environment.ThemeChanged -= OnThemeChanged;
             if (fadeRoutine != null) StopCoroutine(fadeRoutine);
-            if (ownsPickClip && collect != null) Destroy(collect);
+            if (ownsPickClip) ReleaseGeneratedClip(collect);
             if (ownsAmbientClip)
                 for (int i = 0; i < generatedThemeClips.Length; i++)
-                    if (generatedThemeClips[i] != null) Destroy(generatedThemeClips[i]);
+                    ReleaseGeneratedClip(generatedThemeClips[i]);
+        }
+
+        private static void ReleaseGeneratedClip(AudioClip clip)
+        {
+            if (clip == null) return;
+            if (Application.isPlaying) Destroy(clip);
+            else DestroyImmediate(clip);
         }
 
         private void OnFruitPicked(Apple fruit)
