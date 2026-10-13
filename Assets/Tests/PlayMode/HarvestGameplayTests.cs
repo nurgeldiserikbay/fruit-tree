@@ -23,6 +23,43 @@ namespace FruitTree.Tests
         }
 
         [UnityTest]
+        public IEnumerator RebloomRestoresAllGeneratedFruitPositionsAndSizes()
+        {
+            var root = new GameObject("Fruit Rest Pose Regression");
+            var tree = root.AddComponent<TreeGenerator>();
+            if (tree.Apples.Count == 0) tree.Generate();
+            try
+            {
+                var first = tree.Apples[0];
+                var last = tree.Apples[tree.Apples.Count - 1];
+                Vector3 firstPosition = first.transform.localPosition;
+                Vector3 lastPosition = last.transform.localPosition;
+                Vector3 firstScale = first.transform.localScale;
+                Vector3 lastScale = last.transform.localScale;
+                Quaternion firstRotation = first.transform.localRotation;
+
+                first.Pick();
+                last.Pick();
+                tree.ResetHarvest();
+
+                Assert.That(Vector3.Distance(first.transform.localPosition, firstPosition),
+                    Is.LessThan(.0001f));
+                Assert.That(Vector3.Distance(last.transform.localPosition, lastPosition),
+                    Is.LessThan(.0001f));
+                Assert.That(Vector3.Distance(first.transform.localScale, firstScale),
+                    Is.LessThan(.0001f));
+                Assert.That(Vector3.Distance(last.transform.localScale, lastScale),
+                    Is.LessThan(.0001f));
+                Assert.That(Quaternion.Angle(first.transform.localRotation, firstRotation),
+                    Is.LessThan(.01f));
+                Assert.Greater(first.transform.localScale.x, .1f);
+                Assert.Greater(Vector3.Distance(firstPosition, Vector3.zero), 1f);
+            }
+            finally { Object.Destroy(root); }
+            yield return null;
+        }
+
+        [UnityTest]
         public IEnumerator RestartReplenishesApplesAndClearsProgress()
         {
             var root = new GameObject("Restart Test");
