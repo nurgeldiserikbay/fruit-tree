@@ -11,6 +11,11 @@ namespace FruitTree
         public EnvironmentController environment;
         [Header("Optional replacement recordings (licensed audio only)")]
         public AudioClip ambientRecording;
+        [Header("Optional licensed ambient music, one track per scenery")]
+        public AudioClip[] themeMusic = new AudioClip[EnvironmentThemes.Count];
+        private AudioSource music;
+        private bool musicMuted;
+        public bool IsMusicMuted => musicMuted;
         public AudioClip pickRecording;
         public UnityEngine.UI.Text soundStatusText;
         private AudioSource ambience, alternateAmbience, effects;
@@ -49,6 +54,12 @@ namespace FruitTree
             alternateAmbience.playOnAwake = false;
             alternateAmbience.spatialBlend = 0f;
             alternateAmbience.volume = 0f;
+            music = gameObject.AddComponent<AudioSource>();
+            music.loop = true;
+            music.playOnAwake = false;
+            music.spatialBlend = 0f;
+            music.volume = .045f;
+            musicMuted = PlayerPrefs.GetInt("FruitTree.MusicMuted", 0) == 1;
             effects = gameObject.AddComponent<AudioSource>();
             effects.playOnAwake = false;
             effects.spatialBlend = 0;
@@ -71,6 +82,7 @@ namespace FruitTree
                 SelectTheme(environment != null ? environment.CurrentTheme :
                     EnvironmentTheme.Meadow, true);
             else ambience.Play();
+            SelectMusic(activeTheme);
             UpdateStatusText();
         }
 
@@ -100,6 +112,32 @@ namespace FruitTree
             ApplyVolume();
             UpdateStatusText();
         }
+        public void ToggleMusic()
+        {
+            musicMuted = !musicMuted;
+            PlayerPrefs.SetInt("FruitTree.MusicMuted", musicMuted ? 1 : 0);
+            PlayerPrefs.Save();
+            ApplyVolume();
+            SelectMusic(activeTheme);
+        }
+
+        private void SelectMusic(EnvironmentTheme theme)
+        {
+            if (music == null) return;
+            int index = (int)theme;
+            AudioClip next = themeMusic != null && index >= 0 &&
+                index < themeMusic.Length ? themeMusic[index] : null;
+            if (music.clip != next)
+            {
+                music.Stop();
+                music.clip = next;
+            }
+            if (next != null && !musicMuted && !muted && !music.isPlaying)
+                music.Play();
+            else if ((musicMuted || muted || next == null) && music.isPlaying)
+                music.Stop();
+        }
+
         public void ToggleQuietAudio()
         {
             IsQuietAudio = !IsQuietAudio;
@@ -117,6 +155,8 @@ namespace FruitTree
             ambience.mute = muted;
             alternateAmbience.mute = muted;
             effects.mute = muted;
+            music.mute = muted || musicMuted;
+            music.volume = IsQuietAudio ? .035f : .07f;
             float target = IsQuietAudio ? .09f : .18f;
             if (fadingFrom != null && fadingTo != null)
             {
@@ -168,6 +208,8 @@ namespace FruitTree
         private void OnThemeChanged(EnvironmentTheme theme)
         {
             if (ownsAmbientClip) SelectTheme(theme, false);
+            activeTheme = theme;
+            SelectMusic(theme);
         }
 
         /// <summary>
@@ -245,9 +287,13 @@ namespace FruitTree
             float wind = 0f;
             float windStrength = theme == EnvironmentTheme.Mountains ? .095f :
                 theme == EnvironmentTheme.CityPark ? .04f : .065f;
-            int birdsCount = theme == EnvironmentTheme.Meadow ? 3 :
-                theme == EnvironmentTheme.Park ? 2 :
-                theme == EnvironmentTheme.Mountains ? 1 : 0;
+            int birdsCount = theme == EnvironmentTheme.Meadow ||
+                theme == EnvironmentTheme.JapaneseGarden ? 3 :
+                theme == EnvironmentTheme.Park ||
+                theme == EnvironmentTheme.ChineseGarden ||
+                theme == EnvironmentTheme.Lakeside ? 2 :
+                theme == EnvironmentTheme.Mountains ||
+                theme == EnvironmentTheme.EveningGarden ? 1 : 0;
             for (int i = 0; i < count; i++)
             {
                 float t = i / (float)rate;
@@ -268,11 +314,19 @@ namespace FruitTree
                                 (1050f * tau + 530f * tau * tau));
                     }
                 }
+                float water = theme == EnvironmentTheme.Lakeside ||
+                    theme == EnvironmentTheme.JapaneseGarden ||
+                    theme == EnvironmentTheme.ChineseGarden ?
+                    .018f * Mathf.Sin(2f * Mathf.PI * 2.1f * t) *
+                        (.5f + .5f * Mathf.Sin(t * .8f)) : 0f;
+                float insects = theme == EnvironmentTheme.EveningGarden ?
+                    .008f * Mathf.Sin(2f * Mathf.PI * 850f * t) *
+                        Mathf.Max(0f, Mathf.Sin(t * 1.5f)) : 0f;
                 float farCity = theme == EnvironmentTheme.CityPark ?
                     .014f * Mathf.Sin(2f * Mathf.PI * 61f * t) *
                         (.6f + .4f * Mathf.Sin(t * .6f)) : 0f;
                 float fade = Mathf.Clamp01(Mathf.Min(t * 2f, (8f - t) * 2f));
-                data[i] = Mathf.Clamp((airy + birds + farCity) * fade, -.2f, .2f);
+                data[i] = Mathf.Clamp((airy + birds + farCity + water + insects) * fade, -.2f, .2f);
             }
             return MakeClip("Quiet " + EnvironmentThemes.DisplayName(theme) +
                 " atmosphere", rate, data);
