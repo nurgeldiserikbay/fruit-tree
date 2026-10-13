@@ -32,22 +32,33 @@ namespace FruitTree.Editor
             string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
             string outputDirectory = Path.Combine(projectRoot, "Builds");
             Directory.CreateDirectory(outputDirectory);
-            // AAB builds are a separate release flow; this menu command produces APK only.
-            EditorUserBuildSettings.buildAppBundle = false;
-            var options = new BuildPlayerOptions
+            // The quick APK build must not silently switch the developer's
+            // bundle preference for a later signed Play Store release.
+            bool previousBundleSetting = EditorUserBuildSettings.buildAppBundle;
+            try
             {
-                scenes = new[] { scene },
-                locationPathName = Path.Combine(outputDirectory, "FruitTree.apk"),
-                target = BuildTarget.Android,
-                options = BuildOptions.None
-            };
-            BuildReport report = BuildPipeline.BuildPlayer(options);
-            if (report == null || report.summary.result != BuildResult.Succeeded)
-                throw new Exception("Unity Android build failed: " +
-                    (report == null ? "no build report" : report.summary.result.ToString()));
-            if (!File.Exists(options.locationPathName))
-                throw new FileNotFoundException("Build succeeded without an APK", options.locationPathName);
-            Debug.Log("Fruit Tree Android APK: " + Path.GetFullPath(options.locationPathName));
+                EditorUserBuildSettings.buildAppBundle = false;
+                var options = new BuildPlayerOptions
+                {
+                    scenes = new[] { scene },
+                    locationPathName = Path.Combine(outputDirectory, "FruitTree.apk"),
+                    target = BuildTarget.Android,
+                    options = BuildOptions.None
+                };
+                BuildReport report = BuildPipeline.BuildPlayer(options);
+                if (report == null || report.summary.result != BuildResult.Succeeded)
+                    throw new Exception("Unity Android build failed: " +
+                        (report == null ? "no build report" : report.summary.result.ToString()));
+                if (!File.Exists(options.locationPathName))
+                    throw new FileNotFoundException(
+                        "Build succeeded without an APK", options.locationPathName);
+                Debug.Log("Fruit Tree Android APK: " +
+                    Path.GetFullPath(options.locationPathName));
+            }
+            finally
+            {
+                EditorUserBuildSettings.buildAppBundle = previousBundleSetting;
+            }
         }
     }
 }
