@@ -111,9 +111,32 @@ namespace FruitTree.Progression
                     tree.pickedFruitIds == null || tree.roundNumber < 1 ||
                     tree.timesCleared < 0 || !ids.Add(tree.treeId))
                     return false;
+
+                // On disk, each fruit is identified by one canonical, unique
+                // identifier. Duplicates or empty entries can make an
+                // apparently complete save restore as a partial harvest.
+                // Tree-specific ranges are still checked by TreeRoundState.
+                var fruitIds = new System.Collections.Generic.HashSet<string>(
+                    StringComparer.Ordinal);
+                foreach (var fruitId in tree.pickedFruitIds)
+                    if (!IsCanonicalFruitId(fruitId) || !fruitIds.Add(fruitId))
+                        return false;
                 if (tree.treeId == save.activeTreeId) containsActive = true;
             }
             return containsActive;
+        }
+
+        private static bool IsCanonicalFruitId(string value)
+        {
+            // The saved catalog uses fruit_0000..fruit_0299. Keep future
+            // catalog-specific index limits separate from file validation.
+            if (string.IsNullOrEmpty(value) || value.Length != 10 ||
+                !value.StartsWith("fruit_", StringComparison.Ordinal))
+                return false;
+            for (int i = 6; i < value.Length; i++)
+                if (value[i] < '0' || value[i] > '9')
+                    return false;
+            return true;
         }
 
         private static bool IsNewer(string candidate, string current)
