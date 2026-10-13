@@ -73,6 +73,31 @@ namespace FruitTree.Tests
                 OrbitPickingCamera.CanResumeOrbitAfterPinch(phase));
         }
 
+        [TestCase(18f, 1.4f, -20f)]
+        [TestCase(18f, 2.65f, -20f)]
+        [TestCase(7f, 1.4f, -20f)]
+        [TestCase(7f, 4.1f, 13f)]
+        public void CameraCannotDropBelowMeadowAtAnyAllowedZoom(
+            float distance, float focusHeight, float desiredPitch)
+        {
+            float safePitch = Mathf.Max(desiredPitch,
+                OrbitPickingCamera.GroundSafeMinimumPitch(distance, focusHeight));
+            Vector3 position = OrbitPickingCamera.OrbitPosition(
+                Vector3.zero, distance, 54f, safePitch, focusHeight);
+            Assert.GreaterOrEqual(position.y + .0001f,
+                OrbitPickingCamera.MinimumCameraHeight);
+        }
+
+        [Test]
+        public void LongZoomAutomaticallyLimitsUndergroundOrbitAngle()
+        {
+            float low = OrbitPickingCamera.GroundSafeMinimumPitch(7f, 2.65f);
+            float far = OrbitPickingCamera.GroundSafeMinimumPitch(18f, 2.65f);
+            Assert.Greater(far, low,
+                "Zooming away must lift the orbit above the terrain.");
+            Assert.That(far, Is.InRange(-6f, 0f));
+        }
+
         [Test]
         public void DegenerateAuditViewCannotMarkFruitAsVisible()
         {
