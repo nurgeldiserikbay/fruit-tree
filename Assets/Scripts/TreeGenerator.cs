@@ -164,8 +164,9 @@ namespace FruitTree
             // Apple visual reference: finer leaves, more secondary twigs, and
             // a layered canopy. Other species retain their established geometry.
             bool detailedApple = speciesId == "apple";
-            int twigCount = detailedApple ? 7 : 5;
-            int appleLeafCount = detailedApple ? Mathf.Min(leavesPerCluster + 1, 22) : leavesPerCluster;
+            int twigCount = detailedApple ? 7 : profile.BranchCount >= 21 ? 6 : 5;
+            int appleLeafCount = detailedApple ? Mathf.Min(leavesPerCluster + 1, 22) :
+                Mathf.Min(leavesPerCluster + 1, 21);
             for (int i = 0; i < majorBranches; i++)
             {
                 float elevation = i / (float)(majorBranches - 1);
@@ -208,7 +209,7 @@ namespace FruitTree
                         sideways * sideSign * Between(.28f, .7f) +
                         Vector3.up * (Between(.18f,.58f) *
                             profile.TwigUpwardFactor)).normalized;
-                    float twigLength = Between(.44f, detailedApple ? .94f : .77f) *
+                    float twigLength = Between(.44f, detailedApple ? .94f : .82f) *
                         (1f - elevation * .18f);
                     Vector3 end = start + twigDirection * twigLength;
                     wood.Branch(start, end, .039f, .008f, branchColor);
@@ -239,9 +240,9 @@ namespace FruitTree
                             // a soft canopy instead of isolated spear tips.
                             foliage.Leaf(center + offset * .75f, direction,
                                 Between(profile.LeafLengthLow, profile.LeafLengthHigh) *
-                                    (detailedApple ? .72f : .92f),
+                                    (detailedApple ? .72f : .82f),
                                 Between(profile.LeafWidthLow, profile.LeafWidthHigh) *
-                                    (detailedApple ? .78f : 1.06f),
+                                    (detailedApple ? .78f : .91f),
                                 leafColor, profile.LeafOvalness);
                         }
                     }
@@ -249,7 +250,7 @@ namespace FruitTree
             }
             // Lightweight crown fillers close large artificial gaps above the
             // highest limbs while keeping most apples readable from outside.
-            int fillerCount = detailedApple ? 31 : 24;
+            int fillerCount = detailedApple ? 31 : 27;
             for (int cluster = 0; cluster < fillerCount; cluster++)
             {
                 float heightRatio = (cluster + .5f) / fillerCount;
