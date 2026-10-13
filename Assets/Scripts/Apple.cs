@@ -14,6 +14,10 @@ namespace FruitTree
         public void Initialize(int index)
         {
             StableFruitId = "fruit_" + index.ToString("D4");
+            // AddComponent<Apple>() invokes Awake before the tree generator
+            // finishes registering the fruit. Capture its configured position
+            // here, after the generator sets local position, scale and rotation.
+            CaptureRestPose();
         }
 
         public void RestorePicked()
@@ -28,6 +32,11 @@ namespace FruitTree
         private Quaternion originalRotation;
 
         private void Awake()
+        {
+            CaptureRestPose();
+        }
+
+        private void CaptureRestPose()
         {
             originalPosition = transform.localPosition;
             originalScale = transform.localScale;
