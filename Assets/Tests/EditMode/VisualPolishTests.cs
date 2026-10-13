@@ -6,6 +6,21 @@ namespace FruitTree.Tests
     public sealed class VisualPolishTests
     {
         [Test]
+        public void BarkHasVisibleDetailWithoutIncreasingTextureMemory()
+        {
+            Texture2D bark = BarkTexture.Create();
+            try
+            {
+                Assert.AreEqual(128, bark.width);
+                Assert.AreEqual(256, bark.height);
+                Assert.AreEqual(TextureFormat.RGB24, bark.format);
+                // The texture is intentionally non-readable after upload.
+                Assert.IsFalse(bark.isReadable);
+            }
+            finally { Object.DestroyImmediate(bark); }
+        }
+
+        [Test]
         public void AppleSilhouetteHasCompactRoundedDimensionsAndStemDimple()
         {
             Mesh apple = ProceduralMesh.Apple();
