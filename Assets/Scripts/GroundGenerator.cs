@@ -59,6 +59,21 @@ namespace FruitTree
             generated.Clear();
         }
 
+        // Soft baked canopy footprint: no shadow map or extra renderer.
+        // Kept close to the trunk so it reads naturally across all biomes.
+        public static float OrchardContactShade(float x, float z)
+        {
+            float trunk = Mathf.Sqrt(x * x + z * z);
+            float core = 1f - Mathf.SmoothStep(.25f, 2.2f, trunk);
+            // A faint offset penumbra suggests low-angle sun without a hard disk.
+            float dx = (x + .65f) / 3.0f;
+            float dz = (z - .42f) / 2.15f;
+            float canopy = 1f - Mathf.SmoothStep(.35f, 1.0f,
+                Mathf.Sqrt(dx * dx + dz * dz));
+            float noise = Mathf.PerlinNoise(x * 1.6f + 13f, z * 1.6f + 19f);
+            return Mathf.Clamp01(.17f * core + .075f * canopy * (.65f + .35f * noise));
+        }
+
         public static Mesh CreateTerrainMesh()
         {
             const int divisions = 64;
@@ -82,7 +97,7 @@ namespace FruitTree
                     // A soft built-in contact shade grounds the trunk even on
                     // Android tiers without real-time shadow mapping.
                     float contact = 1f - Mathf.SmoothStep(.5f, 3.3f, distance);
-                    shade *= 1f - .20f * contact;
+                    shade *= 1f - OrchardContactShade(px, pz);
                     float clearing = 1f - Mathf.SmoothStep(1.1f, 3.8f, distance);
                     Color baseGreen = new Color(.44f, .62f, .35f);
                     colors.Add(Color.Lerp(baseGreen * shade,
