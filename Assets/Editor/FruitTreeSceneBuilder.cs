@@ -564,7 +564,7 @@ namespace FruitTree.Editor
             var help = MakeButton("Home How To Play", home.transform, "HOW TO PLAY",
                 new Vector2(.18f, .161f), new Vector2(.82f, .241f), fern);
             MakeLabel("Home Footer", home.transform,
-                "10 FRUIT TREES  •  4 PEACEFUL LANDSCAPES", 29, white,
+                "10 FRUIT TREES  •  8 PEACEFUL LANDSCAPES", 29, white,
                 new Vector2(.07f, .06f), new Vector2(.93f, .11f));
             UnityEventTools.AddPersistentListener(play.onClick, flow.Play);
             UnityEventTools.AddPersistentListener(collection.onClick,
@@ -585,20 +585,24 @@ namespace FruitTree.Editor
             var softAudio = MakeButton("Settings Quiet Audio", options.transform,
                 "AUDIO: SOFT", new Vector2(.20f, .575f), new Vector2(.80f, .645f), ivory);
             flow.audioLevelLabel = softAudio.GetComponentInChildren<Text>();
+            var music = MakeButton("Settings Music", options.transform,
+                "MUSIC: ON", new Vector2(.20f, .50f), new Vector2(.80f, .565f), ivory);
+            flow.musicButtonLabel = music.GetComponentInChildren<Text>();
             var motion = MakeButton("Settings Motion", options.transform,
-                "MOTION: GENTLE", new Vector2(.20f, .485f), new Vector2(.80f, .555f), ivory);
+                "MOTION: GENTLE", new Vector2(.20f, .415f), new Vector2(.80f, .48f), ivory);
             flow.motionLabel = motion.GetComponentInChildren<Text>();
             var scenery = MakeButton("Settings Scenery", options.transform,
-                "SCENERY: AUTO", new Vector2(.20f, .395f), new Vector2(.80f, .465f), ivory);
+                "SCENERY: AUTO", new Vector2(.20f, .33f), new Vector2(.80f, .395f), ivory);
             flow.sceneryLabel = scenery.GetComponentInChildren<Text>();
             var policy = MakeButton("Settings Privacy", options.transform, "PRIVACY POLICY",
-                new Vector2(.20f, .305f), new Vector2(.80f, .375f), ivory);
+                new Vector2(.20f, .245f), new Vector2(.80f, .31f), ivory);
             var controls = MakeButton("Settings Controls", options.transform, "HOW TO PLAY",
-                new Vector2(.20f, .215f), new Vector2(.80f, .285f), ivory);
+                new Vector2(.20f, .16f), new Vector2(.80f, .225f), ivory);
             var back = MakeButton("Settings Back", options.transform, "BACK",
-                new Vector2(.27f, .105f), new Vector2(.73f, .175f), fern);
+                new Vector2(.27f, .08f), new Vector2(.73f, .145f), fern);
             UnityEventTools.AddPersistentListener(sound.onClick, flow.ToggleSound);
             UnityEventTools.AddPersistentListener(softAudio.onClick, flow.ToggleQuietAudio);
+            UnityEventTools.AddPersistentListener(music.onClick, flow.ToggleMusic);
             UnityEventTools.AddPersistentListener(motion.onClick, flow.ToggleReducedMotion);
             UnityEventTools.AddPersistentListener(scenery.onClick, flow.CycleScenery);
             UnityEventTools.AddPersistentListener(policy.onClick, flow.OpenPrivacy);
