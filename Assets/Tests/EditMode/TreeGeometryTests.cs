@@ -29,6 +29,28 @@ namespace FruitTree.Tests
         }
 
         [Test]
+        public void LeafCurvatureKeepsMobileTriangleBudgetAndFiniteNormals()
+        {
+            var builder = new ProceduralMesh();
+            builder.Leaf(Vector3.zero, new Vector3(.4f, .8f, .2f),
+                .22f, .15f, Color.green);
+            Mesh mesh = builder.Build("Leaf Curvature Test");
+            try
+            {
+                Assert.AreEqual(8, mesh.vertexCount);
+                Assert.AreEqual(18, mesh.triangles.Length);
+                foreach (Vector3 normal in mesh.normals)
+                {
+                    Assert.IsFalse(float.IsNaN(normal.x) || float.IsNaN(normal.y) ||
+                        float.IsNaN(normal.z));
+                    Assert.That(normal.magnitude, Is.EqualTo(1f).Within(.002f));
+                }
+                Assert.Greater(mesh.bounds.size.magnitude, .2f);
+            }
+            finally { Object.DestroyImmediate(mesh); }
+        }
+
+        [Test]
         public void AppleMeshHasFiniteVerticesAndTriangles()
         {
             Mesh mesh = ProceduralMesh.Apple();
