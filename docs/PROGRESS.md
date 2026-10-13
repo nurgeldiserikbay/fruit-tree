@@ -1,5 +1,15 @@
 # Fruit Tree development state
 
+## Unity screenshot feedback — camera floor and scenic clarity (2026-10-13)
+
+- [x] **Code:** Orbit camera now clamps downward pitch against its distance and inspection focus; the camera cannot physically enter the meadow when zoomed out. The all-species Editor audit ignores any viewpoint that would be underground.
+- [x] **Code:** Initial portrait framing is closer (up to 15 units, instead of 18), making the tree more prominent in narrow phone viewports while retaining manual zoom and full orbit.
+- [x] **Code:** A subtle baked trunk-contact shade has been added to the existing terrain mesh. Grass uses 900 smaller blades rather than 300 sparse spikes, still in **one batched renderer**.
+- [x] **Code:** Default canopy density is 19 leaves per twig cluster rather than 16, with slightly shorter and broader leaf cards; existing fruit IDs, geometry-based hitboxes and progress are unchanged.
+- [x] **Tests authored:** Added camera floor/zoom constraints and updated grass-mesh vertex budgets and framing assertions. Editor scene revision is 7; local regenerated scene is required to take the new serialized tree-density default.
+- [ ] **Not visually verified:** Run Unity Editor and Android to confirm the old empty-blue below-ground horizon is gone, grass reads as continuous rather than sharp spikes, the tree remains fully selectable at 9:16 and 9:20, and frame rates meet the device targets.
+- [ ] These changes are an incremental prototype improvement, **not final Play Store art quality**. Final tree species silhouettes, bark/leaf shaders, lighting and background models need further art review against actual game screenshots.
+
 ## Correct fruit rest-pose restoration (2026-10-13)
 
 - [x] Fixed a real rebloom bug: Unity's `Awake` fires when the Fruit component is attached, before the mesh object's final transform has been captured. `Apple.Initialize` now records the configured fruit transform so ResetHarvest and animated rebloom restore every fruit to its actual branch location, scale and rotation.
