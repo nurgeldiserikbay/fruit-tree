@@ -1,5 +1,17 @@
 # Fruit Tree development state
 
+## Main-branch scene and music release safeguards (2026-10-13)
+
+- [x] PRs #1–#3 were merged into `main` before this pass. All follow-up changes for this pass were committed directly to `main`.
+- [x] Bumped generated-scene layout stamp to revision **6** so old scenes cannot silently omit the new Music controls. Editor validation now verifies the Music button Text reference.
+- [x] Fixed optional music playback after SOUND OFF → scenery change → SOUND ON; the current licensed track resumes instead of remaining stopped.
+- [x] Fixed the initial theme used for music when a global licensed ambience override is configured.
+- [x] Settings shows **MUSIC: NOT AVAILABLE** with a disabled action when the current biome has no licensed track. Nothing is advertised as playable if no clip is supplied.
+- [x] Synthetic audio lifecycle handles EditMode cleanup without calling play-mode-only object destruction.
+- [x] Wrote PlayMode regression for muted scenery changes and EditMode test for missing/available music. Expanded the PlayMode scenery/audio cache check to all eight landscapes and reset test-specific PlayerPrefs.
+- [x] Updated README, Setup, eight-theme acceptance and environment documentation.
+- [ ] Unity 6000.6.5f1 compilation and test suites still need to be executed on an installed Unity editor. Audio clips, real Android thermal/FPS tests, public Privacy Policy and signed AAB remain outstanding.
+
 ## Portrait-reachability audit fidelity (2026-10-13, source only)
 
 - [x] The editor's all-species raycast diagnostic now builds viewpoints from the same `OrbitPickingCamera.OrbitPosition` function used by gameplay.
