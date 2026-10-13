@@ -161,6 +161,11 @@ namespace FruitTree
             const float goldenAngle = 2.39996323f;
             int majorBranches = profile.BranchCount;
             float crownSpread = profile.CrownSpread;
+            // Apple visual reference: finer leaves, more secondary twigs, and
+            // a layered canopy. Other species retain their established geometry.
+            bool detailedApple = speciesId == "apple";
+            int twigCount = detailedApple ? 7 : 5;
+            int appleLeafCount = detailedApple ? Mathf.Min(leavesPerCluster + 1, 22) : leavesPerCluster;
             for (int i = 0; i < majorBranches; i++)
             {
                 float elevation = i / (float)(majorBranches - 1);
@@ -191,9 +196,10 @@ namespace FruitTree
 
                 // Each limb carries several smaller twigs with two leaf clusters.
                 // All wood/leaves are merged into just two renderer objects.
-                for (int twigIndex = 0; twigIndex < 5; twigIndex++)
+                for (int twigIndex = 0; twigIndex < twigCount; twigIndex++)
                 {
-                    float fraction = .32f + twigIndex * .14f;
+                    float fraction = detailedApple ? .24f + twigIndex * .105f :
+                        .32f + twigIndex * .14f;
                     float sideSign = twigIndex % 2 == 0 ? 1f : -1f;
                     Vector3 start = origin + radial * (length * fraction) +
                         Vector3.up * (.12f * fraction +
@@ -202,16 +208,25 @@ namespace FruitTree
                         sideways * sideSign * Between(.28f, .7f) +
                         Vector3.up * (Between(.18f,.58f) *
                             profile.TwigUpwardFactor)).normalized;
-                    float twigLength = Between(.44f, .77f) * (1f - elevation * .18f);
+                    float twigLength = Between(.44f, detailedApple ? .94f : .77f) *
+                        (1f - elevation * .18f);
                     Vector3 end = start + twigDirection * twigLength;
                     wood.Branch(start, end, .039f, .008f, branchColor);
+                    if (detailedApple)
+                    {
+                        // Forked fine shoots enrich silhouette without a new renderer.
+                        Vector3 shootStart = Vector3.Lerp(start, end, .62f);
+                        Vector3 shootTip = shootStart + (twigDirection +
+                            sideways * sideSign * .65f + Vector3.up * .28f).normalized * .32f;
+                        wood.Branch(shootStart, shootTip, .012f, .003f, branchColor);
+                    }
 
                     for (int clusterIndex = 0; clusterIndex < 3; clusterIndex++)
                     {
                         float along = .36f + clusterIndex * .29f;
                         Vector3 center = Vector3.Lerp(start, end, along);
                         fruitAnchors.Add(center);
-                        for (int leafIndex = 0; leafIndex < leavesPerCluster; leafIndex++)
+                        for (int leafIndex = 0; leafIndex < appleLeafCount; leafIndex++)
                         {
                             Vector3 offset = new Vector3(Between(-.39f,.39f),
                                 Between(-.31f,.36f), Between(-.39f,.39f));
@@ -223,8 +238,10 @@ namespace FruitTree
                             // Slightly rounder, shorter foliage cards read as
                             // a soft canopy instead of isolated spear tips.
                             foliage.Leaf(center + offset * .75f, direction,
-                                Between(profile.LeafLengthLow, profile.LeafLengthHigh) * .92f,
-                                Between(profile.LeafWidthLow, profile.LeafWidthHigh) * 1.06f,
+                                Between(profile.LeafLengthLow, profile.LeafLengthHigh) *
+                                    (detailedApple ? .72f : .92f),
+                                Between(profile.LeafWidthLow, profile.LeafWidthHigh) *
+                                    (detailedApple ? .78f : 1.06f),
                                 leafColor, profile.LeafOvalness);
                         }
                     }
@@ -232,9 +249,10 @@ namespace FruitTree
             }
             // Lightweight crown fillers close large artificial gaps above the
             // highest limbs while keeping most apples readable from outside.
-            for (int cluster = 0; cluster < 24; cluster++)
+            int fillerCount = detailedApple ? 31 : 24;
+            for (int cluster = 0; cluster < fillerCount; cluster++)
             {
-                float heightRatio = (cluster + .5f) / 24f;
+                float heightRatio = (cluster + .5f) / fillerCount;
                 float angle = cluster * goldenAngle;
                 float radius = Mathf.Lerp(1.6f, .55f, heightRatio) *
                     profile.FillerSpread * Between(.75f, 1.1f);
@@ -251,7 +269,10 @@ namespace FruitTree
                         Between(-.4f,.4f), .23f, Between(-.4f,.4f))).normalized;
                     float shade = Between(-.055f,.07f);
                     foliage.Leaf(center + offset, direction,
-                        Between(.20f,.30f), Between(.15f,.21f),
+                        Between(detailedApple ? .15f : .20f,
+                            detailedApple ? .23f : .30f),
+                        Between(detailedApple ? .11f : .15f,
+                            detailedApple ? .16f : .21f),
                         profile.LeafColor +
                             new Color(shade, shade, shade * .5f),
                         profile.LeafOvalness);
