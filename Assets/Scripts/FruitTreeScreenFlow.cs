@@ -28,6 +28,7 @@ namespace FruitTree
         public Text audioLevelLabel;
         public Text motionLabel;
         public Text audioButtonLabel;
+        public Text musicButtonLabel;
         public Text privacyStatusLabel;
         public Button openPublishedPrivacyButton;
 
@@ -169,6 +170,12 @@ namespace FruitTree
             RefreshLabels();
         }
 
+        public void ToggleMusic()
+        {
+            if (sound != null) sound.ToggleMusic();
+            RefreshLabels();
+        }
+
         public void ToggleQuietAudio()
         {
             if (sound != null) sound.ToggleQuietAudio();
@@ -217,6 +224,8 @@ namespace FruitTree
             if (sceneryLabel != null && environment != null)
                 sceneryLabel.text = environment.IsAutomatic ?
                     "SCENERY: AUTO" : "SCENERY: " + EnvironmentThemes.DisplayName(environment.CurrentTheme);
+            if (musicButtonLabel != null && sound != null)
+                musicButtonLabel.text = sound.IsMusicMuted ? "MUSIC: OFF" : "MUSIC: ON";
             if (audioLevelLabel != null && sound != null)
                 audioLevelLabel.text = sound.IsQuietAudio ? "AUDIO: SOFT" : "AUDIO: NORMAL";
             if (motionLabel != null && activeTree != null)
