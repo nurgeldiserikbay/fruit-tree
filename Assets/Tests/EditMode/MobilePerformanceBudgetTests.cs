@@ -11,6 +11,9 @@ namespace FruitTree.Tests
         [TestCase(8192, 2048, MobilePerformanceTier.High)]
         [TestCase(0, 0, MobilePerformanceTier.Balanced)]
         [TestCase(8192, 0, MobilePerformanceTier.Balanced)]
+        [TestCase(2048, 0, MobilePerformanceTier.Low)]
+        [TestCase(0, 256, MobilePerformanceTier.Low)]
+        [TestCase(2800, -1, MobilePerformanceTier.Low)]
         public void MemoryBasedTiersAreStableWithoutDeviceQueries(
             int ramMb, int gpuMb, MobilePerformanceTier expected)
         {
@@ -23,7 +26,7 @@ namespace FruitTree.Tests
             Assert.AreEqual(MobilePerformanceTier.Low,
                 MobilePerformanceBudget.Recommend(2800, 600));
             Assert.AreEqual(10, FruitSpeciesProfile.Count);
-            Assert.AreEqual(4, EnvironmentThemes.Count);
+            Assert.AreEqual(8, EnvironmentThemes.Count);
         }
     }
 }
