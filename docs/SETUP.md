@@ -79,18 +79,18 @@ After all graphics/content work and Play Store prerequisites are implemented:
 - Open the refreshed Unity scene and verify the home scene shows an actual tree behind the menu.
 - Harvest down to 10 fruits: **FIND FRUIT** appears; it rotates the camera towards a remaining fruit without picking it, and disappears when none remain.
 - From Pause choose **ZEN MODE**: all standard HUD elements disappear and **EXIT ZEN** remains accessible; normal fruit collection still works and continues saving.
-- From Settings toggle **AUDIO: SOFT/NORMAL**, **SOUND: ON/OFF**, **MOTION: GENTLE/MINIMAL**; close and reopen the app, confirm persisted preferences.
+- From Settings toggle **AUDIO: SOFT/NORMAL**, **SOUND: ON/OFF**, **MOTION: GENTLE/MINIMAL** and **MUSIC: ON/OFF** when a licensed track is assigned; close and reopen the app, confirm persisted preferences.
 - Tree Collection → NEXT/PREVIOUS now closes Pause as the new tree loads, and previously picked fruit stays saved.
 - Check Android Back navigation, Unity EditMode/PlayMode tests, English-only UI, FPS on phones and public Privacy Policy before release. Purchases/ads are disabled.
 
 This is a verification plan. The newest features have **not** been compiled or run in Unity in the authoring environment.
 
-## Four environment themes
-After a scene refresh, Settings → **SCENERY** cycles automatic / Meadow / Park / City Park / Mountains. No scenery has physics colliders. Detailed implementation and future test checklist: [ENVIRONMENT_SYSTEM.md](ENVIRONMENT_SYSTEM.md). The new scenery code has not been tested in Unity or on Android yet.
+## Eight environment themes
+After a scene refresh, Settings → **SCENERY** cycles automatic / Meadow / Park / City Park / Mountains / Japanese Garden / Chinese Garden / Lakeside / Evening Garden. No scenery has physics colliders. Detailed implementation and future test checklist: [ENVIRONMENT_SYSTEM.md](ENVIRONMENT_SYSTEM.md). The new scenery code has not been tested in Unity or on Android yet.
 
 ## Keeping the Unity scene current
 
-GitHub tracks scene-generation code; the generated `Assets/Scenes/Main.unity` is local and intentionally not committed. Pulling `main` does **not** automatically rebuild an old local scene. New scenes include a `FruitTreeSceneVersion` stamp. When `Fruit Tree → Validate Project` reports an outdated scene, stop Play and choose **Fruit Tree → Refresh Visuals (Back Up Scene)**. This makes a local timestamped backup before regenerating. The process does not erase saved orchard progress in `Application.persistentDataPath`.
+GitHub tracks scene-generation code; the generated `Assets/Scenes/Main.unity` is local and intentionally not committed. Pulling `main` does **not** automatically rebuild an old local scene. New scenes include a `FruitTreeSceneVersion` stamp (revision 6 adds the eight-theme Music UI). When `Fruit Tree → Validate Project` reports an outdated scene, stop Play and choose **Fruit Tree → Refresh Visuals (Back Up Scene)**. This makes a local timestamped backup before regenerating. The process does not erase saved orchard progress in `Application.persistentDataPath`.
 
 ## Signed Google Play AAB (not yet built)
 
@@ -98,7 +98,7 @@ After the user publishes the real Google Docs Privacy Policy and configures its 
 
 ## 100% fruit accessibility release audit
 
-The signed bundle command automatically runs **Fruit Tree → Audit All Ten Tree Species** after validating the generated scene. The audit creates a temporary isolated tree for each species and uses the actual saved level counts and seeds. Sampled camera positions must be able to raycast to **every fruit** at least once. Any failures block the AAB, with species names and missing fruit objects in the error message. This tool is not a substitute for final fingertip tests at real screen sizes, and it has not yet been executed in Unity.
+The signed bundle command automatically runs **Fruit Tree → Audit All Ten Tree Species** after validating the generated scene. The upgraded diagnostic also checks each fruit against the actual orbit camera's allowed pitches, focus heights, zoom levels and 9:20 portrait view. The audit creates a temporary isolated tree for each species and uses the actual saved level counts and seeds. Sampled camera positions must be able to raycast to **every fruit** at least once. Any failures block the AAB, with species names and missing fruit objects in the error message. This tool is not a substitute for final fingertip tests at real screen sizes, and it has not yet been executed in Unity.
 
 ## Reduced Motion and offline saves
 
