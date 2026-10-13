@@ -490,8 +490,11 @@ namespace FruitTree
             go.AddComponent<MeshFilter>().sharedMesh = mesh;
             var renderer = go.AddComponent<MeshRenderer>();
             renderer.sharedMaterial = material;
-            if (label == "Merged Wood")
+            if (label == "Merged Wood" || label == "Merged Leaves")
             {
+                // A single non-convex collider keeps leaves visually opaque
+                // to picking rays. Without it, hidden fruit is collected through
+                // the canopy. Never add individual leaf GameObjects/colliders.
                 go.AddComponent<MeshCollider>().sharedMesh = mesh;
             }
             // Avoid dozens of dynamic shadow-casting meshes on constrained phones.
