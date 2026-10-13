@@ -12,6 +12,31 @@ namespace FruitTree.Tests
         };
 
         [Test]
+        public void RefinedSpeciesPreserveFruitCountsAndMergedCanopies()
+        {
+            foreach (string species in Species)
+            {
+                var root = new GameObject("Visual Check " + species);
+                try
+                {
+                    var tree = root.AddComponent<TreeGenerator>();
+                    tree.SetAutomaticGeneration(false);
+                    tree.Configure(species, 30, 122);
+                    Assert.AreEqual(30, tree.Apples.Count, species);
+                    var leaves = root.transform.Find("Merged Leaves");
+                    var wood = root.transform.Find("Merged Wood");
+                    Assert.IsNotNull(leaves, species);
+                    Assert.IsNotNull(wood, species);
+                    Assert.Greater(leaves.GetComponent<MeshFilter>().sharedMesh.vertexCount,
+                        20000, species);
+                    Assert.Less(leaves.GetComponent<MeshFilter>().sharedMesh.vertexCount,
+                        90000, species);
+                }
+                finally { Object.DestroyImmediate(root); }
+            }
+        }
+
+        [Test]
         public void TenSpeciesHaveValidDistinctVisualProfiles()
         {
             Assert.AreEqual(10, FruitSpeciesProfile.Count);
