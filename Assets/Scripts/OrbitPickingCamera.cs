@@ -310,25 +310,36 @@ namespace FruitTree
         {
             Ray ray = viewCamera.ScreenPointToRay(point);
             const float maxDistance = 30f;
-            // Direct hits win. Only a missed tap gets a small camera-aware margin;
-            // this keeps the actual fruit selection precise at crowded branches.
-            if (Physics.Raycast(ray, out RaycastHit hit, maxDistance,
-                Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+            // Foliage cards are rendered two-sided, so raycasts must also
+            // recognize their back faces. Restore the global setting even if
+            // a collider operation fails.
+            bool previousBackfaces = Physics.queriesHitBackfaces;
+            try
             {
-                var exactFruit = hit.collider.GetComponentInParent<Apple>();
-                if (exactFruit != null) exactFruit.Pick();
-                return;
-            }
+                Physics.queriesHitBackfaces = true;
+                if (Physics.Raycast(ray, out RaycastHit hit, maxDistance,
+                    Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                {
+                    var fruit = hit.collider.GetComponentInParent<Apple>();
+                    if (fruit != null) fruit.Pick();
+                    // Leaves, wood and scenery block all taps behind them.
+                    return;
+                }
 
-            float depth = target == null ? distance :
-                Vector3.Distance(viewCamera.transform.position, target.position);
-            float radius = TouchAssistRadius(Screen.height,
-                viewCamera.fieldOfView, depth);
-            if (Physics.SphereCast(ray, radius, out hit, maxDistance,
-                Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                float depth = target == null ? distance :
+                    Vector3.Distance(viewCamera.transform.position, target.position);
+                float radius = TouchAssistRadius(Screen.height,
+                    viewCamera.fieldOfView, depth);
+                if (Physics.SphereCast(ray, radius, out hit, maxDistance,
+                    Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                {
+                    var nearbyFruit = hit.collider.GetComponentInParent<Apple>();
+                    if (nearbyFruit != null) nearbyFruit.Pick();
+                }
+            }
+            finally
             {
-                var nearbyFruit = hit.collider.GetComponentInParent<Apple>();
-                if (nearbyFruit != null) nearbyFruit.Pick();
+                Physics.queriesHitBackfaces = previousBackfaces;
             }
         }
     }
