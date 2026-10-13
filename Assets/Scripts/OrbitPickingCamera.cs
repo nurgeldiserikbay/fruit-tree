@@ -161,13 +161,28 @@ namespace FruitTree
                     wantedFocusHeight = Mathf.Clamp(wantedFocusHeight - verticalSlide * .005f, 1.4f, 4.1f);
                 }
                 pinching = true;
+                // The old one-finger gesture must never finish as a tap after
+                // zooming: its pointer-down event predates the pinch.
                 tracking = false;
+                activeFinger = -1;
+                moved = true;
                 return;
             }
             var touch = Input.GetTouch(0);
             if (pinching)
             {
-                if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled) pinching = false;
+                // One finger remains on the screen after pinch. Start a fresh
+                // drag at its current position, not the stale pre-pinch point.
+                // Mark it moved so lifting it cannot accidentally pick fruit.
+                pinching = false;
+                tracking = false;
+                activeFinger = -1;
+                if (CanResumeOrbitAfterPinch(touch.phase))
+                {
+                    activeFinger = touch.fingerId;
+                    Begin(touch.position);
+                    moved = true;
+                }
                 return;
             }
             if (touch.phase == TouchPhase.Began)
@@ -183,8 +198,32 @@ namespace FruitTree
                     End(touch.position, activeFinger);
                     activeFinger = -1;
                 }
-                if (touch.phase == TouchPhase.Canceled) tracking = false;
+                if (touch.phase == TouchPhase.Canceled)
+                {
+                    tracking = false;
+                    activeFinger = -1;
+                }
             }
+        }
+
+        /// <summary>
+        /// A surviving finger may continue camera rotation, but an ended or
+        /// canceled pointer cannot start a drag or trigger a fruit pick.
+        /// Kept pure so Editor tests can validate mobile touch transitions.
+        /// </summary>
+        public static bool CanResumeOrbitAfterPinch(TouchPhase phase)
+        {
+            return phase != TouchPhase.Ended && phase != TouchPhase.Canceled;
+        }
+
+        private void OnDisable()
+        {
+            // Home/menu transitions must not retain a stale gesture or pick it
+            // when the user returns to the orchard.
+            tracking = false;
+            pinching = false;
+            activeFinger = -1;
+            moved = false;
         }
 
         private void MouseInput()
