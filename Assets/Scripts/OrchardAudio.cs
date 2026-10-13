@@ -78,11 +78,16 @@ namespace FruitTree
             if (tree != null) tree.FruitPicked += OnFruitPicked;
             if (environment != null)
                 environment.ThemeChanged += OnThemeChanged;
+            EnvironmentTheme initialTheme = environment != null ?
+                environment.CurrentTheme : EnvironmentTheme.Meadow;
             if (ownsAmbientClip)
-                SelectTheme(environment != null ? environment.CurrentTheme :
-                    EnvironmentTheme.Meadow, true);
-            else ambience.Play();
-            SelectMusic(activeTheme);
+                SelectTheme(initialTheme, true);
+            else
+            {
+                activeTheme = initialTheme;
+                ambience.Play();
+            }
+            SelectMusic(initialTheme);
             UpdateStatusText();
         }
 
@@ -110,6 +115,9 @@ namespace FruitTree
             PlayerPrefs.SetInt("FruitTree.Muted", muted ? 1 : 0);
             PlayerPrefs.Save();
             ApplyVolume();
+            // A scenery change while globally muted may have stopped the
+            // current music track. Resume it when SOUND returns to ON.
+            SelectMusic(activeTheme);
             UpdateStatusText();
         }
         public void ToggleMusic()
