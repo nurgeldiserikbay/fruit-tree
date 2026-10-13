@@ -24,7 +24,7 @@ namespace FruitTree
 
         public string SpeciesId => speciesId;
         public bool ReducedMotion { get; private set; }
-        [SerializeField, Range(4, 25)] private int leavesPerCluster = 16;
+        [SerializeField, Range(4, 25)] private int leavesPerCluster = 19;
         private readonly List<Apple> apples = new List<Apple>();
         public IReadOnlyList<Apple> Apples => apples;
         public event Action<int, int> HarvestChanged;
@@ -220,9 +220,11 @@ namespace FruitTree
                             float tint = Between(-.065f,.065f);
                             Color leafColor = profile.LeafColor +
                                 new Color(tint, tint * .70f, tint * .48f);
+                            // Slightly rounder, shorter foliage cards read as
+                            // a soft canopy instead of isolated spear tips.
                             foliage.Leaf(center + offset * .75f, direction,
-                                Between(profile.LeafLengthLow, profile.LeafLengthHigh),
-                                Between(profile.LeafWidthLow, profile.LeafWidthHigh),
+                                Between(profile.LeafLengthLow, profile.LeafLengthHigh) * .92f,
+                                Between(profile.LeafWidthLow, profile.LeafWidthHigh) * 1.06f,
                                 leafColor, profile.LeafOvalness);
                         }
                     }
