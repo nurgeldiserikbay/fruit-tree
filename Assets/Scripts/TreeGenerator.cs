@@ -293,6 +293,8 @@ namespace FruitTree
             if (leafMaterial.HasProperty("_Wind"))
                 leafMaterial.SetFloat("_Wind", ReducedMotion ? .008f : .045f);
             if (leafMaterial.HasProperty("_AmbientLight")) leafMaterial.SetFloat("_AmbientLight", .72f);
+            if (leafMaterial.HasProperty("_LeafTranslucency"))
+                leafMaterial.SetFloat("_LeafTranslucency", .28f);
             if (leafMaterial.HasProperty("_Cull")) leafMaterial.SetFloat("_Cull", 0f);
             MakeMeshObject("Merged Leaves", Track(foliage.Build("Leaves")), leafMaterial);
             Mesh appleMesh = Track(profile.CreateFruitMesh());
