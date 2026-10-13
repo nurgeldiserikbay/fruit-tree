@@ -69,12 +69,30 @@ namespace FruitTree
 
             saves = new OrchardSaveRepository(Application.persistentDataPath);
             OrchardSaveData loadedSave = saves.Load();
-            HasPreviousSave = loadedSave != null;
+            HasPreviousSave = HasMeaningfulProgress(loadedSave);
             progress = new OrchardProgressionService(Catalog, loadedSave);
             hud.OrchardMode = true;
             tree.FruitPicked += OnFruitPicked;
             initialized = true;
             DisplayActiveTree();
+        }
+
+        // An empty autosave written when the user leaves the first launch
+        // is not a started game and must not turn PLAY into CONTINUE.
+        public static bool HasMeaningfulProgress(OrchardSaveData save)
+        {
+            if (save == null || save.trees == null) return false;
+            if (!string.IsNullOrEmpty(save.activeTreeId) &&
+                save.activeTreeId != "tree_001") return true;
+            foreach (var tree in save.trees)
+            {
+                if (tree == null) continue;
+                if (tree.completedOnce || tree.timesCleared > 0 ||
+                    tree.roundNumber > 1 ||
+                    (tree.pickedFruitIds != null && tree.pickedFruitIds.Count > 0))
+                    return true;
+            }
+            return false;
         }
 
         private void OnDestroy()
