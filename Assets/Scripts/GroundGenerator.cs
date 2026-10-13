@@ -78,11 +78,16 @@ namespace FruitTree
                     vertices.Add(new Vector3(px, -.055f + (noise - .5f) * .13f * outerBump, pz));
                     float variation = Mathf.PerlinNoise(px * .24f + 91f, pz * .24f + 16f);
                     float fine = Mathf.PerlinNoise(px * .91f + 57f, pz * .91f + 43f);
-                    float shade = .78f + variation * .13f + fine * .07f;
+                    float shade = .82f + variation * .12f + fine * .06f;
+                    // A soft built-in contact shade grounds the trunk even on
+                    // Android tiers without real-time shadow mapping.
+                    float contact = 1f - Mathf.SmoothStep(.5f, 3.3f, distance);
+                    shade *= 1f - .20f * contact;
                     float clearing = 1f - Mathf.SmoothStep(1.1f, 3.8f, distance);
-                    Color baseGreen = new Color(.40f, .55f, .32f);
+                    Color baseGreen = new Color(.44f, .62f, .35f);
                     colors.Add(Color.Lerp(baseGreen * shade,
-                        new Color(.52f, .61f, .37f), clearing * .32f));
+                        new Color(.48f, .61f, .37f) * (1f - contact * .12f),
+                        clearing * .20f));
                     uv.Add(new Vector2(x / (float)divisions, z / (float)divisions));
                 }
             for (int z = 0; z < divisions; z++)
@@ -105,10 +110,10 @@ namespace FruitTree
 
         public static Mesh CreateGrassMesh()
         {
-            // One small merged mesh of short, bent blades. The old tall flat
-            // triangles were visually harsh; five vertices make a softer curve.
+            // Dense but short grass avoids the sparse sharp spikes seen in the
+            // first Unity screenshots. Still one merged mesh/renderer.
             var random = new System.Random(902);
-            const int bladeCount = 300;
+            const int bladeCount = 900;
             var vertices = new List<Vector3>(bladeCount * 5);
             var colors = new List<Color>(bladeCount * 5);
             var uv = new List<Vector2>(bladeCount * 5);
@@ -116,15 +121,15 @@ namespace FruitTree
             for (int i = 0; i < bladeCount; i++)
             {
                 float angle = (float)random.NextDouble() * Mathf.PI * 2f;
-                float radius = Mathf.Sqrt((float)random.NextDouble()) * 5.9f;
+                float radius = Mathf.Sqrt((float)random.NextDouble()) * 8.7f;
                 if (radius < .8f) continue;
                 float x = Mathf.Cos(angle) * radius;
                 float z = Mathf.Sin(angle) * radius;
                 float noise = Mathf.PerlinNoise(x * .33f + 34f, z * .33f + 12f);
                 float y = -.055f + (noise - .5f) * .13f *
                     Mathf.Clamp01((radius - 1f) / 3f);
-                float height = .045f + .074f * (float)random.NextDouble();
-                float width = .022f + .026f * (float)random.NextDouble();
+                float height = .038f + .052f * (float)random.NextDouble();
+                float width = .013f + .018f * (float)random.NextDouble();
                 float rot = (float)random.NextDouble() * Mathf.PI * 2f;
                 Vector3 side = new Vector3(Mathf.Cos(rot), 0f, Mathf.Sin(rot));
                 Vector3 lean = new Vector3(-side.z, 0f, side.x) * height * .30f;
@@ -137,8 +142,8 @@ namespace FruitTree
                 vertices.Add(middle + side * width * .61f);
                 vertices.Add(basePos + Vector3.up * height + lean);
                 float tone = (float)random.NextDouble();
-                var leaf = new Color(.31f + .075f * tone,
-                    .49f + .14f * tone, .20f + .055f * tone);
+                var leaf = new Color(.34f + .09f * tone,
+                    .53f + .12f * tone, .25f + .08f * tone);
                 colors.Add(leaf * .80f);
                 colors.Add(leaf * .80f);
                 colors.Add(leaf * .95f);
