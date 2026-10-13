@@ -201,6 +201,18 @@ namespace FruitTree.Tests
         {
             Assert.IsTrue(FruitTreePrivacyConfig.IsPublishedUrlValid(
                 "https://docs.google.com/document/d/e/examplePublishedId/pub"));
+            Assert.IsTrue(FruitTreePrivacyConfig.IsPublishedUrlValid(
+                "https://docs.google.com/document/d/e/2PACX-1abc_def/pub?embedded=true"));
+            Assert.IsFalse(FruitTreePrivacyConfig.IsPublishedUrlValid(
+                "https://docs.google.com/document/d/e/examplePublishedId/publish"));
+            Assert.IsFalse(FruitTreePrivacyConfig.IsPublishedUrlValid(
+                "https://docs.google.com/document/d/e/examplePublishedId/pub/preview"));
+            Assert.IsFalse(FruitTreePrivacyConfig.IsPublishedUrlValid(
+                "https://docs.google.com/document/d/e//pub"));
+            Assert.IsFalse(FruitTreePrivacyConfig.IsPublishedUrlValid(
+                "https://docs.google.com:444/document/d/e/examplePublishedId/pub"));
+            Assert.IsFalse(FruitTreePrivacyConfig.IsPublishedUrlValid(
+                "https://docs.google.com/document/d/e/examplePublishedId_extra/pub/other"));
             Assert.IsFalse(FruitTreePrivacyConfig.IsPublishedUrlValid(""));
             Assert.IsFalse(FruitTreePrivacyConfig.IsPublishedUrlValid(
                 "http://docs.google.com/document/d/e/example/pub"));
