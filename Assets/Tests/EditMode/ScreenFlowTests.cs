@@ -159,6 +159,44 @@ namespace FruitTree.Tests
         }
 
         [Test]
+        public void MissingThemeMusicShowsUnavailableAndDisablesItsButton()
+        {
+            var root = new GameObject("Music Settings Test");
+            var buttonNode = new GameObject("Music Button",
+                typeof(RectTransform), typeof(UnityEngine.UI.Button));
+            buttonNode.transform.SetParent(root.transform, false);
+            var labelNode = new GameObject("Music Label",
+                typeof(RectTransform), typeof(UnityEngine.UI.Text));
+            labelNode.transform.SetParent(buttonNode.transform, false);
+            var clip = AudioClip.Create("Available Music Test", 22050, 1, 22050, false);
+            try
+            {
+                var audio = root.AddComponent<OrchardAudio>();
+                var flow = root.AddComponent<FruitTreeScreenFlow>();
+                flow.sound = audio;
+                flow.musicButtonLabel = labelNode.GetComponent<UnityEngine.UI.Text>();
+                var button = buttonNode.GetComponent<UnityEngine.UI.Button>();
+
+                flow.OpenSettingsFromHome();
+                Assert.AreEqual("MUSIC: NOT AVAILABLE", flow.musicButtonLabel.text);
+                Assert.IsFalse(button.interactable);
+                Assert.IsFalse(audio.HasMusicForCurrentTheme);
+
+                audio.themeMusic[(int)EnvironmentTheme.Meadow] = clip;
+                flow.OpenSettingsFromHome();
+                Assert.IsTrue(button.interactable);
+                Assert.IsTrue(audio.HasMusicForCurrentTheme);
+                Assert.AreEqual(audio.IsMusicMuted ? "MUSIC: OFF" : "MUSIC: ON",
+                    flow.musicButtonLabel.text);
+            }
+            finally
+            {
+                Object.DestroyImmediate(root);
+                Object.DestroyImmediate(clip);
+            }
+        }
+
+        [Test]
         public void OnlyPublishedGoogleDocsHttpsLinksAreAllowed()
         {
             Assert.IsTrue(FruitTreePrivacyConfig.IsPublishedUrlValid(
