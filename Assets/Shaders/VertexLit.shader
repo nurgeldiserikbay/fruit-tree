@@ -7,6 +7,7 @@ Shader "FruitTree/VertexLit"
         _Wind ("Wind Amount", Range(0,0.1)) = 0
         _Cull ("Cull Back Faces", Float) = 2
         _AmbientLight ("Minimum Light", Range(0,1)) = 0.55
+        _LeafTranslucency ("Leaf Backlight", Range(0,0.5)) = 0
     }
     SubShader
     {
@@ -25,6 +26,7 @@ Shader "FruitTree/VertexLit"
             fixed4 _Color;
             float _Wind;
             float _AmbientLight;
+            float _LeafTranslucency;
             sampler2D _MainTex;
             struct appdata
             {
@@ -59,8 +61,14 @@ Shader "FruitTree/VertexLit"
             fixed4 frag(v2f i) : SV_Target
             {
                 float3 n = normalize(i.normal);
-                float diffuse = saturate(dot(n, normalize(_WorldSpaceLightPos0.xyz)));
-                float light = _AmbientLight + (1.0 - _AmbientLight) * diffuse;
+                float3 sun = normalize(_WorldSpaceLightPos0.xyz);
+                float facing = dot(n, sun);
+                float diffuse = saturate(facing);
+                // Leaf cards have no thickness. A small backside response
+                // prevents harsh black undersides without extra light passes.
+                float backlight = saturate(-facing) * _LeafTranslucency;
+                float light = _AmbientLight + (1.0 - _AmbientLight) *
+                    saturate(diffuse + backlight);
                 fixed4 tex = tex2D(_MainTex, i.uv);
                 fixed4 pixel = fixed4(tex.rgb * i.color.rgb * light, 1);
                 UNITY_APPLY_FOG(i.fogCoord, pixel);
