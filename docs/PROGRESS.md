@@ -1,5 +1,12 @@
 # Fruit Tree development state
 
+## Correct fruit rest-pose restoration (2026-10-13)
+
+- [x] Fixed a real rebloom bug: Unity's `Awake` fires when the Fruit component is attached, before the mesh object's final transform has been captured. `Apple.Initialize` now records the configured fruit transform so ResetHarvest and animated rebloom restore every fruit to its actual branch location, scale and rotation.
+- [x] Added PlayMode regression coverage for first/last fruit position, size and orientation after a pick + reset.
+- [ ] Run Unity PlayMode suite and ten-species orchard/rebloom acceptance on device; no Unity build or FPS test was run in this session.
+
+
 ## Backup freshness and fruit-ID save integrity (2026-10-13)
 
 - [x] `OrchardSaveRepository` rejects saved picked-fruit lists containing duplicated, null, truncated or malformed `fruit_####` identifiers. The last valid primary is left untouched on an invalid write.
