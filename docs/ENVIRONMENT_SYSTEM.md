@@ -92,3 +92,7 @@ Source tests cover easing limits and a deferred PlayMode scenario with `Time.tim
 ### Automatic panorama asset loading
 
 For a theme-specific backdrop, import an equirectangular 2:1 image into `Assets/Resources/Panoramas/` with its filename equal to the enum name: `Meadow.png`, `Park.png`, `CityPark.png`, `Mountains.png`, `JapaneseGarden.png`, `ChineseGarden.png`, `Lakeside.png`, or `EveningGarden.png`. The runtime looks for these assets when no explicit Inspector texture has been assigned. This removes the need to regenerate the scene when introducing a new panorama. Keep horizontal texture Wrap Mode set to **Repeat**; validate horizon/seam and compression on Android. The equirectangular top row is the sky zenith (the shader now maps latitude accordingly). Panorama assets themselves have not been added yet.
+
+### Camera orbit and horizon checks
+
+Sky panorama sampling uses a world-space *direction* rather than the vector from the camera to a finite sky sphere. This prevents panorama features from shifting when orbiting or zooming the camera around a stationary tree. QA: with an assigned 2:1 image, rotate the view through 360 degrees, zoom in and out, inspect seam and poles, then repeat in all eight themes. Test on Android too; this change was made in shader source and has not yet been verified in Unity or on a device.
