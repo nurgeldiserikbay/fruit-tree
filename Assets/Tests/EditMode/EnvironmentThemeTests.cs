@@ -6,6 +6,21 @@ namespace FruitTree.Tests
     public sealed class EnvironmentThemeTests
     {
         [Test]
+        public void SkyPanoramaRemainsOptional()
+        {
+            var shader = Shader.Find("FruitTree/SoftSky");
+            Assert.IsNotNull(shader);
+            var material = new Material(shader);
+            try
+            {
+                Assert.IsTrue(material.HasProperty("_Panorama"));
+                Assert.IsTrue(material.HasProperty("_PanoramaBlend"));
+                Assert.That(material.GetFloat("_PanoramaBlend"), Is.EqualTo(0f));
+            }
+            finally { Object.DestroyImmediate(material); }
+        }
+
+        [Test]
         public void SoftSkySupportsAtmosphericHazeWithoutPanoramaTexture()
         {
             Shader shader = Shader.Find("FruitTree/SoftSky");
