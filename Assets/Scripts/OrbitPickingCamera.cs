@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
@@ -306,23 +307,43 @@ namespace FruitTree
             return Mathf.Clamp(unitsPerPixel * 14f, .035f, .12f);
         }
 
+        // Transparent pixels of an optional foliage atlas are not occluders.
+        // Opaque leaf pixels remain blocking, so touching foliage cannot
+        // harvest a fruit that is visually hidden behind it.
+        private static bool IsTransparentFoliageHit(RaycastHit hit)
+        {
+            if (hit.collider == null || hit.collider.name != "Merged Leaves")
+                return false;
+            var renderer = hit.collider.GetComponent<MeshRenderer>();
+            Material material = renderer != null ? renderer.sharedMaterial : null;
+            if (material == null || !material.HasProperty("_AlphaCutoff") ||
+                material.GetFloat("_AlphaCutoff") <= 0f)
+                return false;
+            Texture2D texture = material.mainTexture as Texture2D;
+            if (texture == null || !texture.isReadable)
+                return false; // Conservative: do not pick hidden fruit.
+            return texture.GetPixelBilinear(hit.textureCoord.x,
+                hit.textureCoord.y).a < material.GetFloat("_AlphaCutoff");
+        }
+
         private void TryPick(Vector2 point)
         {
             Ray ray = viewCamera.ScreenPointToRay(point);
             const float maxDistance = 30f;
-            // Foliage cards are rendered two-sided, so raycasts must also
-            // recognize their back faces. Restore the global setting even if
-            // a collider operation fails.
             bool previousBackfaces = Physics.queriesHitBackfaces;
             try
             {
                 Physics.queriesHitBackfaces = true;
-                if (Physics.Raycast(ray, out RaycastHit hit, maxDistance,
-                    Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                // A tap is infrequent; sorting all hits allows transparent
+                // leaf texels to be skipped while respecting opaque blockers.
+                RaycastHit[] hits = Physics.RaycastAll(ray, maxDistance,
+                    Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+                Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+                for (int i = 0; i < hits.Length; i++)
                 {
-                    var fruit = hit.collider.GetComponentInParent<Apple>();
+                    if (IsTransparentFoliageHit(hits[i])) continue;
+                    Apple fruit = hits[i].collider.GetComponentInParent<Apple>();
                     if (fruit != null) fruit.Pick();
-                    // Leaves, wood and scenery block all taps behind them.
                     return;
                 }
 
@@ -330,11 +351,12 @@ namespace FruitTree
                     Vector3.Distance(viewCamera.transform.position, target.position);
                 float radius = TouchAssistRadius(Screen.height,
                     viewCamera.fieldOfView, depth);
-                if (Physics.SphereCast(ray, radius, out hit, maxDistance,
+                if (Physics.SphereCast(ray, radius, out RaycastHit hit, maxDistance,
                     Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
                 {
-                    var nearbyFruit = hit.collider.GetComponentInParent<Apple>();
-                    if (nearbyFruit != null) nearbyFruit.Pick();
+                    // Touch assist cannot go through an opaque leaf or branch.
+                    Apple fruit = hit.collider.GetComponentInParent<Apple>();
+                    if (fruit != null) fruit.Pick();
                 }
             }
             finally
