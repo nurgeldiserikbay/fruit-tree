@@ -38,7 +38,7 @@ namespace FruitTree.Editor
             }
             finally
             {
-                Object.DestroyImmediate(treeObject);
+                UnityEngine.Object.DestroyImmediate(treeObject);
             }
         }
 
@@ -71,7 +71,7 @@ namespace FruitTree.Editor
                             string.Join(", ", missed));
                     }
                 }
-                finally { Object.DestroyImmediate(probe); }
+                finally { UnityEngine.Object.DestroyImmediate(probe); }
             }
 
             if (problems.Count > 0)
