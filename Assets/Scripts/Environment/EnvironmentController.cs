@@ -234,7 +234,15 @@ namespace FruitTree
                 panorama = null;
             }
             if (panorama != null)
+            {
+                // Equirectangular longitude must join without a visible seam
+                // when the camera rotates through 360 degrees.
+                if (panorama.wrapModeU != TextureWrapMode.Repeat)
+                    panorama.wrapModeU = TextureWrapMode.Repeat;
+                if (panorama.wrapModeV != TextureWrapMode.Clamp)
+                    panorama.wrapModeV = TextureWrapMode.Clamp;
                 skyMaterial.SetTexture("_Panorama", panorama);
+            }
             else
                 skyMaterial.SetTexture("_Panorama", Texture2D.whiteTexture);
             skyMaterial.SetFloat("_PanoramaBlend", panorama == null ? 0f : 1f);
