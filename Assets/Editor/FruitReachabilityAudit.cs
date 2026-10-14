@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -7,8 +8,8 @@ namespace FruitTree.Editor
 {
     /// <summary>
     /// Checks whether ripe fruit are visible and hittable from the actual
-    /// portrait orbit camera's allowed positions. Leaf cards have no colliders,
-    /// but real branch and fruit colliders may block a harvest.
+    /// portrait orbit camera's allowed positions. Foliage, wood and other fruit
+    /// colliders block picking; transparent leaf texels are handled as in gameplay.
     /// </summary>
     public static class FruitReachabilityAudit
     {
@@ -139,15 +140,31 @@ namespace FruitTree.Editor
                     Vector3 difference = fruitPoint - camera;
                     float distance = difference.magnitude;
                     if (distance <= .001f || distance > 30f) continue;
-                    if (Physics.Raycast(camera, difference / distance,
-                            out RaycastHit hit, distance + .25f,
-                            Physics.DefaultRaycastLayers,
-                            QueryTriggerInteraction.Ignore) &&
-                        hit.collider.GetComponentInParent<Apple>() == apple)
+                    // Match actual tap selection: scan front-to-back, skip
+                    // transparent leaf texels, and stop on the first blocker.
+                    bool previousBackfaces = Physics.queriesHitBackfaces;
+                    try
                     {
-                        reachable = true;
-                        break;
+                        Physics.queriesHitBackfaces = true;
+                        RaycastHit[] hits = Physics.RaycastAll(camera,
+                            difference / distance, distance + .25f,
+                            Physics.DefaultRaycastLayers,
+                            QueryTriggerInteraction.Ignore);
+                        Array.Sort(hits, (left, right) =>
+                            left.distance.CompareTo(right.distance));
+                        foreach (RaycastHit hit in hits)
+                        {
+                            if (OrbitPickingCamera.IsTransparentFoliageHit(hit))
+                                continue;
+                            reachable = hit.collider.GetComponentInParent<Apple>() == apple;
+                            break;
+                        }
                     }
+                    finally
+                    {
+                        Physics.queriesHitBackfaces = previousBackfaces;
+                    }
+                    if (reachable) break;
                 }
                 if (!reachable)
                     inaccessible.Add(apple.name + " [" + apple.StableFruitId + "]");
