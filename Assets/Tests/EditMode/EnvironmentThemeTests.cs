@@ -6,6 +6,24 @@ namespace FruitTree.Tests
     public sealed class EnvironmentThemeTests
     {
         [Test]
+        public void OnlyTwoToOnePanoramasAreAccepted()
+        {
+            var valid = new Texture2D(8, 4);
+            var square = new Texture2D(4, 4);
+            try
+            {
+                Assert.IsFalse(EnvironmentController.IsValidPanorama(null));
+                Assert.IsTrue(EnvironmentController.IsValidPanorama(valid));
+                Assert.IsFalse(EnvironmentController.IsValidPanorama(square));
+            }
+            finally
+            {
+                Object.DestroyImmediate(valid);
+                Object.DestroyImmediate(square);
+            }
+        }
+
+        [Test]
         public void SkyPanoramaRemainsOptional()
         {
             var shader = Shader.Find("FruitTree/SoftSky");
