@@ -4,6 +4,7 @@ Shader "FruitTree/SoftSky"
     {
         _Horizon ("Horizon", Color) = (0.88,0.94,0.95,1)
         _Zenith ("Upper Sky", Color) = (0.43,0.68,0.86,1)
+        _HazeStrength ("Horizon Atmosphere", Range(0,1)) = 0.35
     }
     SubShader
     {
@@ -17,6 +18,7 @@ Shader "FruitTree/SoftSky"
             #include "UnityCG.cginc"
             fixed4 _Horizon;
             fixed4 _Zenith;
+            float _HazeStrength;
             struct appdata { float4 vertex : POSITION; };
             struct v2f { float4 pos: SV_POSITION; float3 dir : TEXCOORD0; };
             v2f vert(appdata v)
@@ -31,7 +33,14 @@ Shader "FruitTree/SoftSky"
             {
                 float h = saturate(i.dir.y * .65 + .45);
                 h = h * h * (3 - 2 * h);
-                return lerp(_Horizon, _Zenith, h);
+                fixed4 sky = lerp(_Horizon, _Zenith, h);
+                // Soft atmospheric scattering close to the horizon. The
+                // panoramic direction keeps the effect seamless at 360 degrees.
+                float horizonBand = exp2(-abs(i.dir.y) * 17.0);
+                fixed3 hazeColor = lerp(_Horizon.rgb, fixed3(1, 1, 1), .16);
+                sky.rgb = lerp(sky.rgb, hazeColor,
+                    saturate(horizonBand * _HazeStrength));
+                return sky;
             }
             ENDCG
         }
