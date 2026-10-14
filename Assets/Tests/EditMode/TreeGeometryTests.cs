@@ -6,6 +6,35 @@ namespace FruitTree.Tests
     public sealed class TreeGeometryTests
     {
         [Test]
+        public void TouchAssistDoesNotReachFruitBehindOpaqueBlocker()
+        {
+            var fruit = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            var obstacle = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            try
+            {
+                fruit.transform.position = Vector3.zero;
+                obstacle.transform.position = new Vector3(-2f, 0f, 0f);
+                Physics.SyncTransforms();
+                var method = typeof(OrbitPickingCamera).GetMethod(
+                    "HasVisibleFruitLine",
+                    System.Reflection.BindingFlags.NonPublic |
+                    System.Reflection.BindingFlags.Static);
+                Assert.IsNotNull(method);
+                var args = new object[] { new Vector3(-5f, 0f, 0f),
+                    fruit.GetComponent<Collider>(), 30f };
+                Assert.IsFalse((bool)method.Invoke(null, args));
+                obstacle.SetActive(false);
+                Physics.SyncTransforms();
+                Assert.IsTrue((bool)method.Invoke(null, args));
+            }
+            finally
+            {
+                Object.DestroyImmediate(fruit);
+                Object.DestroyImmediate(obstacle);
+            }
+        }
+
+        [Test]
         public void GeneratedFoliageOccludesPickingRays()
         {
             var root = new GameObject("Leaf Occlusion Test");
