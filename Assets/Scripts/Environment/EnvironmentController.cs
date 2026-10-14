@@ -32,7 +32,7 @@ namespace FruitTree
         private struct Palette
         {
             public Color ground, grass, horizon, zenith, sun, ambient;
-            public float sunIntensity;
+            public float sunIntensity, hazeStrength;
 
             public static Palette FromTheme(EnvironmentTheme theme)
             {
@@ -45,6 +45,8 @@ namespace FruitTree
                     zenith = EnvironmentThemes.Zenith(theme),
                     sun = EnvironmentThemes.Sun(theme),
                     ambient = Color.Lerp(horizon, Color.white, .14f),
+                    hazeStrength = theme == EnvironmentTheme.Mountains ? .20f :
+                        theme == EnvironmentTheme.EveningGarden ? .55f : .35f,
                     sunIntensity = theme == EnvironmentTheme.EveningGarden ? .66f :
                         theme == EnvironmentTheme.CityPark ? .96f : 1.08f
                 };
@@ -60,7 +62,8 @@ namespace FruitTree
                     zenith = Color.Lerp(from.zenith, to.zenith, t),
                     sun = Color.Lerp(from.sun, to.sun, t),
                     ambient = Color.Lerp(from.ambient, to.ambient, t),
-                    sunIntensity = Mathf.Lerp(from.sunIntensity, to.sunIntensity, t)
+                    sunIntensity = Mathf.Lerp(from.sunIntensity, to.sunIntensity, t),
+                    hazeStrength = Mathf.Lerp(from.hazeStrength, to.hazeStrength, t)
                 };
             }
         }
@@ -205,6 +208,8 @@ namespace FruitTree
                     skyMaterial.SetColor("_Horizon", palette.horizon);
                 if (skyMaterial.HasProperty("_Zenith"))
                     skyMaterial.SetColor("_Zenith", palette.zenith);
+                if (skyMaterial.HasProperty("_HazeStrength"))
+                    skyMaterial.SetFloat("_HazeStrength", palette.hazeStrength);
             }
             if (sun != null)
             {
