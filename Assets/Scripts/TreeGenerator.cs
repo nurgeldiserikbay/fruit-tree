@@ -302,6 +302,19 @@ namespace FruitTree
             if (leafMaterial.HasProperty("_LeafTranslucency"))
                 leafMaterial.SetFloat("_LeafTranslucency", .28f);
             if (leafMaterial.HasProperty("_Cull")) leafMaterial.SetFloat("_Cull", 0f);
+            // Alpha artwork is optional. The original opaque geometry remains
+            // the default, while picking still uses the canopy MeshCollider.
+            Texture2D leafArt = Resources.Load<Texture2D>(
+                "TreeTextures/Leaves/" + speciesId);
+            if (leafArt == null)
+                leafArt = Resources.Load<Texture2D>("TreeTextures/Leaves/Default");
+            if (leafArt != null)
+            {
+                if (leafMaterial.HasProperty("_MainTex"))
+                    leafMaterial.SetTexture("_MainTex", leafArt);
+                if (leafMaterial.HasProperty("_AlphaCutoff"))
+                    leafMaterial.SetFloat("_AlphaCutoff", .45f);
+            }
             MakeMeshObject("Merged Leaves", Track(foliage.Build("Leaves")), leafMaterial);
             Mesh appleMesh = Track(profile.CreateFruitMesh());
             Color fruitColor = profile.FruitColor;
