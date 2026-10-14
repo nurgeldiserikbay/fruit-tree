@@ -22,6 +22,8 @@ namespace FruitTree
         private Material skyMaterial;
         private Mesh sceneryMesh;
         private readonly Mesh[] themeMeshes = new Mesh[EnvironmentThemes.Count];
+        private readonly Texture2D[] cachedPanoramas = new Texture2D[EnvironmentThemes.Count];
+        private readonly bool[] panoramaLookedUp = new bool[EnvironmentThemes.Count];
         public event Action<EnvironmentTheme> ThemeChanged;
         private MeshFilter sceneryFilter;
         private int treeIndex;
@@ -200,6 +202,12 @@ namespace FruitTree
             return Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(progress));
         }
 
+        public static bool IsValidPanorama(Texture2D texture)
+        {
+            return texture != null && texture.height > 0 &&
+                texture.width == texture.height * 2;
+        }
+
         private void ApplyPanorama(EnvironmentTheme theme)
         {
             if (skyMaterial == null || !skyMaterial.HasProperty("_PanoramaBlend"))
@@ -207,17 +215,28 @@ namespace FruitTree
             int index = (int)theme;
             Texture2D panorama = panoramas != null && index < panoramas.Length
                 ? panoramas[index] : null;
-            // Resources/Panoramas/<ThemeName>.png can supply optional art
-            // without rebuilding the scene or overwriting Inspector choices.
             if (panorama == null)
-                panorama = Resources.Load<Texture2D>("Panoramas/" + theme);
-            if (panorama != null && panorama.width != panorama.height * 2)
             {
-                Debug.LogWarning("Fruit Tree: panorama must have a 2:1 aspect ratio.");
+                // Missing Resources lookups are cached too; cycling biomes
+                // must not hit the Resources index on every selection.
+                if (!panoramaLookedUp[index])
+                {
+                    cachedPanoramas[index] = Resources.Load<Texture2D>(
+                        "Panoramas/" + theme);
+                    panoramaLookedUp[index] = true;
+                }
+                panorama = cachedPanoramas[index];
+            }
+            if (panorama != null && !IsValidPanorama(panorama))
+            {
+                Debug.LogWarning("Fruit Tree: " + theme +
+                    " panorama requires a 2:1 equirectangular image.");
                 panorama = null;
             }
             if (panorama != null)
                 skyMaterial.SetTexture("_Panorama", panorama);
+            else
+                skyMaterial.SetTexture("_Panorama", Texture2D.whiteTexture);
             skyMaterial.SetFloat("_PanoramaBlend", panorama == null ? 0f : 1f);
         }
 
