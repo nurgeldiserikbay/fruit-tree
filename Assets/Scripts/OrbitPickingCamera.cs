@@ -326,6 +326,24 @@ namespace FruitTree
                 hit.textureCoord.y).a < material.GetFloat("_AlphaCutoff");
         }
 
+        private static bool HasVisibleFruitLine(Vector3 origin,
+            Collider fruitCollider, float maxDistance)
+        {
+            Vector3 towardsFruit = fruitCollider.bounds.center - origin;
+            float length = towardsFruit.magnitude;
+            if (length <= .001f || length > maxDistance) return false;
+            var sight = new Ray(origin, towardsFruit / length);
+            RaycastHit[] hits = Physics.RaycastAll(sight, length + .15f,
+                Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+            Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+            foreach (RaycastHit hit in hits)
+            {
+                if (IsTransparentFoliageHit(hit)) continue;
+                return hit.collider == fruitCollider;
+            }
+            return false;
+        }
+
         private void TryPick(Vector2 point)
         {
             Ray ray = viewCamera.ScreenPointToRay(point);
@@ -356,7 +374,12 @@ namespace FruitTree
                 {
                     // Touch assist cannot go through an opaque leaf or branch.
                     Apple fruit = hit.collider.GetComponentInParent<Apple>();
-                    if (fruit != null) fruit.Pick();
+                    // A wide sphere can graze a fruit hidden just behind a
+                    // nearby leaf. Confirm a clear central line of sight before
+                    // letting touch assistance harvest anything.
+                    if (fruit != null && HasVisibleFruitLine(ray.origin,
+                        hit.collider, maxDistance))
+                        fruit.Pick();
                 }
             }
             finally
