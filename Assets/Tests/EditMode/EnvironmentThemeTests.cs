@@ -6,6 +6,22 @@ namespace FruitTree.Tests
     public sealed class EnvironmentThemeTests
     {
         [Test]
+        public void SoftSkySupportsAtmosphericHazeWithoutPanoramaTexture()
+        {
+            Shader shader = Shader.Find("FruitTree/SoftSky");
+            Assert.IsNotNull(shader);
+            var material = new Material(shader);
+            try
+            {
+                Assert.IsTrue(material.HasProperty("_HazeStrength"));
+                material.SetFloat("_HazeStrength", .35f);
+                Assert.That(material.GetFloat("_HazeStrength"),
+                    Is.EqualTo(.35f).Within(.001f));
+            }
+            finally { Object.DestroyImmediate(material); }
+        }
+
+        [Test]
         public void AllEightThemesHaveFiniteSmallStaticGeometry()
         {
             for (int i = 0; i < EnvironmentThemes.Count; i++)
