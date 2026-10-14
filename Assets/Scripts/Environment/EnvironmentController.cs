@@ -15,6 +15,8 @@ namespace FruitTree
         public GroundGenerator ground;
         public Renderer skyRenderer;
         public Light sun;
+        [Tooltip("Optional 2:1 equirectangular textures in theme order. Empty entries use the procedural sky.")]
+        public Texture2D[] panoramas = new Texture2D[EnvironmentThemes.Count];
 
         private Material sceneryMaterial;
         private Material skyMaterial;
@@ -143,6 +145,7 @@ namespace FruitTree
                 throw new ArgumentOutOfRangeException(nameof(theme));
             if (sceneryMesh != null && CurrentTheme == theme) return;
             CurrentTheme = theme;
+            ApplyPanorama(theme);
             if (paletteTransition != null)
             {
                 StopCoroutine(paletteTransition);
@@ -195,6 +198,23 @@ namespace FruitTree
         public static float TransitionWeight(float progress)
         {
             return Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(progress));
+        }
+
+        private void ApplyPanorama(EnvironmentTheme theme)
+        {
+            if (skyMaterial == null || !skyMaterial.HasProperty("_PanoramaBlend"))
+                return;
+            int index = (int)theme;
+            Texture2D panorama = panoramas != null && index < panoramas.Length
+                ? panoramas[index] : null;
+            if (panorama != null && panorama.width != panorama.height * 2)
+            {
+                Debug.LogWarning("Fruit Tree: panorama must have a 2:1 aspect ratio.");
+                panorama = null;
+            }
+            if (panorama != null)
+                skyMaterial.SetTexture("_Panorama", panorama);
+            skyMaterial.SetFloat("_PanoramaBlend", panorama == null ? 0f : 1f);
         }
 
         private void ApplyPalette(Palette palette)
