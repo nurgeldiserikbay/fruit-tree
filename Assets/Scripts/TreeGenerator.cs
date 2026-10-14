@@ -288,7 +288,12 @@ namespace FruitTree
                 fruitAnchors[index] = swap;
             }
             var barkMaterial = Track(VertexMaterial("Wood", Color.white));
-            if (barkMaterial.HasProperty("_MainTex")) barkMaterial.SetTexture("_MainTex", Track(BarkTexture.Create()));
+            if (barkMaterial.HasProperty("_MainTex"))
+            {
+                Texture2D barkArt = Resources.Load<Texture2D>("TreeTextures/Bark");
+                barkMaterial.SetTexture("_MainTex", barkArt != null ? barkArt :
+                    Track(BarkTexture.Create()));
+            }
             MakeMeshObject("Merged Wood", Track(wood.Build("Wood")), barkMaterial);
             var leafMaterial = Track(VertexMaterial("Leaves", Color.white));
             if (leafMaterial.HasProperty("_Wind"))
@@ -302,8 +307,15 @@ namespace FruitTree
             Color fruitColor = profile.FruitColor;
             Material appleMaterial = Track(LitMaterial("Fruit " + speciesId, fruitColor, .38f));
             if (appleMaterial.HasProperty("_MainTex"))
-                appleMaterial.SetTexture("_MainTex",
+            {
+                // Imported artwork takes priority, with the existing lightweight
+                // generated texture as fallback. Resource assets belong to Unity
+                // and must never be destroyed as transient generated objects.
+                Texture2D fruitArt = Resources.Load<Texture2D>(
+                    "TreeTextures/Fruit/" + speciesId);
+                appleMaterial.SetTexture("_MainTex", fruitArt != null ? fruitArt :
                     Track(AppleSkinTexture.CreateForSpecies(speciesId)));
+            }
             // Just three shared skin variants per species: natural color variation
             // without allocating an individual material for every fruit.
             var skins = new Material[3];
