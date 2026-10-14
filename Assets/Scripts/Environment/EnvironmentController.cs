@@ -207,6 +207,10 @@ namespace FruitTree
             int index = (int)theme;
             Texture2D panorama = panoramas != null && index < panoramas.Length
                 ? panoramas[index] : null;
+            // Resources/Panoramas/<ThemeName>.png can supply optional art
+            // without rebuilding the scene or overwriting Inspector choices.
+            if (panorama == null)
+                panorama = Resources.Load<Texture2D>("Panoramas/" + theme);
             if (panorama != null && panorama.width != panorama.height * 2)
             {
                 Debug.LogWarning("Fruit Tree: panorama must have a 2:1 aspect ratio.");
