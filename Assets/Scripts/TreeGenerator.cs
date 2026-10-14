@@ -150,6 +150,7 @@ namespace FruitTree
             Color branchColor = profile.BranchColor;
             // A slight bend in the trunk and irregularly-spaced limbs avoid the
             // artificial radial symmetry of the first prototype.
+            const float goldenRootAngle = 2.39996323f;
             Vector3 trunkBase = Vector3.zero;
             Vector3 trunkLow = new Vector3(.055f, profile.TrunkHeight * .30f, -.025f);
             Vector3 trunkMid = new Vector3(-.04f, profile.TrunkHeight * .63f, .06f);
@@ -157,6 +158,16 @@ namespace FruitTree
             wood.BranchCurve(
                 new[] { trunkBase, trunkLow, trunkMid, trunkTop },
                 new[] { .43f, .33f, .22f, .035f }, brown);
+            // Broad buttress roots soften the abrupt cylinder-to-ground seam.
+            // One merged wood mesh; no physics objects or extra draw calls.
+            for (int root = 0; root < 5; root++)
+            {
+                float a = root * goldenRootAngle + .21f;
+                Vector3 outward = new Vector3(Mathf.Cos(a), 0f, Mathf.Sin(a));
+                wood.Branch(trunkBase + Vector3.up * .31f + outward * .22f,
+                    outward * (.60f + root * .035f) + Vector3.down * .047f,
+                    .14f, .018f, brown);
+            }
 
             const float goldenAngle = 2.39996323f;
             int majorBranches = profile.BranchCount;
@@ -175,7 +186,12 @@ namespace FruitTree
                 float angle = goldenAngle * i + Between(-.18f, .18f);
                 Vector3 radial = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle));
                 Vector3 sideways = new Vector3(-radial.z, 0f, radial.x);
-                float length = (2.65f - elevation * 1.2f) * crownSpread * Between(.88f, 1.12f);
+                // Break the perfectly circular umbrella outline into a few
+                // broad lobes, while preserving stable fruit IDs and counts.
+                float canopyLobes = 1f + .12f * Mathf.Sin(angle * 3f + .8f) +
+                    .055f * Mathf.Sin(angle * 5f - .6f);
+                float length = (2.65f - elevation * 1.2f) * crownSpread *
+                    canopyLobes * Between(.84f, 1.10f);
                 Vector3 origin = new Vector3(Between(-.065f,.065f), height, Between(-.065f,.065f));
 
                 var limbPoints = new Vector3[4];
