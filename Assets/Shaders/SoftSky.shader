@@ -50,7 +50,7 @@ Shader "FruitTree/SoftSky"
                 {
                     float3 dir = normalize(i.dir);
                     float2 uv = float2(atan2(dir.z, dir.x) * (0.5 / UNITY_PI) + .5,
-                        asin(clamp(dir.y, -1.0, 1.0)) / UNITY_PI + .5);
+                        0.5 - asin(clamp(dir.y, -1.0, 1.0)) / UNITY_PI);
                     fixed3 panorama = tex2D(_Panorama, uv).rgb;
                     sky.rgb = lerp(sky.rgb, panorama, saturate(_PanoramaBlend));
                 }
