@@ -18,6 +18,23 @@ namespace FruitTree.Tests
         }
 
         [Test]
+        public void FoliageShaderSupportsOptionalAlphaCutout()
+        {
+            Shader shader = Shader.Find("FruitTree/VertexLit");
+            Assert.IsNotNull(shader);
+            var material = new Material(shader);
+            try
+            {
+                Assert.IsTrue(material.HasProperty("_AlphaCutoff"));
+                Assert.That(material.GetFloat("_AlphaCutoff"), Is.EqualTo(0f));
+                material.SetFloat("_AlphaCutoff", .45f);
+                Assert.That(material.GetFloat("_AlphaCutoff"),
+                    Is.EqualTo(.45f).Within(.001f));
+            }
+            finally { Object.DestroyImmediate(material); }
+        }
+
+        [Test]
         public void CanopyShaderExposesMobileBacklightControl()
         {
             Shader shader = Shader.Find("FruitTree/VertexLit");
