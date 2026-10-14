@@ -7,7 +7,7 @@ Shader "FruitTree/SoftSky"
         _HazeStrength ("Horizon Atmosphere", Range(0,1)) = 0.35
         _Panorama ("Equirectangular Panorama", 2D) = "white" {}
         _PanoramaBlend ("Panorama Blend", Range(0,1)) = 0
-        _PanoramaGroundFade ("Panorama Ground Fade", Range(0,1)) = 0.65
+        _PanoramaGroundFade ("Panorama Ground Fade", Range(0,1)) = 1
     }
     SubShader
     {
@@ -54,13 +54,15 @@ Shader "FruitTree/SoftSky"
                 {
                     float3 dir = normalize(i.dir);
                     float2 uv = float2(atan2(dir.z, dir.x) * (0.5 / UNITY_PI) + .5,
-                        0.5 - asin(clamp(dir.y, -1.0, 1.0)) / UNITY_PI);
+                        0.5 + asin(clamp(dir.y, -1.0, 1.0)) / UNITY_PI);
                     fixed3 panorama = tex2D(_Panorama, uv).rgb;
                     // Perspective-style foreground in concept art appears
                     // huge on a sky sphere. Fade its lower hemisphere into
                     // the biome haze instead of showing a nearby fake floor.
+                    // Fade photographic foreground before it intersects the
+                    // actual 3D terrain. Keep the sky above the horizon.
                     float groundFade = 1.0 - _PanoramaGroundFade *
-                        (1.0 - smoothstep(-0.28, 0.055, dir.y));
+                        (1.0 - smoothstep(-0.05, 0.24, dir.y));
                     sky.rgb = lerp(sky.rgb, panorama,
                         saturate(_PanoramaBlend * groundFade));
                 }
