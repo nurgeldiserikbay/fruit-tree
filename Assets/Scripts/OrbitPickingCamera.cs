@@ -310,7 +310,7 @@ namespace FruitTree
         // Transparent pixels of an optional foliage atlas are not occluders.
         // Opaque leaf pixels remain blocking, so touching foliage cannot
         // harvest a fruit that is visually hidden behind it.
-        private static bool IsTransparentFoliageHit(RaycastHit hit)
+        public static bool IsTransparentFoliageHit(RaycastHit hit)
         {
             if (hit.collider == null || hit.collider.name != "Merged Leaves")
                 return false;
