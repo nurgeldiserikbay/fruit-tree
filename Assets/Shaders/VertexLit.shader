@@ -8,6 +8,7 @@ Shader "FruitTree/VertexLit"
         _Cull ("Cull Back Faces", Float) = 2
         _AmbientLight ("Minimum Light", Range(0,1)) = 0.55
         _LeafTranslucency ("Leaf Backlight", Range(0,0.5)) = 0
+        _AlphaCutoff ("Leaf Alpha Cutoff", Range(0,1)) = 0
     }
     SubShader
     {
@@ -27,6 +28,7 @@ Shader "FruitTree/VertexLit"
             float _Wind;
             float _AmbientLight;
             float _LeafTranslucency;
+            float _AlphaCutoff;
             sampler2D _MainTex;
             struct appdata
             {
@@ -70,6 +72,9 @@ Shader "FruitTree/VertexLit"
                 float light = _AmbientLight + (1.0 - _AmbientLight) *
                     saturate(diffuse + backlight);
                 fixed4 tex = tex2D(_MainTex, i.uv);
+                // Optional cutout foliage texture; zero leaves all other
+                // opaque wood, grass and scenery materials unchanged.
+                clip(tex.a - _AlphaCutoff);
                 fixed4 pixel = fixed4(tex.rgb * i.color.rgb * light, 1);
                 UNITY_APPLY_FOG(i.fogCoord, pixel);
                 return pixel;
