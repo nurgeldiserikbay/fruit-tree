@@ -28,9 +28,11 @@ Shader "FruitTree/SoftSky"
             v2f vert(appdata v)
             {
                 v2f o;
-                float3 world = mul(unity_ObjectToWorld, v.vertex).xyz;
+                // Sample the infinite sky by direction, not by the camera's
+                // position inside a finite sphere. Otherwise the panorama
+                // slides as the player orbits the tree.
                 o.pos = UnityObjectToClipPos(v.vertex);
-                o.dir = normalize(world - _WorldSpaceCameraPos);
+                o.dir = normalize(mul((float3x3)unity_ObjectToWorld, v.vertex.xyz));
                 return o;
             }
             fixed4 frag(v2f i) : SV_Target
