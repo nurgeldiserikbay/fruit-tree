@@ -83,3 +83,8 @@ The runtime logs which tier it selected. This changes **graphics quality only**,
 The environment keeps four cached static scenery meshes, but the background **palette** now eases between two theme settings over **one unscaled second**. Sky horizon and zenith, terrain/grass tint, fog, ambient and direct sunlight are interpolated together. The transition continues if Settings is open while the game time scale is zero; rapid changes stop the previous blend and start from the currently displayed colors. This adds only a brief coroutine, not terrain or GameObject rebuilds.
 
 Source tests cover easing limits and a deferred PlayMode scenario with `Time.timeScale = 0`. Real Unity Editor/device rendering is still unverified.
+
+
+## Optional panoramic sky backgrounds (source support, Unity verification pending)
+
+`EnvironmentController.panoramas` can hold one 2:1 equirectangular `Texture2D` per existing environment theme, in enum order (Meadow, Park, CityPark, Mountains, JapaneseGarden, ChineseGarden, Lakeside, EveningGarden). Import with horizontal wrap **Repeat** and vertical clamp as appropriate; use a mobile-appropriate compressed texture and profile memory before shipping. Assign textures to the component in the Unity inspector. Empty or invalid-aspect entries use the existing procedural gradient/haze sky (`_PanoramaBlend = 0`). These are distant backgrounds, not physically navigable scenery and do not affect picking colliders. Panorama artwork is **not yet included** in this repository. Test seam, zenith/nadir, biome switching, Android shader compilation and GPU memory before release.
