@@ -6,6 +6,24 @@ namespace FruitTree.Tests
     public sealed class EnvironmentThemeTests
     {
         [Test]
+        public void PanoramaSeamCheckRejectsDiscontinuousEdges()
+        {
+            var image = new Texture2D(32, 16, TextureFormat.RGB24, false);
+            try
+            {
+                var pixels = new Color[32 * 16];
+                for (int i = 0; i < pixels.Length; i++) pixels[i] = Color.blue;
+                image.SetPixels(pixels);
+                image.Apply(false, false);
+                Assert.IsTrue(EnvironmentController.HasAcceptablePanoramaSeam(image));
+                for (int y = 0; y < 16; y++) image.SetPixel(31, y, Color.red);
+                image.Apply(false, false);
+                Assert.IsFalse(EnvironmentController.HasAcceptablePanoramaSeam(image));
+            }
+            finally { Object.DestroyImmediate(image); }
+        }
+
+        [Test]
         public void OnlyTwoToOnePanoramasAreAccepted()
         {
             var valid = new Texture2D(8, 4);
