@@ -18,6 +18,7 @@ namespace FruitTree.Tests
                 Assert.IsTrue(EnvironmentController.HasAcceptablePanoramaSeam(image));
                 for (int y = 0; y < 16; y++) image.SetPixel(31, y, Color.red);
                 image.Apply(false, false);
+                image.wrapMode = TextureWrapMode.Repeat;
                 Assert.IsFalse(EnvironmentController.HasAcceptablePanoramaSeam(image));
             }
             finally { Object.DestroyImmediate(image); }
@@ -31,6 +32,7 @@ namespace FruitTree.Tests
             try
             {
                 Assert.IsFalse(EnvironmentController.IsValidPanorama(null));
+                Assert.IsFalse(EnvironmentController.HasAcceptablePanoramaSeam(null));
                 Assert.IsTrue(EnvironmentController.IsValidPanorama(valid));
                 Assert.IsFalse(EnvironmentController.IsValidPanorama(square));
             }
