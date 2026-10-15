@@ -35,8 +35,15 @@ Shader "FruitTree/SoftSky"
                 // Sample the infinite sky by direction, not by the camera's
                 // position inside a finite sphere. Otherwise the panorama
                 // slides as the player orbits the tree.
-                o.pos = UnityObjectToClipPos(v.vertex);
-                o.dir = normalize(mul((float3x3)unity_ObjectToWorld, v.vertex.xyz));
+                // Render the sky sphere centered on the viewer, while the
+                // texture direction stays fixed in world space. This removes
+                // camera-translation parallax and prevents approaching a sky
+                // sphere wall while orbiting or zooming.
+                float3 worldDirection = mul((float3x3)unity_ObjectToWorld, v.vertex.xyz);
+                float3 cameraCentered = _WorldSpaceCameraPos + worldDirection;
+                o.pos = mul(UNITY_MATRIX_VP, float4(cameraCentered, 1.0));
+                o.pos.z = o.pos.w * 0.999;
+                o.dir = normalize(worldDirection);
                 return o;
             }
             fixed4 frag(v2f i) : SV_Target
