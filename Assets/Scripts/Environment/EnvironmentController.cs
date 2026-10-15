@@ -216,14 +216,18 @@ namespace FruitTree
         // Non-readable compressed Android textures cannot be inspected here.
         public static bool HasAcceptablePanoramaSeam(Texture2D texture)
         {
-            if (!IsValidPanorama(texture) || !texture.isReadable) return true;
+            if (!IsValidPanorama(texture)) return false;
+            if (!texture.isReadable) return true;
             float difference = 0f;
             const int samples = 16;
             for (int i = 0; i < samples; i++)
             {
-                float v = (i + .5f) / samples;
-                Color left = texture.GetPixelBilinear(0f, v);
-                Color right = texture.GetPixelBilinear(1f, v);
+                int y = Mathf.Min(texture.height - 1,
+                    Mathf.FloorToInt((i + .5f) * texture.height / samples));
+                // Sample the actual edge texels: bilinear sampling at U=1
+                // can wrap back to U=0 when the texture uses Repeat.
+                Color left = texture.GetPixel(0, y);
+                Color right = texture.GetPixel(texture.width - 1, y);
                 difference += (Mathf.Abs(left.r - right.r) +
                     Mathf.Abs(left.g - right.g) +
                     Mathf.Abs(left.b - right.b)) / 3f;
