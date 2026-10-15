@@ -10,13 +10,24 @@ namespace FruitTree
         private readonly List<UnityEngine.Object> generated = new List<UnityEngine.Object>();
         private Material meadowMaterial;
         private Material bladesMaterial;
+        private Color appliedGroundTint = Color.white;
+        private Color appliedGrassTint = Color.white;
 
         public void SetPalette(Color meadowTint, Color grassTint)
         {
+            // Theme may arrive before GroundGenerator.Awake. Cache it so the
+            // runtime materials always receive the same chosen palette.
+            appliedGroundTint = meadowTint;
+            appliedGrassTint = grassTint;
+            ApplyStoredPalette();
+        }
+
+        private void ApplyStoredPalette()
+        {
             if (meadowMaterial != null && meadowMaterial.HasProperty("_Color"))
-                meadowMaterial.SetColor("_Color", meadowTint);
+                meadowMaterial.SetColor("_Color", appliedGroundTint);
             if (bladesMaterial != null && bladesMaterial.HasProperty("_Color"))
-                bladesMaterial.SetColor("_Color", grassTint);
+                bladesMaterial.SetColor("_Color", appliedGrassTint);
         }
 
         private void Awake()
@@ -30,6 +41,7 @@ namespace FruitTree
             if (grassMaterial.HasProperty("_Cull")) grassMaterial.SetFloat("_Cull", 0f);
             meadowMaterial = material;
             bladesMaterial = grassMaterial;
+            ApplyStoredPalette();
             generated.Add(material);
             generated.Add(grassMaterial);
             Create("Meadow Terrain", CreateTerrainMesh(), material);
