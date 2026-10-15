@@ -99,8 +99,19 @@ namespace FruitTree
                     float contact = 1f - Mathf.SmoothStep(.5f, 3.3f, distance);
                     shade *= 1f - OrchardContactShade(px, pz);
                     float clearing = 1f - Mathf.SmoothStep(1.1f, 3.8f, distance);
-                    Color baseGreen = new Color(.44f, .62f, .35f);
-                    colors.Add(Color.Lerp(baseGreen * shade,
+                    // Broad warm/cool patches read as real turf instead of
+                    // a perfectly uniform green floor. Vertex colors keep
+                    // this texture-free and cost nothing per frame.
+                    float earth = Mathf.PerlinNoise(px * .12f + 7f, pz * .12f + 51f);
+                    float dry = Mathf.SmoothStep(.48f, .84f, earth) * .24f;
+                    Color turf = Color.Lerp(
+                        new Color(.38f, .58f, .30f),
+                        new Color(.54f, .54f, .30f), dry);
+                    float edge = Mathf.SmoothStep(14f, 33f, distance);
+                    Color farTurf = new Color(.55f, .65f, .49f);
+                    Color groundColor = Color.Lerp(turf * shade,
+                        farTurf * (.88f + variation * .10f), edge * .55f);
+                    colors.Add(Color.Lerp(groundColor,
                         new Color(.48f, .61f, .37f) * (1f - contact * .12f),
                         clearing * .20f));
                     uv.Add(new Vector2(x / (float)divisions, z / (float)divisions));
