@@ -42,7 +42,14 @@ Shader "FruitTree/SoftSky"
                 float3 worldDirection = mul((float3x3)unity_ObjectToWorld, v.vertex.xyz);
                 float3 cameraCentered = _WorldSpaceCameraPos + worldDirection;
                 o.pos = mul(UNITY_MATRIX_VP, float4(cameraCentered, 1.0));
-                o.pos.z = o.pos.w * 0.999;
+                // Unity platforms differ in depth-buffer direction.
+                // Sky must stay at the far plane in both conventional and
+                // reversed-Z rendering, behind all gameplay geometry.
+                #if defined(UNITY_REVERSED_Z)
+                    o.pos.z = 0.001 * o.pos.w;
+                #else
+                    o.pos.z = 0.999 * o.pos.w;
+                #endif
                 o.dir = normalize(worldDirection);
                 return o;
             }
