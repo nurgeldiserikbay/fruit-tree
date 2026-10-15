@@ -211,6 +211,26 @@ namespace FruitTree
                 texture.width == texture.height * 2;
         }
 
+        // A 2:1 image is not necessarily a seamless 360-degree panorama.
+        // Reject visibly discontinuous seams when CPU pixels are available.
+        // Non-readable compressed Android textures cannot be inspected here.
+        public static bool HasAcceptablePanoramaSeam(Texture2D texture)
+        {
+            if (!IsValidPanorama(texture) || !texture.isReadable) return true;
+            float difference = 0f;
+            const int samples = 16;
+            for (int i = 0; i < samples; i++)
+            {
+                float v = (i + .5f) / samples;
+                Color left = texture.GetPixelBilinear(0f, v);
+                Color right = texture.GetPixelBilinear(1f, v);
+                difference += (Mathf.Abs(left.r - right.r) +
+                    Mathf.Abs(left.g - right.g) +
+                    Mathf.Abs(left.b - right.b)) / 3f;
+            }
+            return difference / samples < .12f;
+        }
+
         private void ApplyPanorama(EnvironmentTheme theme)
         {
             if (skyMaterial == null || !skyMaterial.HasProperty("_PanoramaBlend"))
@@ -234,6 +254,12 @@ namespace FruitTree
             {
                 Debug.LogWarning("Fruit Tree: " + theme +
                     " panorama requires a 2:1 equirectangular image.");
+                panorama = null;
+            }
+            if (panorama != null && !HasAcceptablePanoramaSeam(panorama))
+            {
+                Debug.LogWarning("Fruit Tree: " + theme +
+                    " panorama has a visible 360-degree seam; using gradient sky.");
                 panorama = null;
             }
             if (panorama != null)
