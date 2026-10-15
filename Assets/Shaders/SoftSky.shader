@@ -8,6 +8,7 @@ Shader "FruitTree/SoftSky"
         _Panorama ("Equirectangular Panorama", 2D) = "white" {}
         _PanoramaBlend ("Panorama Blend", Range(0,1)) = 0
         _PanoramaGroundFade ("Panorama Ground Fade", Range(0,1)) = 1
+        _PanoramaHorizonHeight ("Panorama Horizon Height", Range(-0.2,0.5)) = 0.12
     }
     SubShader
     {
@@ -25,6 +26,7 @@ Shader "FruitTree/SoftSky"
             sampler2D _Panorama;
             float _PanoramaBlend;
             float _PanoramaGroundFade;
+            float _PanoramaHorizonHeight;
             struct appdata { float4 vertex : POSITION; };
             struct v2f { float4 pos: SV_POSITION; float3 dir : TEXCOORD0; };
             v2f vert(appdata v)
@@ -61,8 +63,13 @@ Shader "FruitTree/SoftSky"
                     // the biome haze instead of showing a nearby fake floor.
                     // Fade photographic foreground before it intersects the
                     // actual 3D terrain. Keep the sky above the horizon.
-                    float groundFade = 1.0 - _PanoramaGroundFade *
-                        (1.0 - smoothstep(-0.05, 0.24, dir.y));
+                    // Suppress close-up photographed ground and oversized
+                    // near-field objects; keep the distant upper sky only.
+                    // Shiftable horizon helps align varying panorama sources.
+                    float skyOnly = smoothstep(_PanoramaHorizonHeight - .07,
+                        _PanoramaHorizonHeight + .20, dir.y);
+                    float groundFade = lerp(1.0, skyOnly,
+                        saturate(_PanoramaGroundFade));
                     sky.rgb = lerp(sky.rgb, panorama,
                         saturate(_PanoramaBlend * groundFade));
                 }
