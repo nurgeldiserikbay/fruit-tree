@@ -156,8 +156,11 @@ namespace FruitTree
             Palette destination = Palette.FromTheme(theme);
             RenderSettings.fog = true;
             RenderSettings.fogMode = FogMode.Linear;
-            RenderSettings.fogStartDistance = 19f;
-            RenderSettings.fogEndDistance = 45f;
+            // Ground mesh ends at 35m along its nearest edges. Full fog must
+            // take effect before that edge or the panorama shows a sharp,
+            // horizontal green cut-off on portrait devices.
+            RenderSettings.fogStartDistance = 16f;
+            RenderSettings.fogEndDistance = 33f;
             // Initial scene preparation must be immediate (including Editor tests).
             // Subsequent theme selections gently blend color over one second.
             if (!paletteInitialized || !Application.isPlaying || !isActiveAndEnabled ||
