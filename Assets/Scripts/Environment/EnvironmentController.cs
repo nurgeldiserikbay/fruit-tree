@@ -17,6 +17,8 @@ namespace FruitTree
         public Light sun;
         [Tooltip("Optional 2:1 equirectangular textures in theme order. Empty entries use the procedural sky.")]
         public Texture2D[] panoramas = new Texture2D[EnvironmentThemes.Count];
+        [Tooltip("Enable only with verified distant-horizon 360-degree panoramas. Off by default: ordinary photos produce giant nearby objects and clash with the 3D landscape.")]
+        public bool usePhotoPanoramas = false;
 
         private Material sceneryMaterial;
         private Material skyMaterial;
@@ -239,6 +241,14 @@ namespace FruitTree
         {
             if (skyMaterial == null || !skyMaterial.HasProperty("_PanoramaBlend"))
                 return;
+            if (!usePhotoPanoramas)
+            {
+                // Prefer coherent procedural sky + 3D scenery over incompatible
+                // photographs, including panoramas in Resources or scene slots.
+                skyMaterial.SetTexture("_Panorama", Texture2D.whiteTexture);
+                skyMaterial.SetFloat("_PanoramaBlend", 0f);
+                return;
+            }
             int index = (int)theme;
             Texture2D panorama = panoramas != null && index < panoramas.Length
                 ? panoramas[index] : null;
