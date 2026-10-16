@@ -165,16 +165,16 @@ namespace FruitTree
             Vector3 trunkTop = new Vector3(.04f, profile.TrunkHeight, -.025f);
             wood.BranchCurve(
                 new[] { trunkBase, trunkLow, trunkMid, trunkTop },
-                new[] { .43f, .33f, .22f, .035f }, brown);
-            // Broad buttress roots soften the abrupt cylinder-to-ground seam.
+                new[] { .33f, .27f, .19f, .035f }, brown);
+            // Subtle roots merge the trunk into the soil without an oversized base.
             // One merged wood mesh; no physics objects or extra draw calls.
             for (int root = 0; root < 5; root++)
             {
                 float a = root * goldenRootAngle + .21f;
                 Vector3 outward = new Vector3(Mathf.Cos(a), 0f, Mathf.Sin(a));
                 wood.Branch(trunkBase + Vector3.up * .31f + outward * .22f,
-                    outward * (.60f + root * .035f) + Vector3.down * .047f,
-                    .14f, .018f, brown);
+                    outward * (.42f + root * .025f) + Vector3.down * .047f,
+                    .085f, .012f, brown);
             }
 
             const float goldenAngle = 2.39996323f;
