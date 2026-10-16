@@ -189,8 +189,13 @@ namespace FruitTree
             for (int i = 0; i < majorBranches; i++)
             {
                 float elevation = i / (float)(majorBranches - 1);
+                // A real crown has overlapping high and low lobes rather
+                // than one flat disc. Introduce broad vertical variation,
+                // without changing branch/fruit counts or stable IDs.
+                float crownWave = Mathf.Sin(goldenAngle * i * 2f + .4f) * .28f;
                 float height = Mathf.Lerp(profile.CrownHeightLow,
-                    profile.CrownHeightHigh, elevation) + Between(-.13f, .13f);
+                    profile.CrownHeightHigh, elevation) +
+                    crownWave + Between(-.19f, .19f);
                 float angle = goldenAngle * i + Between(-.18f, .18f);
                 Vector3 radial = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle));
                 Vector3 sideways = new Vector3(-radial.z, 0f, radial.x);
@@ -249,7 +254,10 @@ namespace FruitTree
                     for (int clusterIndex = 0; clusterIndex < 3; clusterIndex++)
                     {
                         float along = .36f + clusterIndex * .29f;
-                        Vector3 center = Vector3.Lerp(start, end, along);
+                        // Alternate cluster height to avoid flat rows of
+                        // leaf cards on every secondary shoot.
+                        Vector3 center = Vector3.Lerp(start, end, along) +
+                            Vector3.up * Between(-.13f, .21f);
                         fruitAnchors.Add(center);
                         for (int leafIndex = 0; leafIndex < appleLeafCount; leafIndex++)
                         {
