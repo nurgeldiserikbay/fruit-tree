@@ -66,11 +66,16 @@ Shader "FruitTree/VertexLit"
                 float3 sun = normalize(_WorldSpaceLightPos0.xyz);
                 float facing = dot(n, sun);
                 float diffuse = saturate(facing);
-                // Leaf cards have no thickness. A small backside response
-                // prevents harsh black undersides without extra light passes.
-                float backlight = saturate(-facing) * _LeafTranslucency;
+                // Leaf cards are rendered on both sides, but their mesh
+                // normals point in only one direction. Use a gentle diffuse
+                // response on the reverse side so half the crown does not
+                // become a uniformly dark silhouette. Non-leaf materials
+                // have _LeafTranslucency = 0 and retain their original light.
+                float reverseDiffuse = saturate(-facing);
+                float leafLight = max(diffuse,
+                    reverseDiffuse * _LeafTranslucency);
                 float light = _AmbientLight + (1.0 - _AmbientLight) *
-                    saturate(diffuse + backlight);
+                    saturate(leafLight);
                 fixed4 tex = tex2D(_MainTex, i.uv);
                 // Optional cutout foliage texture; zero leaves all other
                 // opaque wood, grass and scenery materials unchanged.
