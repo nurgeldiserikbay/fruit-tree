@@ -82,18 +82,19 @@ namespace FruitTree
         private static Mesh CreateGrassCards(int variant)
         {
             var rng = new System.Random(2400 + variant * 31);
-            const int count = 25;
+            // Dense, smaller tufts create ground cover rather than isolated bushes.
+            const int count = 105;
             var vertices = new List<Vector3>(count * 8);
             var uvs = new List<Vector2>(count * 8);
             var triangles = new List<int>(count * 12);
             for (int i = 0; i < count; i++)
             {
                 float angle = (float)rng.NextDouble() * Mathf.PI * 2f;
-                float radius = Mathf.Lerp(3.8f, 15f,
+                float radius = Mathf.Lerp(2.5f, 18f,
                     Mathf.Sqrt((float)rng.NextDouble()));
                 float x = Mathf.Cos(angle) * radius;
                 float z = Mathf.Sin(angle) * radius;
-                float scale = .42f + .48f * (float)rng.NextDouble();
+                float scale = .19f + .31f * (float)rng.NextDouble();
                 float y = -.055f + (Mathf.PerlinNoise(
                     x * .33f + 34f, z * .33f + 12f) - .5f) * .13f *
                     Mathf.Clamp01((radius - 1f) / 3f);
