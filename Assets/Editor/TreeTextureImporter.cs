@@ -20,7 +20,9 @@ namespace FruitTree.Editor
             importer.textureType = TextureImporterType.Default;
             importer.sRGBTexture = true;
             importer.mipmapEnabled = true;
-            importer.wrapMode = TextureWrapMode.Repeat;
+            // Single leaf cutouts must not repeat their opposite edge into the
+            // transparent silhouette. Bark and fruit skins still tile.
+            importer.wrapMode = leaf ? TextureWrapMode.Clamp : TextureWrapMode.Repeat;
             importer.filterMode = FilterMode.Bilinear;
             importer.maxTextureSize = 512;
             importer.alphaSource = leaf
