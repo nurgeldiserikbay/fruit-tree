@@ -143,6 +143,14 @@ namespace FruitTree
                 leavesPerCluster = Mathf.Min(leavesPerCluster, 8);
             random = new System.Random(seed);
             FruitSpeciesProfile profile = FruitSpeciesProfile.Get(speciesId);
+            // Photographic foliage already includes green pigment. Multiplying
+            // it by the procedural green vertex tint makes it muddy/dark.
+            // Resolve the optional artwork once before building any leaves.
+            Texture2D leafArt = Resources.Load<Texture2D>(
+                "TreeTextures/Leaves/" + speciesId);
+            if (leafArt == null)
+                leafArt = Resources.Load<Texture2D>("TreeTextures/Leaves/Default");
+            bool texturedLeaves = leafArt != null;
             var wood = new ProceduralMesh();
             var foliage = new ProceduralMesh();
             var fruitAnchors = new List<Vector3>();
@@ -250,7 +258,8 @@ namespace FruitTree
                             Vector3 direction = (offset +
                                 new Vector3(Between(-.3f,.3f), .21f, Between(-.3f,.3f))).normalized;
                             float tint = Between(-.065f,.065f);
-                            Color leafColor = profile.LeafColor +
+                            Color leafColor = (texturedLeaves
+                                ? Color.white : profile.LeafColor) +
                                 new Color(tint, tint * .70f, tint * .48f);
                             // Slightly rounder, shorter foliage cards read as
                             // a soft canopy instead of isolated spear tips.
@@ -290,7 +299,7 @@ namespace FruitTree
                             detailedApple ? .23f : .30f),
                         Between(detailedApple ? .11f : .15f,
                             detailedApple ? .16f : .21f),
-                        profile.LeafColor +
+                        (texturedLeaves ? Color.white : profile.LeafColor) +
                             new Color(shade, shade, shade * .5f),
                         profile.LeafOvalness);
                 }
@@ -320,10 +329,6 @@ namespace FruitTree
             if (leafMaterial.HasProperty("_Cull")) leafMaterial.SetFloat("_Cull", 0f);
             // Alpha artwork is optional. The original opaque geometry remains
             // the default, while picking still uses the canopy MeshCollider.
-            Texture2D leafArt = Resources.Load<Texture2D>(
-                "TreeTextures/Leaves/" + speciesId);
-            if (leafArt == null)
-                leafArt = Resources.Load<Texture2D>("TreeTextures/Leaves/Default");
             if (leafArt != null)
             {
                 if (leafMaterial.HasProperty("_MainTex"))
