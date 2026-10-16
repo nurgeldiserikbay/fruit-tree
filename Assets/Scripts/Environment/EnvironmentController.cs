@@ -388,22 +388,22 @@ namespace FruitTree
 
         private static void BuildMeadow(EnvironmentMeshBuilder mesh)
         {
-            mesh.RidgeBand(27f, -.12f, 1.35f, 40, .3f,
-                new Color(.60f, .74f, .59f));
-            mesh.RidgeBand(32f, -.12f, 2.0f, 36, 1.5f,
-                new Color(.68f, .79f, .67f));
+            // Keep meadow hills low and muted: tall silhouette ridges and
+            // cone-shaped trees used to read as arbitrary cut-out geometry
+            // against the sky, not a continuous landscape.
+            mesh.RidgeBand(27f, -.12f, .52f, 48, .3f,
+                new Color(.55f, .68f, .53f));
+            mesh.RidgeBand(32f, -.12f, .78f, 48, 1.5f,
+                new Color(.65f, .76f, .64f));
             MeadowShrubs(mesh);
             // Close-to-midground petals are visible in portrait framing.
             // Keep the trunk clearing open and all decor collider-free.
             Wildflowers(mesh, 160, 171, 3.8f, 12f, new Color(.96f, .83f, .56f));
             Wildflowers(mesh, 105, 208, 4.5f, 13f, new Color(.90f, .84f, .92f));
             Wildflowers(mesh, 65, 360, 5.4f, 15f, new Color(.91f, .92f, .73f));
-            for (int i = 0; i < 9; i++)
-            {
-                float a = i * Mathf.PI * 2f / 9f + .1f;
-                BackgroundTree(mesh, Mathf.Cos(a) * 20f, Mathf.Sin(a) * 20f,
-                    .55f + (i % 3) * .16f, new Color(.48f, .67f, .43f));
-            }
+            // The old nine isolated triangular 'trees' broke the illusion
+            // of a natural horizon. Midground shrubs provide the vegetation
+            // without disconnected icon-shaped silhouettes.
         }
 
         private static void Bench(EnvironmentMeshBuilder mesh, float x, float z, float rotation)
