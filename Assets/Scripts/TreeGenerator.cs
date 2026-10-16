@@ -344,6 +344,12 @@ namespace FruitTree
                     "TreeTextures/Fruit/" + speciesId);
                 appleMaterial.SetTexture("_MainTex", fruitArt != null ? fruitArt :
                     Track(AppleSkinTexture.CreateForSpecies(speciesId)));
+                // External fruit art already contains the species hue. Applying
+                // FruitColor again multiplies that color and makes imported
+                // apples, lemons and plums unnaturally dark or oversaturated.
+                // The generated fallback keeps its established colored tint.
+                if (fruitArt != null && appleMaterial.HasProperty("_Color"))
+                    appleMaterial.SetColor("_Color", Color.white);
             }
             // Just three shared skin variants per species: natural color variation
             // without allocating an individual material for every fruit.
@@ -354,8 +360,10 @@ namespace FruitTree
                 var tone = new Material(appleMaterial) { name = "Fruit Skin Variant " + variant };
                 Color tint = variant == 1 ?
                     new Color(1f, .93f, .89f) : new Color(.93f, 1f, .93f);
-                tone.color = new Color(fruitColor.r * tint.r,
-                    fruitColor.g * tint.g, fruitColor.b * tint.b, fruitColor.a);
+                Color baseTint = appleMaterial.HasProperty("_Color")
+                    ? appleMaterial.GetColor("_Color") : fruitColor;
+                tone.color = new Color(baseTint.r * tint.r,
+                    baseTint.g * tint.g, baseTint.b * tint.b, baseTint.a);
                 skins[variant] = Track(tone);
             }
             Material stemMaterial = Track(LitMaterial("Stem", new Color(.28f,.19f,.095f), .12f));
