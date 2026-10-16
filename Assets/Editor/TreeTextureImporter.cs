@@ -17,9 +17,6 @@ namespace FruitTree.Editor
             var importer = (TextureImporter)assetImporter;
             bool leaf = assetPath.StartsWith(Root + "Leaves/",
                 System.StringComparison.OrdinalIgnoreCase);
-            bool bark = assetPath.EndsWith("/Bark.png",
-                System.StringComparison.OrdinalIgnoreCase);
-
             importer.textureType = TextureImporterType.Default;
             importer.sRGBTexture = true;
             importer.mipmapEnabled = true;
