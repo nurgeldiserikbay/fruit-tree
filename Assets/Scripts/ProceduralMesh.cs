@@ -103,11 +103,16 @@ namespace FruitTree
         // Map upright procedural leaf coordinates onto a diagonal photo
         // cutout (stem bottom-left, tip upper-right). Leave padding at the
         // atlas edges so clamp + bilinear filtering stay transparent.
+                // This mapped UV frame is used for optional diagonal leaf artwork.
+        // Restrict the sampling region to the interior of the image, leaving
+        // a small guard band for bilinear filtering and mipmap downsampling.
         private static Vector2 LeafArtUV(float x, float y)
         {
             float cross = (x - .5f) * .74f;
-            return new Vector2(.5f + (y - .5f) * .70f + cross * .70f,
-                .5f + (y - .5f) * .70f - cross * .70f);
+            float u = .5f + (y - .5f) * .70f + cross * .70f;
+            float v = .5f + (y - .5f) * .70f - cross * .70f;
+            return new Vector2(Mathf.Clamp(u, .02f, .98f),
+                Mathf.Clamp(v, .02f, .98f));
         }
 
         public void Leaf(Vector3 center, Vector3 outward, float length, float width,
