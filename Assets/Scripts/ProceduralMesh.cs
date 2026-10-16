@@ -36,7 +36,7 @@ namespace FruitTree
                 {
                     float t = s * Mathf.PI * 2f / sides;
                     Vector3 normal = right * Mathf.Cos(t) + forward * Mathf.Sin(t);
-                    Vertex(center + normal * radius, normal, baseColor * (0.88f + 0.12f * Mathf.Cos(t)), new Vector2(s / (float)sides, ring));
+                    Vertex(center + normal * radius, normal, baseColor * (0.88f + 0.12f * Mathf.Cos(t)), new Vector2(s / (float)sides, (ring == 0 ? 0f : Vector3.Distance(start, finish)) * .65f));
                 }
             }
             for (int s = 0; s < sides; s++)
@@ -78,7 +78,7 @@ namespace FruitTree
                     Vector3 normal = right * Mathf.Cos(angle) + forward * Mathf.Sin(angle);
                     Color shade = baseColor * (.92f + .08f * Mathf.Cos(angle * 2f));
                     Vertex(points[i] + normal * radius, normal, shade,
-                        new Vector2(side / (float)sides, distanceAlong * .45f));
+                        new Vector2(side / (float)sides, distanceAlong * .65f));
                 }
             }
             for (int ring = 0; ring < points.Length - 1; ring++)
