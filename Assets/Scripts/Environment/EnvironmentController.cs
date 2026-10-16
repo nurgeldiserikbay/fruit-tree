@@ -364,14 +364,14 @@ namespace FruitTree
         private static void MeadowShrubs(EnvironmentMeshBuilder mesh)
         {
             var random = new System.Random(731);
-            for (int i = 0; i < 27; i++)
+            for (int i = 0; i < 44; i++)
             {
                 float angle = (float)random.NextDouble() * Mathf.PI * 2f;
-                float radius = Mathf.Lerp(10.5f, 20f,
+                float radius = Mathf.Lerp(7.0f, 15f,
                     (float)random.NextDouble());
                 Vector3 basePoint = new Vector3(Mathf.Cos(angle) * radius,
                     -.04f, Mathf.Sin(angle) * radius);
-                float scale = .42f + .46f * (float)random.NextDouble();
+                float scale = .72f + .74f * (float)random.NextDouble();
                 Color green = Color.Lerp(new Color(.30f, .51f, .30f),
                     new Color(.52f, .68f, .35f),
                     (float)random.NextDouble());
@@ -393,8 +393,11 @@ namespace FruitTree
             mesh.RidgeBand(32f, -.12f, 2.0f, 36, 1.5f,
                 new Color(.68f, .79f, .67f));
             MeadowShrubs(mesh);
-            Wildflowers(mesh, 58, 171, 5.7f, 15f, new Color(.96f, .83f, .56f));
-            Wildflowers(mesh, 24, 208, 8f, 17f, new Color(.90f, .84f, .92f));
+            // Close-to-midground petals are visible in portrait framing.
+            // Keep the trunk clearing open and all decor collider-free.
+            Wildflowers(mesh, 160, 171, 3.8f, 12f, new Color(.96f, .83f, .56f));
+            Wildflowers(mesh, 105, 208, 4.5f, 13f, new Color(.90f, .84f, .92f));
+            Wildflowers(mesh, 65, 360, 5.4f, 15f, new Color(.91f, .92f, .73f));
             for (int i = 0; i < 9; i++)
             {
                 float a = i * Mathf.PI * 2f / 9f + .1f;
