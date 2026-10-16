@@ -46,6 +46,88 @@ namespace FruitTree
             generated.Add(grassMaterial);
             Create("Meadow Terrain", CreateTerrainMesh(), material);
             Create("Merged Grass", CreateGrassMesh(), grassMaterial);
+            CreateIllustratedGrass();
+        }
+
+        // Art pack path: Assets/Art/Vegetation/Grass/grass_01.png ...
+        // Resources copies are preferred for player builds. In Editor Play Mode
+        // load the original Art folder directly, so merely importing the ZIP
+        // immediately changes the scene without rebuilding serialized scenes.
+        private void CreateIllustratedGrass()
+        {
+            const int variants = 10;
+            for (int variant = 0; variant < variants; variant++)
+            {
+                string filename = "grass_" + (variant + 1).ToString("00");
+                Texture2D texture = Resources.Load<Texture2D>(
+                    "Vegetation/Grass/" + filename);
+#if UNITY_EDITOR
+                if (texture == null)
+                    texture = UnityEditor.AssetDatabase.LoadAssetAtPath<Texture2D>(
+                        "Assets/Art/Vegetation/Grass/" + filename + ".png");
+#endif
+                if (texture == null) continue;
+                var shader = Shader.Find("Unlit/Transparent Cutout");
+                if (shader == null) shader = Shader.Find("Unlit/Transparent");
+                if (shader == null) continue;
+                var material = new Material(shader) { name = "Grass Card " + filename };
+                material.mainTexture = texture;
+                if (material.HasProperty("_Cutoff")) material.SetFloat("_Cutoff", .38f);
+                generated.Add(material);
+                Create("Illustrated " + filename,
+                    CreateGrassCards(variant), material);
+            }
+        }
+
+        private static Mesh CreateGrassCards(int variant)
+        {
+            var rng = new System.Random(2400 + variant * 31);
+            const int count = 25;
+            var vertices = new List<Vector3>(count * 8);
+            var uvs = new List<Vector2>(count * 8);
+            var triangles = new List<int>(count * 12);
+            for (int i = 0; i < count; i++)
+            {
+                float angle = (float)rng.NextDouble() * Mathf.PI * 2f;
+                float radius = Mathf.Lerp(3.8f, 15f,
+                    Mathf.Sqrt((float)rng.NextDouble()));
+                float x = Mathf.Cos(angle) * radius;
+                float z = Mathf.Sin(angle) * radius;
+                float scale = .42f + .48f * (float)rng.NextDouble();
+                float y = -.055f + (Mathf.PerlinNoise(
+                    x * .33f + 34f, z * .33f + 12f) - .5f) * .13f *
+                    Mathf.Clamp01((radius - 1f) / 3f);
+                // Two perpendicular cutout cards produce a full tuft
+                // from every orbit angle without a billboard Update().
+                for (int card = 0; card < 2; card++)
+                {
+                    float orientation = angle + card * Mathf.PI * .5f;
+                    Vector3 sideways = new Vector3(
+                        Mathf.Cos(orientation), 0f, Mathf.Sin(orientation));
+                    Vector3 basePoint = new Vector3(x, y, z);
+                    int start = vertices.Count;
+                    vertices.Add(basePoint - sideways * scale * .5f);
+                    vertices.Add(basePoint + sideways * scale * .5f);
+                    vertices.Add(basePoint - sideways * scale * .5f + Vector3.up * scale);
+                    vertices.Add(basePoint + sideways * scale * .5f + Vector3.up * scale);
+                    uvs.Add(new Vector2(0f, 0f));
+                    uvs.Add(new Vector2(1f, 0f));
+                    uvs.Add(new Vector2(0f, 1f));
+                    uvs.Add(new Vector2(1f, 1f));
+                    // Double-sided triangles; reliable on mobile cutout shaders.
+                    triangles.Add(start); triangles.Add(start + 2); triangles.Add(start + 1);
+                    triangles.Add(start + 1); triangles.Add(start + 2); triangles.Add(start + 3);
+                    triangles.Add(start + 1); triangles.Add(start + 2); triangles.Add(start);
+                    triangles.Add(start + 3); triangles.Add(start + 2); triangles.Add(start + 1);
+                }
+            }
+            var mesh = new Mesh { name = "Illustrated Grass Cards " + variant };
+            mesh.SetVertices(vertices);
+            mesh.SetUVs(0, uvs);
+            mesh.SetTriangles(triangles, 0);
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            return mesh;
         }
 
         private void Create(string label, Mesh mesh, Material material)
