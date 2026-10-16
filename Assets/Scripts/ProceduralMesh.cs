@@ -100,6 +100,16 @@ namespace FruitTree
         /// six triangles are sufficient for a readable mobile-sized canopy.
         /// UV.y gradually increases to bend only the leaf tip in the wind.
         /// </summary>
+        // Map upright procedural leaf coordinates onto a diagonal photo
+        // cutout (stem bottom-left, tip upper-right). Leave padding at the
+        // atlas edges so clamp + bilinear filtering stay transparent.
+        private static Vector2 LeafArtUV(float x, float y)
+        {
+            float cross = (x - .5f) * .74f;
+            return new Vector2(.5f + (y - .5f) * .70f + cross * .70f,
+                .5f + (y - .5f) * .70f - cross * .70f);
+        }
+
         public void Leaf(Vector3 center, Vector3 outward, float length, float width,
             Color color, float ovalness = .5f)
         {
@@ -126,13 +136,17 @@ namespace FruitTree
                 center + axis * (length * .81f) + side * (width * .46f) + camber * .58f,
                 center + axis * length + surface * (width * .12f)
             };
+            // The optional photographed leaf runs diagonally from lower
+            // left (stem) to upper right (tip). Rotate the foliage UV frame
+            // to match the art instead of stretching its veins sideways.
+            // Both texture sampling and leaf-hit alpha tests use these UVs.
             var texcoords = new[]
             {
-                new Vector2(.5f, 0f),
-                new Vector2(0f, .19f), new Vector2(1f, .19f),
-                new Vector2(0f, widestAt), new Vector2(1f, widestAt),
-                new Vector2(.2f, .81f), new Vector2(.8f, .81f),
-                new Vector2(.5f, 1f)
+                LeafArtUV(.5f, 0f),
+                LeafArtUV(0f, .19f), LeafArtUV(1f, .19f),
+                LeafArtUV(0f, widestAt), LeafArtUV(1f, widestAt),
+                LeafArtUV(.2f, .81f), LeafArtUV(.8f, .81f),
+                LeafArtUV(.5f, 1f)
             };
             Vector3 normal = Vector3.Cross(side, axis).normalized;
             int first = this.positions.Count;
