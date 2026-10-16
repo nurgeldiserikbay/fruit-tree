@@ -89,12 +89,30 @@ namespace FruitTree
             var triangles = new List<int>(count * 12);
             for (int i = 0; i < count; i++)
             {
+                // Organic clusters separated by short clearings. Most
+                // grass is low ground cover; occasional taller accents avoid
+                // the previous look of evenly scattered miniature bushes.
                 float angle = (float)rng.NextDouble() * Mathf.PI * 2f;
-                float radius = Mathf.Lerp(2.5f, 18f,
+                float radius = Mathf.Lerp(2.0f, 17f,
                     Mathf.Sqrt((float)rng.NextDouble()));
                 float x = Mathf.Cos(angle) * radius;
                 float z = Mathf.Sin(angle) * radius;
-                float scale = .19f + .31f * (float)rng.NextDouble();
+                float patch = Mathf.PerlinNoise(x * .18f + 27f,
+                    z * .18f + 39f);
+                // Reposition points in bare patches into their neighbours,
+                // keeping the exact vertex and draw-call budget unchanged.
+                if (patch < .39f)
+                {
+                    x += 1.25f * Mathf.Cos(angle + 1.1f);
+                    z += 1.25f * Mathf.Sin(angle + 1.1f);
+                }
+                float heightVariation = (float)rng.NextDouble();
+                float scale = Mathf.Lerp(.12f, .32f, heightVariation);
+                if (variant == 4 || variant == 6 || variant == 7 ||
+                    variant == 8) scale *= .78f;
+                // Reserve a subtle open patch around the main trunk.
+                float rootDistance = Mathf.Sqrt(x * x + z * z);
+                if (rootDistance < 2.0f) scale *= .55f;
                 float y = -.055f + (Mathf.PerlinNoise(
                     x * .33f + 34f, z * .33f + 12f) - .5f) * .13f *
                     Mathf.Clamp01((radius - 1f) / 3f);
