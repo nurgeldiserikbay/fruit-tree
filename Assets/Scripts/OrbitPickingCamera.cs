@@ -52,11 +52,15 @@ namespace FruitTree
             float verticalTan = Mathf.Tan(viewCamera.fieldOfView * Mathf.Deg2Rad * .5f);
             float horizontalTan = verticalTan * aspect;
             float radial = Mathf.Max(bounds.extents.x, bounds.extents.z);
-            float framedDistance = Mathf.Max(radial / horizontalTan, bounds.extents.y / verticalTan);
-            // Margins leave room for a gentle wind sway and avoid cut branches.
-            // The old 18-unit fit made the fruit tree tiny on 9:20 phones.
-            // Allow slight crown margins to be inspected by orbit/zoom instead.
-            framedDistance = Mathf.Clamp(framedDistance * .98f + .4f, 7f, 15f);
+            // Perspective framing must also account for the closest side
+            // of a deep canopy. A simple radius / tan(FOV) fit clips the
+            // front branches even though the crown center fits.
+            float framedDistance = Mathf.Max(
+                radial + radial / horizontalTan,
+                radial + bounds.extents.y / verticalTan);
+            // Keep 12% margin for orbit changes and wind sway. Do not cap
+            // the computed framing at 15m: large mature trees need more room.
+            framedDistance = Mathf.Clamp(framedDistance * 1.12f, 7f, 25f);
             wantedFocusHeight = Mathf.Clamp(bounds.center.y, 1.4f, 4.1f);
             focusHeight = wantedFocusHeight;
             wantedDistance = framedDistance;
