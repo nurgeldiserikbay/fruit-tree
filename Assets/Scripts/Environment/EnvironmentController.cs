@@ -358,12 +358,41 @@ namespace FruitTree
                 size * 1.65f, 6, foliage);
         }
 
+        // Small clustered shrubs break up the empty flat lawn without
+        // introducing separate renderers, colliders or texture allocations.
+        // Keep them outside the player orbit and fruit-picking zone.
+        private static void MeadowShrubs(EnvironmentMeshBuilder mesh)
+        {
+            var random = new System.Random(731);
+            for (int i = 0; i < 27; i++)
+            {
+                float angle = (float)random.NextDouble() * Mathf.PI * 2f;
+                float radius = Mathf.Lerp(10.5f, 20f,
+                    (float)random.NextDouble());
+                Vector3 basePoint = new Vector3(Mathf.Cos(angle) * radius,
+                    -.04f, Mathf.Sin(angle) * radius);
+                float scale = .42f + .46f * (float)random.NextDouble();
+                Color green = Color.Lerp(new Color(.30f, .51f, .30f),
+                    new Color(.52f, .68f, .35f),
+                    (float)random.NextDouble());
+                // Three interlocked tapered mounds read as a leafy shrub
+                // from any camera angle at a very small triangle cost.
+                mesh.Cone(basePoint + new Vector3(-.24f * scale, 0f, 0f),
+                    .51f * scale, .67f * scale, 7, green);
+                mesh.Cone(basePoint + new Vector3(.23f * scale, 0f, .13f * scale),
+                    .48f * scale, .75f * scale, 7, green * .93f);
+                mesh.Cone(basePoint + new Vector3(0f, 0f, -.22f * scale),
+                    .42f * scale, .86f * scale, 7, green * 1.05f);
+            }
+        }
+
         private static void BuildMeadow(EnvironmentMeshBuilder mesh)
         {
             mesh.RidgeBand(27f, -.12f, 1.35f, 40, .3f,
                 new Color(.60f, .74f, .59f));
             mesh.RidgeBand(32f, -.12f, 2.0f, 36, 1.5f,
                 new Color(.68f, .79f, .67f));
+            MeadowShrubs(mesh);
             Wildflowers(mesh, 58, 171, 5.7f, 15f, new Color(.96f, .83f, .56f));
             Wildflowers(mesh, 24, 208, 8f, 17f, new Color(.90f, .84f, .92f));
             for (int i = 0; i < 9; i++)
