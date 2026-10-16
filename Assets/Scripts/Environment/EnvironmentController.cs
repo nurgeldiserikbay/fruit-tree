@@ -241,10 +241,13 @@ namespace FruitTree
         {
             if (skyMaterial == null || !skyMaterial.HasProperty("_PanoramaBlend"))
                 return;
-            if (!usePhotoPanoramas)
+            // A deliberately imported Meadow.png acts as an opt-in preview,
+            // even for scenes serialized before usePhotoPanoramas existed.
+            // Other themes remain off unless enabled explicitly.
+            Texture2D meadowPreview = theme == EnvironmentTheme.Meadow
+                ? Resources.Load<Texture2D>("Panoramas/Meadow") : null;
+            if (!usePhotoPanoramas && meadowPreview == null)
             {
-                // Prefer coherent procedural sky + 3D scenery over incompatible
-                // photographs, including panoramas in Resources or scene slots.
                 skyMaterial.SetTexture("_Panorama", Texture2D.whiteTexture);
                 skyMaterial.SetFloat("_PanoramaBlend", 0f);
                 return;
@@ -252,6 +255,8 @@ namespace FruitTree
             int index = (int)theme;
             Texture2D panorama = panoramas != null && index < panoramas.Length
                 ? panoramas[index] : null;
+            if (meadowPreview != null && !usePhotoPanoramas)
+                panorama = meadowPreview;
             if (panorama == null)
             {
                 // Missing Resources lookups are cached too; cycling biomes
@@ -270,7 +275,8 @@ namespace FruitTree
                     " panorama requires a 2:1 equirectangular image.");
                 panorama = null;
             }
-            if (panorama != null && !HasAcceptablePanoramaSeam(panorama))
+            if (panorama != null && !HasAcceptablePanoramaSeam(panorama) &&
+                (usePhotoPanoramas || meadowPreview == null))
             {
                 Debug.LogWarning("Fruit Tree: " + theme +
                     " panorama has a visible 360-degree seam; using gradient sky.");
