@@ -55,6 +55,62 @@ namespace FruitTree
         // immediately changes the scene without rebuilding serialized scenes.
         private void CreateIllustratedGrass()
         {
+            // A packed 4x3 atlas turns ten grass renderers into one.
+            // The individual sprites remain a safe fallback until the
+            // Editor atlas has been built from the complete PNG pack.
+            Texture2D atlas = Resources.Load<Texture2D>(
+                "Vegetation/Grass/GrassAtlas");
+            if (atlas != null)
+            {
+                var meshes = new List<Mesh>(10);
+                var combined = new List<CombineInstance>(10);
+                for (int variant = 0; variant < 10; variant++)
+                {
+                    Mesh part = CreateGrassCards(variant);
+                    Vector2[] uv = part.uv;
+                    int column = variant % 4;
+                    int row = variant / 4;
+                    for (int i = 0; i < uv.Length; i++)
+                    {
+                        uv[i] = new Vector2(
+                            (column + uv[i].x) * .25f,
+                            (2 - row + uv[i].y) / 3f);
+                    }
+                    part.uv = uv;
+                    meshes.Add(part);
+                    combined.Add(new CombineInstance {
+                        mesh = part, transform = Matrix4x4.identity
+                    });
+                }
+                var mesh = new Mesh { name = "Merged Illustrated Grass Atlas" };
+                mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+                mesh.CombineMeshes(combined.ToArray(), true, false);
+                foreach (var part in meshes)
+                {
+                    if (Application.isPlaying) Destroy(part);
+                    else DestroyImmediate(part);
+                }
+                var shader = Shader.Find("FruitTree/VertexLit");
+                if (shader == null) shader = Shader.Find("Unlit/Transparent Cutout");
+                if (shader != null)
+                {
+                    var material = new Material(shader) { name = "Grass Atlas Material" };
+                    material.mainTexture = atlas;
+                    if (material.HasProperty("_AlphaCutoff"))
+                        material.SetFloat("_AlphaCutoff", .4f);
+                    if (material.HasProperty("_Cutoff"))
+                        material.SetFloat("_Cutoff", .4f);
+                    if (material.HasProperty("_AmbientLight"))
+                        material.SetFloat("_AmbientLight", .72f);
+                    if (material.HasProperty("_Cull"))
+                        material.SetFloat("_Cull", 0f);
+                    generated.Add(material);
+                    Create("Illustrated Grass Atlas", mesh, material);
+                    return;
+                }
+                if (Application.isPlaying) Destroy(mesh);
+                else DestroyImmediate(mesh);
+            }
             const int variants = 10;
             for (int variant = 0; variant < variants; variant++)
             {
