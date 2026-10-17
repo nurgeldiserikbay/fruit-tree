@@ -67,12 +67,23 @@ namespace FruitTree
                         "Assets/Art/Vegetation/Grass/" + filename + ".png");
 #endif
                 if (texture == null) continue;
-                var shader = Shader.Find("Unlit/Transparent Cutout");
-                if (shader == null) shader = Shader.Find("Unlit/Transparent");
+                // Use the same fog and sunlight as the terrain. The old
+                // Unlit cards were disconnected from the meadow lighting.
+                var shader = Shader.Find("FruitTree/VertexLit");
+                if (shader == null) shader = Shader.Find("Unlit/Transparent Cutout");
                 if (shader == null) continue;
                 var material = new Material(shader) { name = "Grass Card " + filename };
                 material.mainTexture = texture;
-                if (material.HasProperty("_Cutoff")) material.SetFloat("_Cutoff", .38f);
+                if (material.HasProperty("_AlphaCutoff"))
+                    material.SetFloat("_AlphaCutoff", .40f);
+                if (material.HasProperty("_Cutoff"))
+                    material.SetFloat("_Cutoff", .40f);
+                if (material.HasProperty("_AmbientLight"))
+                    material.SetFloat("_AmbientLight", .72f);
+                if (material.HasProperty("_Cull"))
+                    material.SetFloat("_Cull", 0f);
+                if (material.HasProperty("_Wind"))
+                    material.SetFloat("_Wind", .006f);
                 generated.Add(material);
                 Create("Illustrated " + filename,
                     CreateGrassCards(variant), material);
