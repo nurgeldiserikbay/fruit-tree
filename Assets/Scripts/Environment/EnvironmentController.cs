@@ -514,20 +514,10 @@ namespace FruitTree
             mesh.RidgeBand(28f, -.15f, 4.45f, 40, 1.3f,
                 new Color(.56f, .71f, .69f));
             Wildflowers(mesh, 45, 439, 5.9f, 16f, new Color(.92f, .84f, .68f));
-            for (int i = 0; i < 20; i++)
-            {
-                float a = (i + .22f) * Mathf.PI * 2f / 20f;
-                float radius = 27f + (i % 3) * .7f;
-                float height = 4.1f + (i % 5) * 1.05f;
-                Color stone = i % 3 == 0 ? new Color(.68f, .72f, .70f) :
-                    new Color(.55f, .67f, .66f);
-                mesh.Cone(new Vector3(Mathf.Cos(a) * radius, -.25f,
-                    Mathf.Sin(a) * radius), 3.4f, height, 5, stone);
-                if (i % 3 == 0)
-                    mesh.Cone(new Vector3(Mathf.Cos(a) * radius,
-                        height * .67f, Mathf.Sin(a) * radius),
-                        1.06f, height * .34f, 5, new Color(.90f, .94f, .90f));
-            }
+            // Distant peaks come from layered 360-degree ridge bands, not
+            // twenty oversized low-sided cone props. Their triangular edges
+            // previously projected into the foreground and obscured the tree.
+            // Keep real geometry near the player limited to low decoration.
             for (int i = 0; i < 12; i++)
             {
                 float a = (i + .4f) * Mathf.PI * 2f / 12f;
