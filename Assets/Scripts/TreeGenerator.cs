@@ -261,10 +261,20 @@ namespace FruitTree
                         fruitAnchors.Add(center);
                         for (int leafIndex = 0; leafIndex < appleLeafCount; leafIndex++)
                         {
-                            Vector3 offset = new Vector3(Between(-.39f,.39f),
-                                Between(-.31f,.36f), Between(-.39f,.39f));
-                            Vector3 direction = (offset +
-                                new Vector3(Between(-.3f,.3f), .21f, Between(-.3f,.3f))).normalized;
+                            // Leaves grow in sprays around their twig,
+                            // not as an isotropic cloud of random polygons.
+                            // Bias each leaf outwards from the branch with
+                            // alternating lateral spread and slight droop.
+                            float leafAngle = leafIndex * goldenAngle +
+                                Between(-.22f, .22f);
+                            float sprayRadius = Between(.13f, .39f);
+                            Vector3 spread = sideways * (Mathf.Cos(leafAngle) * sprayRadius) +
+                                Vector3.up * (Mathf.Sin(leafAngle) * sprayRadius * .72f);
+                            Vector3 offset = twigDirection * Between(.07f, .23f) +
+                                spread + Vector3.up * Between(-.08f, .09f);
+                            Vector3 direction = (twigDirection * .52f +
+                                spread.normalized * .74f +
+                                Vector3.up * Between(-.08f, .24f)).normalized;
                             float tint = Between(-.065f,.065f);
                             Color leafColor = (texturedLeaves
                                 ? Color.white : profile.LeafColor) +
@@ -300,7 +310,7 @@ namespace FruitTree
                     Vector3 offset = new Vector3(
                         Between(-.32f,.32f), Between(-.24f,.23f), Between(-.32f,.32f));
                     Vector3 direction = (offset + new Vector3(
-                        Between(-.4f,.4f), .23f, Between(-.4f,.4f))).normalized;
+                        Between(-.4f,.4f), .13f, Between(-.4f,.4f))).normalized;
                     float shade = Between(-.055f,.07f);
                     foliage.Leaf(center + offset, direction,
                         Between(detailedApple ? .15f : .20f,
