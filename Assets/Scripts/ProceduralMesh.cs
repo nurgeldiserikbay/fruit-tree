@@ -208,16 +208,24 @@ namespace FruitTree
                 float angle = t * Mathf.PI;
                 float sine = Mathf.Max(0f, Mathf.Sin(angle));
                 float shoulder = Mathf.SmoothStep(.53f, .91f, t);
-                float body = Mathf.Pow(sine, .69f) * (.176f + .028f * t);
-                float upperDimple = Mathf.Pow(Mathf.Clamp01((t - .86f) / .14f), 2f);
-                float baseY = -.18f + .375f * t - .044f * upperDimple;
+                // Rounded, asymmetrical apple shoulders, with a broad lower
+                // belly and a clearly recessed stem socket at the crown.
+                // Texture UVs remain continuous for the imported peel maps.
+                float body = Mathf.Pow(sine, .57f) *
+                    (.188f + .013f * Mathf.Sin(t * Mathf.PI) + .016f * t);
+                float upperDimple = Mathf.Pow(Mathf.Clamp01((t - .79f) / .21f), 2f);
+                float lowerDimple = Mathf.Pow(Mathf.Clamp01((.17f - t) / .17f), 2f);
+                float baseY = -.18f + .375f * t -
+                    .043f * upperDimple + .013f * lowerDimple;
                 for (int x = 0; x <= longitude; x++)
                 {
                     float theta = x * Mathf.PI * 2f / longitude;
                     float lobes = Mathf.Cos(theta * 5f);
-                    float variation = 1f + .039f * lobes * shoulder;
-                    float bottomLobes = .007f * Mathf.Pow(1f - t, 9f) * lobes;
-                    float upperLobes = .012f * shoulder * upperDimple * lobes;
+                    // Five subtle lobes at the socket; the apple sides are
+                    // smooth, avoiding the old pumpkin-like vertical ribs.
+                    float variation = 1f + .017f * lobes * shoulder;
+                    float bottomLobes = .004f * lowerDimple * lobes;
+                    float upperLobes = .010f * upperDimple * lobes;
                     verts.Add(new Vector3(body * variation * Mathf.Cos(theta),
                         baseY + bottomLobes + upperLobes,
                         body * variation * Mathf.Sin(theta)));
