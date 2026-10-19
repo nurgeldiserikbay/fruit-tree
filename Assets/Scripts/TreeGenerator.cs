@@ -357,7 +357,18 @@ namespace FruitTree
             MakeMeshObject("Merged Leaves", Track(foliage.Build("Leaves")), leafMaterial);
             Mesh appleMesh = Track(profile.CreateFruitMesh());
             Color fruitColor = profile.FruitColor;
-            Material appleMaterial = Track(LitMaterial("Fruit " + speciesId, fruitColor, .38f));
+            // Different peels reflect light differently. Apples and cherries
+            // have a waxy skin, peaches/apricots are softer and matte, while
+            // citrus and pomegranate sit between those extremes.
+            float peelGloss = speciesId == "apple" ? .53f :
+                speciesId == "cherry" ? .63f :
+                speciesId == "plum" ? .49f :
+                speciesId == "pear" ? .42f :
+                speciesId == "peach" || speciesId == "apricot" ? .24f :
+                speciesId == "orange" || speciesId == "mandarin" ||
+                speciesId == "lemon" ? .34f : .41f;
+            Material appleMaterial = Track(LitMaterial("Fruit " + speciesId,
+                fruitColor, peelGloss));
             if (appleMaterial.HasProperty("_MainTex"))
             {
                 // Imported artwork takes priority, with the existing lightweight
