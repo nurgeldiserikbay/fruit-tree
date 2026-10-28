@@ -241,11 +241,11 @@ namespace FruitTree
         {
             if (skyMaterial == null || !skyMaterial.HasProperty("_PanoramaBlend"))
                 return;
-            // A deliberately imported Meadow.png acts as an opt-in preview,
+            // A deliberately imported OrchardTest.png acts as an opt-in preview,
             // even for scenes serialized before usePhotoPanoramas existed.
             // Other themes remain off unless enabled explicitly.
             Texture2D meadowPreview = theme == EnvironmentTheme.Meadow
-                ? Resources.Load<Texture2D>("Panoramas/Meadow") : null;
+                ? Resources.Load<Texture2D>("Panoramas/OrchardTest") : null;
             if (!usePhotoPanoramas && meadowPreview == null)
             {
                 skyMaterial.SetTexture("_Panorama", Texture2D.whiteTexture);
