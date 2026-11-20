@@ -38,6 +38,7 @@ To update an existing Unity scene and see the new tree collection: [Ten-tree fin
 - Eight procedural, static, merged-mesh landscapes: Meadow, Park, City Park, Mountains, Japanese Garden, Chinese Garden, Lakeside and Evening Garden, with themed sky, sun, fog and ground tint.
 - Settings → SCENERY cycles themes and saves a manual choice; AUTO follows tree progression.
 - Background geometry has no colliders and stays outside the central fruit-picking radius. [Details & tests](docs/ENVIRONMENT_SYSTEM.md) and [eight-theme acceptance](docs/EIGHT_THEME_ACCEPTANCE.md).
+- Optional 360° photo panoramas (`Assets/Resources/Panoramas`, compressed JPEG, one per theme) can replace the gradient sky. They are off by default (`EnvironmentController.usePhotoPanoramas`) because ordinary photos clash with the 3D landscape; Meadow uses an opt-in preview image. Panoramas in `Resources` always ship in the build (~3 MB) — check Android texture compression before release.
 - Unity visual/device performance verification is still outstanding.
 
 ## App front-end / Google Play preparation

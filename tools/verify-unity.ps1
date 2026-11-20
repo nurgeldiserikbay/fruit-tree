@@ -12,8 +12,14 @@ New-Item -Path $logs -ItemType Directory -Force | Out-Null
 function Invoke-Unity {
     param([string[]] $Arguments, [string] $LogName)
     $log = Join-Path $logs $LogName
-    & $UnityEditor -batchmode -nographics -quit -projectPath $project @Arguments -logFile $log
-    $code = $LASTEXITCODE
+    # Unity.exe is a GUI-subsystem binary: '&' returns immediately with a stale
+    # $LASTEXITCODE, which launched the next step while the project was still
+    # locked. Start-Process -Wait blocks until Unity exits and yields its code.
+    $allArgs = @('-batchmode', '-nographics', '-quit', '-projectPath', "`"$project`"") +
+        ($Arguments | ForEach-Object { if ($_ -match '\s') { "`"$_`"" } else { $_ } }) +
+        @('-logFile', "`"$log`"")
+    $process = Start-Process -FilePath $UnityEditor -ArgumentList $allArgs -Wait -PassThru -NoNewWindow
+    $code = $process.ExitCode
     if ($code -ne 0) {
         Write-Host "Unity failed. Log: $log"
         if (Test-Path $log) { Get-Content $log -Tail 75 }

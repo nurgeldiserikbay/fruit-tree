@@ -1,5 +1,13 @@
 # Fruit Tree development state
 
+## Save batching, verification script and cleanup (2026-11-20)
+
+- [x] **Code:** `OrchardGameController` no longer rewrites the JSON save on every fruit tap. Picks are batched and written at most 1.5 s after the first unsaved pick (unscaled time, so it still saves while paused). A tree clear, tree switch, rebloom, app pause, focus loss, quit and destroy still save immediately. A failed write is retried after 6 s instead of every frame.
+- [x] **Build size:** removed the unused runtime package `com.unity.ai.inference` from `Packages/manifest.json` (no code referenced it). `com.unity.ai.assistant` (Editor-only tool) and `com.unity.purchasing` (required by `RemoveAdsPurchaser`) are kept. Unity regenerates `packages-lock.json` on next open.
+- [x] **Fixed `tools/verify-unity.ps1`:** `Unity.exe` is a GUI-subsystem binary, so `& $UnityEditor` returned immediately with a stale exit code. The script printed "OK" for steps that had not finished (or had failed) and launched the next Unity instance while the project was still locked. It now uses `Start-Process -Wait -PassThru` and checks the real exit code.
+- [ ] **Blocked: Unity licence.** Batch-mode run with Unity 6000.6.8f1 (6000.6.5f1 is no longer installed) stops with "No valid Unity Editor license found" (exit 198). Sign in to Unity Hub / activate a licence, then run `tools/verify-unity.ps1 -UnityEditor "C:\Program Files\Unity\Hub\Editor\6000.6.8f1\Editor\Unity.exe" -BuildApk`. No tests have been executed yet.
+- [ ] **Broken asset:** `Assets/Resources/Panoramas/OrchardTest.png` (commit 1e666d6) is 93 bytes with no PNG signature — the upload was corrupted. The Meadow theme tries to load it as its preview panorama; it will fail to import and Meadow falls back to the procedural sky. Re-add the real image (or point the code back to `Meadow.png`).
+
 ## Unity screenshot feedback — camera floor and scenic clarity (2026-10-13)
 
 - [x] **Code:** Orbit camera now clamps downward pitch against its distance and inspection focus; the camera cannot physically enter the meadow when zoomed out. The all-species Editor audit ignores any viewpoint that would be underground.
@@ -274,7 +282,7 @@ See [GAME_DESIGN.md](GAME_DESIGN.md), [ARCHITECTURE.md](ARCHITECTURE.md), [IMPLE
 - [ ] Test purchases, pending/deferred orders, refunds and restore on Play internal-testing build
 - [ ] Android signing, Google Play store release assets, privacy/data-safety declarations and age-rating review
 
-No APK is included. Do not describe the game as production-ready without Unity builds and hardware testing.
+No APK is committed to git (`Builds/` and `*.apk` are ignored). A local development APK was built on 2026-10-13, before the later fruit/leaf/panorama commits, so it is outdated. Do not describe the game as production-ready without Unity builds and hardware testing.
 
 ## Testing handoff
 See [SETUP.md](SETUP.md). The user's intended first manual check is near the end of development, but testing is indispensable before release.
