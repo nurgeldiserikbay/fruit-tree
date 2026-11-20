@@ -6,7 +6,8 @@
 - [x] **Build size:** removed the unused runtime package `com.unity.ai.inference` from `Packages/manifest.json` (no code referenced it). `com.unity.ai.assistant` (Editor-only tool) and `com.unity.purchasing` (required by `RemoveAdsPurchaser`) are kept. Unity regenerates `packages-lock.json` on next open.
 - [x] **Fixed `tools/verify-unity.ps1`:** `Unity.exe` is a GUI-subsystem binary, so `& $UnityEditor` returned immediately with a stale exit code. The script printed "OK" for steps that had not finished (or had failed) and launched the next Unity instance while the project was still locked. It now uses `Start-Process -Wait -PassThru` and checks the real exit code.
 - [ ] **Blocked: Unity licence.** Batch-mode run with Unity 6000.6.8f1 (6000.6.5f1 is no longer installed) stops with "No valid Unity Editor license found" (exit 198). Sign in to Unity Hub / activate a licence, then run `tools/verify-unity.ps1 -UnityEditor "C:\Program Files\Unity\Hub\Editor\6000.6.8f1\Editor\Unity.exe" -BuildApk`. No tests have been executed yet.
-- [ ] **Broken asset:** `Assets/Resources/Panoramas/OrchardTest.png` (commit 1e666d6) is 93 bytes with no PNG signature — the upload was corrupted. The Meadow theme tries to load it as its preview panorama; it will fail to import and Meadow falls back to the procedural sky. Re-add the real image (or point the code back to `Meadow.png`).
+- [x] **Broken asset removed:** `Assets/Resources/Panoramas/OrchardTest.png` (commit 1e666d6) was 93 bytes with no PNG signature — a corrupted upload. The Meadow preview again loads the valid `Meadow.png` (1774×887, 2:1). To use an orchard photo instead, re-add a real 2:1 image and change the `Resources.Load` path in `EnvironmentController.ApplyPanorama`.
+- [x] Panorama import settings checked: compressed, max 2048, Android uses automatic (ASTC) format. No change needed.
 
 ## Unity screenshot feedback — camera floor and scenic clarity (2026-10-13)
 
