@@ -244,12 +244,13 @@ namespace FruitTree
         public static float OrchardContactShade(float x, float z)
         {
             float trunk = Mathf.Sqrt(x * x + z * z);
-            float core = 1f - Mathf.SmoothStep(.25f, 2.2f, trunk);
+            // Mathf.SmoothStep(a, b, t) interpolates a..b; it is not GLSL smoothstep.
+            float core = 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(.25f, 2.2f, trunk));
             // A faint offset penumbra suggests low-angle sun without a hard disk.
             float dx = (x + .65f) / 3.0f;
             float dz = (z - .42f) / 2.15f;
-            float canopy = 1f - Mathf.SmoothStep(.35f, 1.0f,
-                Mathf.Sqrt(dx * dx + dz * dz));
+            float canopy = 1f - Mathf.SmoothStep(0f, 1f,
+                Mathf.InverseLerp(.35f, 1.0f, Mathf.Sqrt(dx * dx + dz * dz)));
             float noise = Mathf.PerlinNoise(x * 1.6f + 13f, z * 1.6f + 19f);
             return Mathf.Clamp01(.17f * core + .075f * canopy * (.65f + .35f * noise));
         }
@@ -276,18 +277,18 @@ namespace FruitTree
                     float shade = .82f + variation * .12f + fine * .06f;
                     // A soft built-in contact shade grounds the trunk even on
                     // Android tiers without real-time shadow mapping.
-                    float contact = 1f - Mathf.SmoothStep(.5f, 3.3f, distance);
+                    float contact = 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(.5f, 3.3f, distance));
                     shade *= 1f - OrchardContactShade(px, pz);
-                    float clearing = 1f - Mathf.SmoothStep(1.1f, 3.8f, distance);
+                    float clearing = 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(1.1f, 3.8f, distance));
                     // Broad warm/cool patches read as real turf instead of
                     // a perfectly uniform green floor. Vertex colors keep
                     // this texture-free and cost nothing per frame.
                     float earth = Mathf.PerlinNoise(px * .12f + 7f, pz * .12f + 51f);
-                    float dry = Mathf.SmoothStep(.48f, .84f, earth) * .24f;
+                    float dry = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(.48f, .84f, earth)) * .24f;
                     Color turf = Color.Lerp(
                         new Color(.38f, .58f, .30f),
                         new Color(.54f, .54f, .30f), dry);
-                    float edge = Mathf.SmoothStep(14f, 33f, distance);
+                    float edge = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(14f, 33f, distance));
                     Color farTurf = new Color(.55f, .65f, .49f);
                     Color groundColor = Color.Lerp(turf * shade,
                         farTurf * (.88f + variation * .10f), edge * .55f);

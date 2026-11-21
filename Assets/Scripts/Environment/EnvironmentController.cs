@@ -405,8 +405,8 @@ namespace FruitTree
             MeadowShrubs(mesh);
             // Close-to-midground petals are visible in portrait framing.
             // Keep the trunk clearing open and all decor collider-free.
-            Wildflowers(mesh, 160, 171, 3.8f, 12f, new Color(.96f, .83f, .56f));
-            Wildflowers(mesh, 105, 208, 4.5f, 13f, new Color(.90f, .84f, .92f));
+            Wildflowers(mesh, 160, 171, 5.3f, 12f, new Color(.96f, .83f, .56f));
+            Wildflowers(mesh, 105, 208, 5.3f, 13f, new Color(.90f, .84f, .92f));
             Wildflowers(mesh, 65, 360, 5.4f, 15f, new Color(.91f, .92f, .73f));
             // The old nine isolated triangular 'trees' broke the illusion
             // of a natural horizon. Midground shrubs provide the vegetation

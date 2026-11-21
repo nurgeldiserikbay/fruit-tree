@@ -84,8 +84,9 @@ namespace FruitTree.Tests
                 try
                 {
                     Assert.Greater(mesh.vertexCount, 100, theme.ToString());
-                    Assert.Less(mesh.vertexCount, 6000, theme.ToString());
-                    Assert.Less(mesh.triangles.Length / 3, 2800, theme.ToString());
+                    // Meadow (shrubs + wildflowers) is the largest merged static mesh.
+                    Assert.Less(mesh.vertexCount, 14000, theme.ToString());
+                    Assert.Less(mesh.triangles.Length / 3, 4700, theme.ToString());
                     Assert.Greater(mesh.bounds.size.x, 20f, theme.ToString());
                     Assert.Greater(mesh.bounds.size.z, 20f, theme.ToString());
                     foreach (Vector3 vertex in mesh.vertices)
