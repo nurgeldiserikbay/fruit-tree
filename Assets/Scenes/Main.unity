@@ -6008,7 +6008,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  usePhotoPanoramas: 0
+  usePhotoPanoramas: 1
 --- !u!114 &920893448
 MonoBehaviour:
   m_ObjectHideFlags: 0

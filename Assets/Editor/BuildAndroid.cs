@@ -26,6 +26,7 @@ namespace FruitTree.Editor
                 throw new InvalidOperationException(
                     "Select Android in Unity Build Profiles first, or run batchmode with -buildTarget Android.");
 
+            MusicPlaylistBuilder.Rebuild();
             // Do not quietly produce an APK from a broken or incompletely imported scene.
             ValidateProject.Run();
 

@@ -15,6 +15,18 @@ namespace FruitTree
         public float focusHeight = 2.65f;
         public float sensitivity = .2f;
         public const float MinimumCameraHeight = .85f;
+        // The player stays beside the canopy, among the branches.
+        public const float MinimumOrbitDistance = 2.8f;
+        public const float MaximumOrbitDistance = 8f;
+        // The look-at point travels only through the crown, not the bare trunk.
+        public const float MinimumFocusHeight = 2.2f;
+        public const float MaximumFocusHeight = 4.6f;
+        private const float HomePitch = 13f;
+        private const float MinimumPitch = -20f;
+        private const float MaximumPitch = 58f;
+        private const float NearestStartDistance = 5.2f;
+        // Far enough to read the rounded crown, still close to the branches.
+        private const float FarthestStartDistance = 6.6f;
         private float wantedYaw, wantedPitch, wantedDistance, wantedFocusHeight;
         private Vector2 pointerDown, lastPointer;
         private int activeFinger = -1;
@@ -58,10 +70,11 @@ namespace FruitTree
             float framedDistance = Mathf.Max(
                 radial + radial / horizontalTan,
                 radial + bounds.extents.y / verticalTan);
-            // Keep 12% margin for orbit changes and wind sway. Do not cap
-            // the computed framing at 15m: large mature trees need more room.
-            framedDistance = Mathf.Clamp(framedDistance * 1.12f, 7f, 25f);
-            wantedFocusHeight = Mathf.Clamp(bounds.center.y, 1.4f, 4.1f);
+            // Start close: the crown fills the portrait screen and the player
+            // orbits to reach its sides instead of viewing the tree from afar.
+            framedDistance = Mathf.Clamp(framedDistance * 1.12f,
+                NearestStartDistance, FarthestStartDistance);
+            wantedFocusHeight = Mathf.Clamp(bounds.center.y, MinimumFocusHeight, 4.1f);
             focusHeight = wantedFocusHeight;
             wantedDistance = framedDistance;
             distance = framedDistance;
@@ -79,9 +92,9 @@ namespace FruitTree
             Vector2 radial = new Vector2(offset.x, offset.z);
             if (radial.sqrMagnitude > .0001f)
                 wantedYaw = Mathf.Atan2(-offset.x, -offset.z) * Mathf.Rad2Deg;
-            wantedFocusHeight = Mathf.Clamp(offset.y, 1.4f, 4.1f);
+            wantedFocusHeight = Mathf.Clamp(offset.y, MinimumFocusHeight, MaximumFocusHeight);
             // Move gently closer if the player is far away. Keep user freedom to zoom.
-            wantedDistance = Mathf.Min(wantedDistance, 8.5f);
+            wantedDistance = Mathf.Min(wantedDistance, FarthestStartDistance);
         }
 
         private void Update()
@@ -178,10 +191,12 @@ namespace FruitTree
                 float newGap = Vector2.Distance(a.position, b.position);
                 if (pinching)
                 {
-                    wantedDistance = Mathf.Clamp(wantedDistance - (newGap - oldGap) * .009f, 2.8f, 18f);
+                    wantedDistance = Mathf.Clamp(wantedDistance - (newGap - oldGap) * .009f,
+                        MinimumOrbitDistance, MaximumOrbitDistance);
                     // A two-finger vertical slide can inspect upper or lower branches.
                     float verticalSlide = (a.deltaPosition.y + b.deltaPosition.y) * .5f;
-                    wantedFocusHeight = Mathf.Clamp(wantedFocusHeight - verticalSlide * .005f, 1.4f, 4.1f);
+                    wantedFocusHeight = Mathf.Clamp(wantedFocusHeight - verticalSlide * .005f,
+                        MinimumFocusHeight, MaximumFocusHeight);
                 }
                 pinching = true;
                 // The old one-finger gesture must never finish as a tap after
@@ -256,9 +271,11 @@ namespace FruitTree
             if (Input.GetMouseButton(0) && tracking) Move(pos);
             if (Input.GetMouseButtonUp(0) && tracking) End(pos, -1);
             if (Input.mouseScrollDelta.y != 0)
-                wantedDistance = Mathf.Clamp(wantedDistance - Input.mouseScrollDelta.y * .5f, 2.8f, 18f);
+                wantedDistance = Mathf.Clamp(wantedDistance - Input.mouseScrollDelta.y * .5f,
+                    MinimumOrbitDistance, MaximumOrbitDistance);
             if (Input.GetKey(KeyCode.LeftShift) && Input.GetMouseButton(1))
-                wantedFocusHeight = Mathf.Clamp(wantedFocusHeight + Input.GetAxis("Mouse Y") * .18f, 1.4f, 4.1f);
+                wantedFocusHeight = Mathf.Clamp(wantedFocusHeight + Input.GetAxis("Mouse Y") * .18f,
+                    MinimumFocusHeight, MaximumFocusHeight);
         }
 
         private void Begin(Vector2 position)
@@ -276,9 +293,36 @@ namespace FruitTree
             if (moved)
             {
                 wantedYaw += delta.x * sensitivity;
-                wantedPitch = Mathf.Clamp(wantedPitch - delta.y * sensitivity, -20f, 58f);
+                ApplyVerticalDrag(delta.y, 6.5f / Mathf.Max(480f, Screen.height), sensitivity,
+                    ref wantedFocusHeight, ref wantedPitch);
             }
             lastPointer = position;
+        }
+
+        /// <summary>
+        /// A vertical drag moves the view along the tree. Past the top or bottom
+        /// it tilts the camera, and dragging back levels the tilt before moving.
+        /// </summary>
+        public static void ApplyVerticalDrag(float pixels, float heightPerPixel,
+            float degreesPerPixel, ref float height, ref float orbitPitch)
+        {
+            float remaining = pixels;
+            if (degreesPerPixel > 0f && remaining * (orbitPitch - HomePitch) > 0f)
+            {
+                float toHome = (orbitPitch - HomePitch) / degreesPerPixel;
+                float used = Mathf.Abs(remaining) < Mathf.Abs(toHome) ? remaining : toHome;
+                orbitPitch -= used * degreesPerPixel;
+                remaining -= used;
+            }
+            if (heightPerPixel > 0f)
+            {
+                float next = Mathf.Clamp(height - remaining * heightPerPixel,
+                    MinimumFocusHeight, MaximumFocusHeight);
+                remaining -= (height - next) / heightPerPixel;
+                height = next;
+            }
+            orbitPitch = Mathf.Clamp(orbitPitch - remaining * degreesPerPixel,
+                MinimumPitch, MaximumPitch);
         }
 
         private void End(Vector2 position, int fingerId)

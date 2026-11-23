@@ -150,12 +150,18 @@ namespace FruitTree
                 "TreeTextures/Leaves/" + speciesId);
             if (leafArt == null)
                 leafArt = Resources.Load<Texture2D>("TreeTextures/Leaves/Default");
+            // Every species shares the real photo leaf, tinted to its own green.
+            if (leafArt == null)
+                leafArt = Resources.Load<Texture2D>("TreeTextures/Leaves/apple");
             bool texturedLeaves = leafArt != null;
             var wood = new ProceduralMesh();
             var foliage = new ProceduralMesh();
             var fruitAnchors = new List<Vector3>();
-            Color brown = profile.TrunkColor;
-            Color branchColor = profile.BranchColor;
+            // Photographic bark already contains its colour; the darker
+            // procedural tint would multiply it into a near-black trunk.
+            bool photoBark = Resources.Load<Texture2D>("TreeTextures/Bark") != null;
+            Color brown = photoBark ? new Color(.96f, .92f, .88f) : profile.TrunkColor;
+            Color branchColor = photoBark ? new Color(.90f, .86f, .80f) : profile.BranchColor;
             // A slight bend in the trunk and irregularly-spaced limbs avoid the
             // artificial radial symmetry of the first prototype.
             const float goldenRootAngle = 2.39996323f;
@@ -172,20 +178,39 @@ namespace FruitTree
             {
                 float a = root * goldenRootAngle + .21f;
                 Vector3 outward = new Vector3(Mathf.Cos(a), 0f, Mathf.Sin(a));
-                wood.Branch(trunkBase + Vector3.up * .31f + outward * .22f,
-                    outward * (.42f + root * .025f) + Vector3.down * .047f,
-                    .085f, .012f, brown);
+                // Photo bark: broad flares that sink into the soil instead of spikes.
+                if (photoBark)
+                    wood.Branch(trunkBase + Vector3.up * .20f + outward * .16f,
+                        outward * (.47f + root * .025f) + Vector3.down * .13f,
+                        .15f, .06f, brown);
+                else
+                    wood.Branch(trunkBase + Vector3.up * .31f + outward * .22f,
+                        outward * (.42f + root * .025f) + Vector3.down * .047f,
+                        .085f, .012f, brown);
             }
 
             const float goldenAngle = 2.39996323f;
             int majorBranches = profile.BranchCount;
             float crownSpread = profile.CrownSpread;
-            // Apple visual reference: finer leaves, more secondary twigs, and
-            // a layered canopy. Other species retain their established geometry.
-            bool detailedApple = speciesId == "apple";
-            int twigCount = detailedApple ? 7 : profile.BranchCount >= 21 ? 6 : 5;
-            int appleLeafCount = detailedApple ? Mathf.Min(leavesPerCluster + 1, 22) :
+            // Photoreal pass for every species: finer curved limbs, secondary
+            // twigs, a shaded crown volume and fruit near the outside.
+            bool photoTree = texturedLeaves;
+            bool detailedTree = photoTree || speciesId == "apple";
+            Color photoLeafColor = photoTree ? profile.PhotoLeafTint : Color.white;
+            // A tall dome instead of flat horizontal tiers; its shape varies by species.
+            float crownTop = photoTree ? profile.CrownHeightHigh + profile.PhotoCrownLift :
+                profile.FillerTopHeight;
+            Vector3 crownCenter = Vector3.up * ((profile.CrownHeightLow + crownTop) * .5f);
+            float crownRadius = (photoTree ? 2.8f : 2.65f) * crownSpread;
+            int twigCount = detailedTree ? 7 : profile.BranchCount >= 21 ? 6 : 5;
+            int appleLeafCount = detailedTree ? Mathf.Min(leavesPerCluster + 1, 22) :
                 Mathf.Min(leavesPerCluster + 1, 21);
+            // More limbs with fewer leaves each: a fuller tree at the same mesh budget.
+            if (photoTree)
+            {
+                majorBranches = profile.PhotoLimbs;
+                appleLeafCount = Mathf.Min(appleLeafCount, 14);
+            }
             for (int i = 0; i < majorBranches; i++)
             {
                 float elevation = i / (float)(majorBranches - 1);
@@ -193,7 +218,7 @@ namespace FruitTree
                 // than one flat disc. Introduce broad vertical variation,
                 // without changing branch/fruit counts or stable IDs.
                 float crownWave = Mathf.Sin(goldenAngle * i * 2f + .4f) * .28f;
-                float height = Mathf.Lerp(profile.CrownHeightLow,
+                float height = Mathf.Lerp(profile.CrownHeightLow + (photoTree ? .55f : 0f),
                     profile.CrownHeightHigh, elevation) +
                     crownWave + Between(-.19f, .19f);
                 float angle = goldenAngle * i + Between(-.18f, .18f);
@@ -203,24 +228,37 @@ namespace FruitTree
                 // broad lobes, while preserving stable fruit IDs and counts.
                 float canopyLobes = 1f + .12f * Mathf.Sin(angle * 3f + .8f) +
                     .055f * Mathf.Sin(angle * 5f - .6f);
-                float length = (2.65f - elevation * 1.2f) * crownSpread *
+                float length = (photoTree ? Mathf.Lerp(2.7f, 1.25f, Mathf.Pow(elevation, 1.4f)) :
+                    2.65f - elevation * 1.2f) * crownSpread *
                     canopyLobes * Between(.84f, 1.10f);
+                // Low limbs reach outward, high limbs climb steeply: a rounded dome.
+                float limbRise = photoTree ? Mathf.Lerp(.15f, profile.PhotoLimbRise, elevation * elevation) :
+                    profile.BranchRise;
                 Vector3 origin = new Vector3(Between(-.065f,.065f), height, Between(-.065f,.065f));
 
-                var limbPoints = new Vector3[4];
-                var limbRadii = new float[4];
+                int limbSections = photoTree ? 7 : 3;
+                var limbPoints = new Vector3[limbSections + 1];
+                var limbRadii = new float[limbSections + 1];
                 limbPoints[0] = origin;
-                float baseRadius = Mathf.Lerp(.14f, .095f, elevation);
+                float baseRadius = Mathf.Lerp(.14f, .095f, elevation) * (photoTree ? .62f : 1f);
                 limbRadii[0] = baseRadius;
-                float bend = Between(-.16f, .16f);
-                for (int section = 1; section <= 3; section++)
+                float bend = photoTree ? Between(-.55f, .55f) : Between(-.16f, .16f);
+                float wigglePhase = photoTree ? Between(0f, 6.28f) : 0f;
+                Vector3 LimbCurve(float along) => !photoTree ? Vector3.zero :
+                    sideways * (Mathf.Sin(along * Mathf.PI) * bend +
+                        Mathf.Sin(along * 9f + wigglePhase) * .055f * along) +
+                    // Limbs leave the trunk upward and arch out, not as straight logs.
+                    Vector3.up * (Mathf.Sin(along * 7f + wigglePhase) * .05f * along +
+                        .62f * along * (1f - along));
+                for (int section = 1; section <= limbSections; section++)
                 {
-                    float fraction = section / 3f;
+                    float fraction = section / (float)limbSections;
                     limbPoints[section] = origin + radial * (length * fraction) +
-                        sideways * (Mathf.Sin(fraction * Mathf.PI) * bend) +
+                        (photoTree ? LimbCurve(fraction) :
+                            sideways * (Mathf.Sin(fraction * Mathf.PI) * bend)) +
                         Vector3.up * (.12f * fraction +
-                            profile.BranchRise * fraction * fraction);
-                    limbRadii[section] = Mathf.Lerp(baseRadius, .022f, fraction);
+                            limbRise * fraction * fraction);
+                    limbRadii[section] = Mathf.Lerp(baseRadius, photoTree ? .016f : .022f, fraction);
                 }
                 wood.BranchCurve(limbPoints, limbRadii, branchColor);
 
@@ -228,21 +266,21 @@ namespace FruitTree
                 // All wood/leaves are merged into just two renderer objects.
                 for (int twigIndex = 0; twigIndex < twigCount; twigIndex++)
                 {
-                    float fraction = detailedApple ? .24f + twigIndex * .105f :
+                    float fraction = detailedTree ? .24f + twigIndex * .105f :
                         .32f + twigIndex * .14f;
                     float sideSign = twigIndex % 2 == 0 ? 1f : -1f;
-                    Vector3 start = origin + radial * (length * fraction) +
+                    Vector3 start = origin + radial * (length * fraction) + LimbCurve(fraction) +
                         Vector3.up * (.12f * fraction +
-                            profile.BranchRise * fraction * fraction);
+                            limbRise * fraction * fraction);
                     Vector3 twigDirection = (radial * .65f +
                         sideways * sideSign * Between(.28f, .7f) +
                         Vector3.up * (Between(.18f,.58f) *
                             profile.TwigUpwardFactor)).normalized;
-                    float twigLength = Between(.44f, detailedApple ? .94f : .82f) *
+                    float twigLength = Between(.44f, detailedTree ? .94f : .82f) *
                         (1f - elevation * .18f);
                     Vector3 end = start + twigDirection * twigLength;
-                    wood.Branch(start, end, .039f, .008f, branchColor);
-                    if (detailedApple)
+                    wood.Branch(start, end, photoTree ? .024f : .039f, .006f, branchColor);
+                    if (detailedTree)
                     {
                         // Forked fine shoots enrich silhouette without a new renderer.
                         Vector3 shootStart = Vector3.Lerp(start, end, .62f);
@@ -275,25 +313,36 @@ namespace FruitTree
                             Vector3 direction = (twigDirection * .52f +
                                 spread.normalized * .74f +
                                 Vector3.up * Between(-.08f, .24f)).normalized;
-                            float tint = Between(-.065f,.065f);
+                            // Photo leaves need a wider tone range and a smaller
+                            // size, or the crown reads as flat overlapping cards.
+                            float tint = Between(-.065f,.065f) * (texturedLeaves ? 2.6f : 1f);
+                            float photoScale = photoTree ? Between(.62f, .95f) :
+                                texturedLeaves ? .72f : 1f;
                             Color leafColor = (texturedLeaves
-                                ? Color.white : profile.LeafColor) +
+                                ? photoLeafColor : profile.LeafColor) +
                                 new Color(tint, tint * .70f, tint * .48f);
+                            Vector3 leafPoint = center + offset * .75f;
+                            if (photoTree)
+                                // Each cluster reads as a puff: lit on top, darker beneath.
+                                leafColor *= CrownShade(leafPoint, crownCenter, crownRadius) *
+                                    Mathf.Lerp(.86f, 1.1f, Mathf.InverseLerp(-.3f, .3f, offset.y));
                             // Slightly rounder, shorter foliage cards read as
                             // a soft canopy instead of isolated spear tips.
-                            foliage.Leaf(center + offset * .75f, direction,
+                            foliage.Leaf(leafPoint, direction,
                                 Between(profile.LeafLengthLow, profile.LeafLengthHigh) *
-                                    (detailedApple ? .72f : .82f),
+                                    (detailedTree ? .72f : .82f) * photoScale,
                                 Between(profile.LeafWidthLow, profile.LeafWidthHigh) *
-                                    (detailedApple ? .78f : .91f),
-                                leafColor, profile.LeafOvalness);
+                                    (detailedTree ? .78f : .91f) * photoScale,
+                                leafColor, profile.LeafOvalness,
+                                photoTree ? ((leafPoint - crownCenter).normalized +
+                                    offset.normalized * .7f).normalized : (Vector3?)null);
                         }
                     }
                 }
             }
             // Lightweight crown fillers close large artificial gaps above the
             // highest limbs while keeping most apples readable from outside.
-            int fillerCount = detailedApple ? 31 : 27;
+            int fillerCount = detailedTree ? 31 : 27;
             for (int cluster = 0; cluster < fillerCount; cluster++)
             {
                 float heightRatio = (cluster + .5f) / fillerCount;
@@ -303,7 +352,7 @@ namespace FruitTree
                 Vector3 center = new Vector3(
                     Mathf.Cos(angle) * radius,
                     Mathf.Lerp(profile.CrownHeightLow + 1.2f,
-                        profile.FillerTopHeight, heightRatio),
+                        crownTop, heightRatio),
                     Mathf.Sin(angle) * radius);
                 for (int leafIndex = 0; leafIndex < 9; leafIndex++)
                 {
@@ -312,15 +361,31 @@ namespace FruitTree
                     Vector3 direction = (offset + new Vector3(
                         Between(-.4f,.4f), .13f, Between(-.4f,.4f))).normalized;
                     float shade = Between(-.055f,.07f);
-                    foliage.Leaf(center + offset, direction,
-                        Between(detailedApple ? .15f : .20f,
-                            detailedApple ? .23f : .30f),
-                        Between(detailedApple ? .11f : .15f,
-                            detailedApple ? .16f : .21f),
-                        (texturedLeaves ? Color.white : profile.LeafColor) +
-                            new Color(shade, shade, shade * .5f),
-                        profile.LeafOvalness);
+                    Vector3 fillerPoint = center + offset;
+                    float fillerScale = photoTree ? Between(.55f, .85f) : 1f;
+                    Color fillerColor = (texturedLeaves ? photoLeafColor : profile.LeafColor) +
+                        new Color(shade, shade, shade * .5f);
+                    if (photoTree)
+                        fillerColor *= CrownShade(fillerPoint, crownCenter, crownRadius);
+                    foliage.Leaf(fillerPoint, direction,
+                        Between(detailedTree ? .15f : .20f,
+                            detailedTree ? .23f : .30f) * fillerScale,
+                        Between(detailedTree ? .11f : .15f,
+                            detailedTree ? .16f : .21f) * fillerScale,
+                        fillerColor,
+                        profile.LeafOvalness,
+                        photoTree ? (fillerPoint - crownCenter).normalized : (Vector3?)null);
                 }
+            }
+            // Photo crown: hang fruit from the outer clusters so it stays visible.
+            if (photoTree)
+            {
+                fruitAnchors.Sort((left, right) =>
+                    (right - crownCenter).sqrMagnitude.CompareTo(
+                        (left - crownCenter).sqrMagnitude));
+                int keep = Mathf.Max(appleCount, Mathf.CeilToInt(fruitAnchors.Count * .55f));
+                if (keep < fruitAnchors.Count)
+                    fruitAnchors.RemoveRange(keep, fruitAnchors.Count - keep);
             }
             // Prevent multiple fruits overlapping a single leaf cluster.
             for (int i = fruitAnchors.Count - 1; i > 0; i--)
@@ -356,7 +421,8 @@ namespace FruitTree
             }
             MakeMeshObject("Merged Leaves", Track(foliage.Build("Leaves")), leafMaterial);
             Mesh appleMesh = Track(profile.CreateFruitMesh());
-            Color fruitColor = profile.FruitColor;
+            Color fruitColor = photoTree ? profile.FruitColor * profile.PhotoFruitTint :
+                profile.FruitColor;
             // Different peels reflect light differently. Apples and cherries
             // have a waxy skin, peaches/apricots are softer and matte, while
             // citrus and pomegranate sit between those extremes.
@@ -405,19 +471,24 @@ namespace FruitTree
             {
                 Vector3 attachment = fruitAnchors[i * fruitAnchors.Count / appleCount];
                 Vector3 outward = new Vector3(attachment.x, 0f, attachment.z).normalized;
+                if (photoTree) attachment += outward * .16f;
                 // Smaller fruit tuck underneath twig ends and leaves rather than
                 // sitting like large red spheres on the outside of the crown.
-                Vector3 at = attachment + Vector3.down * Between(.19f, .26f) +
+                Vector3 at = attachment + Vector3.down * Between(.19f, .26f) *
+                    (photoTree ? .6f : 1f) +
                     outward * (i % 4 == 0 ? .025f : .105f) +
                     new Vector3(Between(-.05f, .05f), 0f, Between(-.05f, .05f));
                 var fruit = MakeMeshObject(speciesId + " " + (i + 1), appleMesh,
                     skins[i % skins.Length]);
                 fruit.transform.localPosition = at;
                 // Gentle size variety with ~30% smaller apples than the early prototype.
-                float fruitScale = Between(profile.FruitScaleLow, profile.FruitScaleHigh);
+                float photoFruitSize = photoTree ? profile.PhotoFruitSize : 1f;
+                float fruitScale = Between(profile.FruitScaleLow, profile.FruitScaleHigh) *
+                    photoFruitSize;
                 fruit.transform.localScale = Vector3.one * fruitScale;
                 fruit.transform.localRotation = Quaternion.Euler(Between(-10, 10), Between(0, 360), Between(-10, 10));
-                fruit.AddComponent<SphereCollider>().radius = profile.HitRadius;
+                // Smaller art keeps the same finger-sized tap target.
+                fruit.AddComponent<SphereCollider>().radius = profile.HitRadius / photoFruitSize;
                 var component = fruit.AddComponent<Apple>();
                 component.Initialize(i);
                 component.Harvested += OnHarvest;
@@ -610,6 +681,15 @@ namespace FruitTree
                 mat.enableInstancing = true;
             if (mat.HasProperty("_Glossiness")) mat.SetFloat("_Glossiness", smoothness);
             return mat;
+        }
+
+        // Baked canopy shading: leaves deep inside or under the crown get less sky.
+        private static float CrownShade(Vector3 point, Vector3 center, float radius)
+        {
+            Vector3 fromCore = point - center;
+            float depth = Mathf.InverseLerp(.25f, .95f, fromCore.magnitude / radius);
+            float outer = Mathf.Lerp(.62f, 1.18f, Mathf.SmoothStep(0f, 1f, depth));
+            return outer * Mathf.Lerp(.8f, 1.05f, Mathf.InverseLerp(-1.6f, 1.2f, fromCore.y));
         }
 
         private float Between(float min, float max) => min + (float)random.NextDouble() * (max - min);

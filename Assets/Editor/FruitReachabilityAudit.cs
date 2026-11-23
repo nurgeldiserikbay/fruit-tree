@@ -91,8 +91,9 @@ namespace FruitTree.Editor
             // which are actually outside a narrow portrait screen.
             // Sample reachable orbit/zoom/focus states from the real camera.
             float[] pitches = { -20f, 13f, 38f, 58f };
-            // Pinch zoom reaches 2.8 units, so close views must be audited too.
-            float[] zooms = { 2.8f, 4f, 5.5f, 7f, 12f, 18f };
+            // Only distances the player can actually reach with pinch zoom.
+            float[] zooms = { OrbitPickingCamera.MinimumOrbitDistance, 4f, 5.5f,
+                OrbitPickingCamera.MaximumOrbitDistance };
             int totalViews = angleSteps * heightSteps * pitches.Length * zooms.Length;
             var samplePositions = new Vector3[totalViews];
             var sampleTargets = new Vector3[totalViews];
@@ -100,7 +101,8 @@ namespace FruitTree.Editor
             Vector3 pivot = tree.transform.position;
             for (int height = 0; height < heightSteps; height++)
             {
-                float focusHeight = Mathf.Lerp(1.4f, 4.1f,
+                float focusHeight = Mathf.Lerp(OrbitPickingCamera.MinimumFocusHeight,
+                    OrbitPickingCamera.MaximumFocusHeight,
                     heightSteps == 1 ? .5f : height / (float)(heightSteps - 1));
                 Vector3 focus = pivot + Vector3.up * focusHeight;
                 foreach (float pitch in pitches)

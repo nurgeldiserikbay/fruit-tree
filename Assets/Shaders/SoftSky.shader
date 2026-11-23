@@ -9,6 +9,10 @@ Shader "FruitTree/SoftSky"
         _PanoramaBlend ("Panorama Blend", Range(0,1)) = 0
         _PanoramaGroundFade ("Panorama Ground Fade", Range(0,1)) = 1
         _PanoramaHorizonHeight ("Panorama Horizon Height", Range(-0.2,0.5)) = 0.12
+        _PanoramaScale ("Panorama Object Shrink", Range(1,4)) = 1
+        _PanoramaSoftness ("Panorama Distance Softness", Range(0,1)) = 0
+        _PanoramaMist ("Panorama Ground Mist", Range(0,1)) = 0
+        _WeatherTint ("Weather Light", Color) = (1,1,1,1)
     }
     SubShader
     {
@@ -19,6 +23,7 @@ Shader "FruitTree/SoftSky"
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
+            #pragma target 3.0
             #include "UnityCG.cginc"
             fixed4 _Horizon;
             fixed4 _Zenith;
@@ -27,6 +32,10 @@ Shader "FruitTree/SoftSky"
             float _PanoramaBlend;
             float _PanoramaGroundFade;
             float _PanoramaHorizonHeight;
+            float _PanoramaScale;
+            float _PanoramaSoftness;
+            float _PanoramaMist;
+            float4 _WeatherTint;
             struct appdata { float4 vertex : POSITION; };
             struct v2f { float4 pos: SV_POSITION; float3 dir : TEXCOORD0; };
             v2f vert(appdata v)
@@ -64,14 +73,36 @@ Shader "FruitTree/SoftSky"
                 fixed3 hazeColor = lerp(_Horizon.rgb, fixed3(1, 1, 1), .16);
                 sky.rgb = lerp(sky.rgb, hazeColor,
                     saturate(horizonBand * _HazeStrength));
+                sky.rgb *= _WeatherTint.rgb;
+                hazeColor *= _WeatherTint.rgb;
                 // Latitude/longitude lookup is seamless in yaw and uses one
                 // optional texture fetch only when a panorama is enabled.
                 if (_PanoramaBlend > .001)
                 {
                     float3 dir = normalize(i.dir);
-                    float2 uv = float2(atan2(dir.z, dir.x) * (0.5 / UNITY_PI) + .5,
-                        0.5 + asin(clamp(dir.y, -1.0, 1.0)) / UNITY_PI);
-                    fixed3 panorama = tex2D(_Panorama, uv).rgb;
+                    // Shrink photographed objects: whole-number yaw repeats stay
+                    // seamless, and the curve is steepest at the horizon while
+                    // still reaching the photo's zenith and nadir exactly.
+                    float shrink = max(_PanoramaScale, 1.0);
+                    float elevation = asin(clamp(dir.y, -1.0, 1.0)) / (0.5 * UNITY_PI);
+                    float compressed = sign(elevation) *
+                        (1.0 - pow(1.0 - abs(elevation), shrink));
+                    float2 uv = float2(
+                        (atan2(dir.z, dir.x) * (0.5 / UNITY_PI) + .5) * round(shrink),
+                        0.5 + compressed * 0.5);
+                    // Aerial perspective: a slightly blurred, paler and less
+                    // saturated distance keeps the sharp 3D tree in front of it.
+                    fixed3 panorama = tex2Dbias(_Panorama,
+                        float4(uv, 0.0, _PanoramaSoftness * 1.6)).rgb;
+                    float luma = dot(panorama, float3(.3, .59, .11));
+                    panorama = lerp(panorama, luma.xxx, .22 * _PanoramaSoftness);
+                    panorama *= _WeatherTint.rgb;
+                    panorama = lerp(panorama, hazeColor,
+                        .34 * _PanoramaSoftness * exp(-abs(dir.y) * 4.5));
+                    // Ground mist: at and below the horizon the photo becomes the
+                    // scene fog colour, so the fogged 3D ground has no visible edge.
+                    panorama = lerp(panorama, unity_FogColor.rgb,
+                        _PanoramaMist * (1.0 - smoothstep(0.0, 0.17, dir.y)));
                     // Perspective-style foreground in concept art appears
                     // huge on a sky sphere. Fade its lower hemisphere into
                     // the biome haze instead of showing a nearby fake floor.

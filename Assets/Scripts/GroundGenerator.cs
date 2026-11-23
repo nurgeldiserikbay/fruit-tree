@@ -22,12 +22,68 @@ namespace FruitTree
             ApplyStoredPalette();
         }
 
+        // Muted undergrowth that sits inside the photographed light.
+        private static readonly Color PhotoGrassShade = new Color(.62f, .66f, .55f, 1f);
+        private const float PhotoGroundTiles = 18f;
+        private const int FadedTerrainQueue = 1900, FadedGrassQueue = 1950;
+        private Texture2D photoGround;
+        private Color photoGroundTint = Color.white;
+        private bool fadeToPhoto, showGrass = true;
+        private float photoGrassLight = 1f;
+        private readonly List<Material> grassMaterials = new List<Material>();
+        private readonly List<Renderer> grassRenderers = new List<Renderer>();
+
+        /// <summary>Uses a tiling photo for the terrain; null restores the plain ground.</summary>
+        public void SetPhotoGround(Texture2D texture, Color tint, bool fadeIntoPhoto,
+            bool grassVisible, float grassLight = 1f)
+        {
+            photoGrassLight = texture != null ? grassLight : 1f;
+            photoGround = texture;
+            photoGroundTint = tint;
+            fadeToPhoto = texture != null && fadeIntoPhoto;
+            showGrass = texture == null || grassVisible;
+            ApplyPhotoState();
+        }
+
+        private void ApplyPhotoState()
+        {
+            if (meadowMaterial == null) return;
+            meadowMaterial.mainTexture = photoGround != null ? photoGround : Texture2D.whiteTexture;
+            meadowMaterial.mainTextureScale = Vector2.one * (photoGround != null ? PhotoGroundTiles : 1f);
+            ConfigureFade(meadowMaterial, FadedTerrainQueue);
+            if (meadowMaterial.HasProperty("_NeutralVertex"))
+                meadowMaterial.SetFloat("_NeutralVertex", fadeToPhoto ? 1f : 0f);
+            foreach (Material material in grassMaterials)
+                ConfigureFade(material, FadedGrassQueue);
+            foreach (Renderer renderer in grassRenderers)
+                renderer.enabled = showGrass;
+            ApplyStoredPalette();
+        }
+
+        private void ConfigureFade(Material material, int fadedQueue)
+        {
+            if (!material.HasProperty("_GroundFade")) return;
+            material.SetFloat("_GroundFade", fadeToPhoto ? 1f : 0f);
+            material.SetFloat("_SrcBlend", (float)(fadeToPhoto ?
+                UnityEngine.Rendering.BlendMode.SrcAlpha : UnityEngine.Rendering.BlendMode.One));
+            material.SetFloat("_DstBlend", (float)(fadeToPhoto ?
+                UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha : UnityEngine.Rendering.BlendMode.Zero));
+            material.renderQueue = fadeToPhoto ? fadedQueue : -1;
+        }
+
         private void ApplyStoredPalette()
         {
             if (meadowMaterial != null && meadowMaterial.HasProperty("_Color"))
-                meadowMaterial.SetColor("_Color", appliedGroundTint);
+                meadowMaterial.SetColor("_Color",
+                    photoGround != null ? photoGroundTint : appliedGroundTint);
             if (bladesMaterial != null && bladesMaterial.HasProperty("_Color"))
-                bladesMaterial.SetColor("_Color", appliedGrassTint);
+                bladesMaterial.SetColor("_Color", photoGround != null
+                    ? appliedGrassTint * PhotoGrassShade * photoGrassLight : appliedGrassTint);
+            // Grass cards are drawn from art, so only their brightness follows the photo.
+            Color cardLight = new Color(photoGrassLight, photoGrassLight, photoGrassLight, 1f);
+            foreach (Material material in grassMaterials)
+                if (material != bladesMaterial && material.HasProperty("_Color"))
+                    material.SetColor("_Color", cardLight);
         }
 
         private void Awake()
@@ -47,6 +103,7 @@ namespace FruitTree
             Create("Meadow Terrain", CreateTerrainMesh(), material);
             Create("Merged Grass", CreateGrassMesh(), grassMaterial);
             CreateIllustratedGrass();
+            ApplyPhotoState();
         }
 
         // Art pack path: Assets/Art/Vegetation/Grass/grass_01.png ...
@@ -174,7 +231,7 @@ namespace FruitTree
                     z += 1.25f * Mathf.Sin(angle + 1.1f);
                 }
                 float heightVariation = (float)rng.NextDouble();
-                float scale = Mathf.Lerp(.12f, .32f, heightVariation);
+                float scale = Mathf.Lerp(.14f, .36f, heightVariation);
                 if (variant == 4 || variant == 6 || variant == 7 ||
                     variant == 8) scale *= .78f;
                 // Reserve a subtle open patch around the main trunk.
@@ -226,6 +283,11 @@ namespace FruitTree
             renderer.sharedMaterial = material;
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             renderer.receiveShadows = true;
+            if (material != meadowMaterial)
+            {
+                grassMaterials.Add(material);
+                grassRenderers.Add(renderer);
+            }
         }
 
         private void OnDestroy()
