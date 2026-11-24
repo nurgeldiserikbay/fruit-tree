@@ -365,6 +365,8 @@ namespace FruitTree
 
         private bool photoSceneActive;
         private PhotoScene photoScene;
+        public bool PhotoSceneActive => photoSceneActive;
+        public PhotoScene CurrentPhotoScene => photoScene;
 
         private void ApplyFogRange()
         {

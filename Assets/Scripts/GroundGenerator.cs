@@ -317,6 +317,15 @@ namespace FruitTree
             return Mathf.Clamp01(.17f * core + .075f * canopy * (.65f + .35f * noise));
         }
 
+        /// <summary>Terrain height at a point, matching the generated ground mesh.</summary>
+        public static float HeightAt(float x, float z)
+        {
+            float distance = Mathf.Sqrt(x * x + z * z);
+            float outerBump = Mathf.Clamp01((distance - 1f) / 3f);
+            float noise = Mathf.PerlinNoise(x * .33f + 34f, z * .33f + 12f);
+            return -.055f + (noise - .5f) * .13f * outerBump;
+        }
+
         public static Mesh CreateTerrainMesh()
         {
             const int divisions = 64;

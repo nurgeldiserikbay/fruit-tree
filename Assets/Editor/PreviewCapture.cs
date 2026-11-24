@@ -101,6 +101,13 @@ namespace FruitTree.Editor
                         scenery.ApplyThemeDirect(theme);
                         Save(camera, "preview-theme-" + theme + ".png");
                     }
+                    var wildlife = Object.FindFirstObjectByType<Wildlife>();
+                    foreach (var theme in new[] { EnvironmentTheme.Meadow, EnvironmentTheme.JapaneseGarden })
+                    {
+                        scenery.ApplyThemeDirect(theme);
+                        if (wildlife != null) wildlife.Showcase(camera);
+                        Save(camera, "preview-nature-" + theme + ".png");
+                    }
                     scenery.ApplyThemeDirect(EnvironmentTheme.Meadow);
                 }
                 camera.transform.SetPositionAndRotation(startPosition, startRotation);

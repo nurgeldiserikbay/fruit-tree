@@ -10,6 +10,13 @@ namespace FruitTree
         public readonly float FogStart, FogEnd, Softness, Mist, GrassLight;
         public readonly bool FadeGroundToPhoto, ShowGrass;
 
+        /// <summary>A small stream runs past the tree in these natural places.</summary>
+        public static bool HasBrook(EnvironmentTheme theme)
+        {
+            return theme == EnvironmentTheme.Meadow || theme == EnvironmentTheme.Park ||
+                theme == EnvironmentTheme.Mountains || theme == EnvironmentTheme.JapaneseGarden;
+        }
+
         private PhotoScene(string ground, Color groundTint, Color fog, float fogStart,
             float fogEnd, float softness, float mist, bool fadeGroundToPhoto, bool showGrass,
             float grassLight)

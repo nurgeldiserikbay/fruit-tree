@@ -482,7 +482,7 @@ namespace FruitTree
                     skins[i % skins.Length]);
                 fruit.transform.localPosition = at;
                 // Gentle size variety with ~30% smaller apples than the early prototype.
-                float photoFruitSize = photoTree ? profile.PhotoFruitSize : 1f;
+                float photoFruitSize = photoTree ? profile.PhotoFruitSize * .85f : 1f;
                 float fruitScale = Between(profile.FruitScaleLow, profile.FruitScaleHigh) *
                     photoFruitSize;
                 fruit.transform.localScale = Vector3.one * fruitScale;

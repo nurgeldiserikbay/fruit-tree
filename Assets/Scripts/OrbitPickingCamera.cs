@@ -392,6 +392,11 @@ namespace FruitTree
             return false;
         }
 
+        /// <summary>Fruit must be this close to the camera: zoom in to pick.</summary>
+        public const float MaximumPickDistance = 4.5f;
+        /// <summary>A visible fruit was tapped but is too far away to pick.</summary>
+        public event Action FruitOutOfReach;
+
         private void TryPick(Vector2 point)
         {
             Ray ray = viewCamera.ScreenPointToRay(point);
@@ -409,7 +414,11 @@ namespace FruitTree
                 {
                     if (IsTransparentFoliageHit(hits[i])) continue;
                     Apple fruit = hits[i].collider.GetComponentInParent<Apple>();
-                    if (fruit != null) fruit.Pick();
+                    if (fruit != null)
+                    {
+                        if (hits[i].distance <= MaximumPickDistance) fruit.Pick();
+                        else FruitOutOfReach?.Invoke();
+                    }
                     return;
                 }
 
@@ -417,7 +426,7 @@ namespace FruitTree
                     Vector3.Distance(viewCamera.transform.position, target.position);
                 float radius = TouchAssistRadius(Screen.height,
                     viewCamera.fieldOfView, depth);
-                if (Physics.SphereCast(ray, radius, out RaycastHit hit, maxDistance,
+                if (Physics.SphereCast(ray, radius, out RaycastHit hit, MaximumPickDistance,
                     Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
                 {
                     // Touch assist cannot go through an opaque leaf or branch.
@@ -426,7 +435,7 @@ namespace FruitTree
                     // nearby leaf. Confirm a clear central line of sight before
                     // letting touch assistance harvest anything.
                     if (fruit != null && HasVisibleFruitLine(ray.origin,
-                        hit.collider, maxDistance))
+                        hit.collider, MaximumPickDistance))
                         fruit.Pick();
                 }
             }

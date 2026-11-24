@@ -177,7 +177,8 @@ namespace FruitTree.Editor
                     continue;
                 Vector3 difference = fruitPoint - camera;
                 float distance = difference.magnitude;
-                if (distance <= .001f || distance > 30f) continue;
+                // Gameplay only picks fruit within arm's reach of the camera.
+                if (distance <= .001f || distance > OrbitPickingCamera.MaximumPickDistance) continue;
                 // Match actual tap selection: scan front-to-back, skip
                 // transparent leaf texels, and stop on the first blocker.
                 bool previousBackfaces = Physics.queriesHitBackfaces;

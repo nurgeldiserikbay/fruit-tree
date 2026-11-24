@@ -51,16 +51,16 @@ namespace FruitTree
 
         private static readonly TreeLevelDefinition[] Catalog =
         {
-            new TreeLevelDefinition("tree_001", "apple", 120),
-            new TreeLevelDefinition("tree_002", "pear", 140),
-            new TreeLevelDefinition("tree_003", "cherry", 220),
-            new TreeLevelDefinition("tree_004", "peach", 130),
-            new TreeLevelDefinition("tree_005", "orange", 160),
-            new TreeLevelDefinition("tree_006", "apricot", 180),
-            new TreeLevelDefinition("tree_007", "plum", 160),
-            new TreeLevelDefinition("tree_008", "lemon", 140),
-            new TreeLevelDefinition("tree_009", "mandarin", 200),
-            new TreeLevelDefinition("tree_010", "pomegranate", 110)
+            new TreeLevelDefinition("tree_001", "apple", 150),
+            new TreeLevelDefinition("tree_002", "pear", 175),
+            new TreeLevelDefinition("tree_003", "cherry", 275),
+            new TreeLevelDefinition("tree_004", "peach", 165),
+            new TreeLevelDefinition("tree_005", "orange", 200),
+            new TreeLevelDefinition("tree_006", "apricot", 225),
+            new TreeLevelDefinition("tree_007", "plum", 200),
+            new TreeLevelDefinition("tree_008", "lemon", 175),
+            new TreeLevelDefinition("tree_009", "mandarin", 250),
+            new TreeLevelDefinition("tree_010", "pomegranate", 140)
         };
 
         // Single source of truth for the Editor's all-species reachability audit.
