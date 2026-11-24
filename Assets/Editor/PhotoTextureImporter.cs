@@ -24,6 +24,29 @@ namespace FruitTree.Editor
                 importer.wrapMode = TextureWrapMode.Clamp;
                 importer.maxTextureSize = 512;
             }
+            else if (assetPath.StartsWith("Assets/Resources/Branding/"))
+            {
+                // A sprite so the splash screen can use it; mipmaps keep it smooth when small.
+                importer.textureType = TextureImporterType.Sprite;
+                importer.spriteImportMode = SpriteImportMode.Single;
+                // The original import had alpha switched off, which drew a black box.
+                importer.alphaSource = TextureImporterAlphaSource.FromInput;
+                importer.alphaIsTransparency = true;
+                importer.mipmapEnabled = true;
+                importer.wrapMode = TextureWrapMode.Clamp;
+                importer.maxTextureSize = 2048;
+            }
+            else if (assetPath.StartsWith("Assets/Art/Icon/"))
+            {
+                // Unity scales these to every launcher size; keep the source lossless.
+                importer.textureType = TextureImporterType.Default;
+                importer.npotScale = TextureImporterNPOTScale.None;
+                importer.mipmapEnabled = false;
+                importer.alphaSource = TextureImporterAlphaSource.FromInput;
+                importer.alphaIsTransparency = true;
+                importer.textureCompression = TextureImporterCompression.Uncompressed;
+                importer.maxTextureSize = 1024;
+            }
             else if (assetPath == "Assets/Resources/TreeTextures/Bark.jpg" ||
                 assetPath.StartsWith("Assets/Resources/Ground/"))
             {

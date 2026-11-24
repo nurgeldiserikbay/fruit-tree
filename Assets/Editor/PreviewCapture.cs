@@ -58,6 +58,7 @@ namespace FruitTree.Editor
             try
             {
                 Camera camera = Camera.main;
+                SaveWithInterface(camera, "preview-home.png");
                 Save(camera, "preview-meadow.png");
                 Vector3 startPosition = camera.transform.position;
                 Quaternion startRotation = camera.transform.rotation;
@@ -126,6 +127,28 @@ namespace FruitTree.Editor
                 exitCode = 1;
             }
             EditorApplication.Exit(exitCode);
+        }
+
+        /// <summary>Overlay canvases skip Camera.Render, so route them through the camera once.</summary>
+        private static void SaveWithInterface(Camera camera, string fileName)
+        {
+            var canvases = Object.FindObjectsByType<Canvas>(FindObjectsSortMode.None);
+            var modes = new RenderMode[canvases.Length];
+            for (int i = 0; i < canvases.Length; i++)
+            {
+                modes[i] = canvases[i].renderMode;
+                if (!canvases[i].isRootCanvas || modes[i] != RenderMode.ScreenSpaceOverlay) continue;
+                canvases[i].renderMode = RenderMode.ScreenSpaceCamera;
+                canvases[i].worldCamera = camera;
+                canvases[i].planeDistance = camera.nearClipPlane + .05f;
+            }
+            Canvas.ForceUpdateCanvases();
+            try { Save(camera, fileName); }
+            finally
+            {
+                for (int i = 0; i < canvases.Length; i++)
+                    if (canvases[i].isRootCanvas) canvases[i].renderMode = modes[i];
+            }
         }
 
         private static void Save(Camera camera, string fileName)
