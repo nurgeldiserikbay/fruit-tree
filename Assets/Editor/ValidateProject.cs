@@ -187,6 +187,14 @@ namespace FruitTree.Editor
                 errors.Add("Foliage shader reference material is missing");
             if (AssetDatabase.LoadAssetAtPath<Material>("Assets/Resources/SoftSkyReference.mat") == null)
                 errors.Add("Sky shader reference material is missing");
+            // Fruit materials use Shader.Find("Standard"). Without a referencing
+            // asset the shader is stripped from players and fruit creation fails.
+            var standardReference = AssetDatabase.LoadAssetAtPath<Material>(
+                "Assets/Resources/StandardReference.mat");
+            if (standardReference == null || standardReference.shader == null ||
+                standardReference.shader.name != "Standard" ||
+                !standardReference.enableInstancing)
+                errors.Add("Fruit Standard shader reference material is missing or invalid");
 
             bool foundBuildScene = false;
             foreach (var entry in EditorBuildSettings.scenes)

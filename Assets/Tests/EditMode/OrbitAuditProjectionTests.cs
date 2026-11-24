@@ -99,6 +99,25 @@ namespace FruitTree.Tests
         }
 
         [Test]
+        public void VerticalDragMovesAlongTreeThenTiltsAndLevelsBack()
+        {
+            float bottom = OrbitPickingCamera.MinimumFocusHeight;
+            float height = bottom + 1f, pitch = 13f;
+            OrbitPickingCamera.ApplyVerticalDrag(100f, .01f, .2f, ref height, ref pitch);
+            Assert.That(height, Is.EqualTo(bottom).Within(.001f));
+            Assert.That(pitch, Is.EqualTo(13f).Within(.001f));
+
+            height = bottom + .1f;
+            OrbitPickingCamera.ApplyVerticalDrag(100f, .01f, .2f, ref height, ref pitch);
+            Assert.That(height, Is.EqualTo(OrbitPickingCamera.MinimumFocusHeight).Within(.001f));
+            Assert.That(pitch, Is.EqualTo(-5f).Within(.001f));
+
+            OrbitPickingCamera.ApplyVerticalDrag(-25f, .01f, .2f, ref height, ref pitch);
+            Assert.That(height, Is.EqualTo(OrbitPickingCamera.MinimumFocusHeight).Within(.001f));
+            Assert.That(pitch, Is.EqualTo(0f).Within(.001f));
+        }
+
+        [Test]
         public void DegenerateAuditViewCannotMarkFruitAsVisible()
         {
             Assert.IsFalse(OrbitPickingCamera.IsInsidePortraitView(

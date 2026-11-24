@@ -22,12 +22,68 @@ namespace FruitTree
             ApplyStoredPalette();
         }
 
+        // Muted undergrowth that sits inside the photographed light.
+        private static readonly Color PhotoGrassShade = new Color(.62f, .66f, .55f, 1f);
+        private const float PhotoGroundTiles = 18f;
+        private const int FadedTerrainQueue = 1900, FadedGrassQueue = 1950;
+        private Texture2D photoGround;
+        private Color photoGroundTint = Color.white;
+        private bool fadeToPhoto, showGrass = true;
+        private float photoGrassLight = 1f;
+        private readonly List<Material> grassMaterials = new List<Material>();
+        private readonly List<Renderer> grassRenderers = new List<Renderer>();
+
+        /// <summary>Uses a tiling photo for the terrain; null restores the plain ground.</summary>
+        public void SetPhotoGround(Texture2D texture, Color tint, bool fadeIntoPhoto,
+            bool grassVisible, float grassLight = 1f)
+        {
+            photoGrassLight = texture != null ? grassLight : 1f;
+            photoGround = texture;
+            photoGroundTint = tint;
+            fadeToPhoto = texture != null && fadeIntoPhoto;
+            showGrass = texture == null || grassVisible;
+            ApplyPhotoState();
+        }
+
+        private void ApplyPhotoState()
+        {
+            if (meadowMaterial == null) return;
+            meadowMaterial.mainTexture = photoGround != null ? photoGround : Texture2D.whiteTexture;
+            meadowMaterial.mainTextureScale = Vector2.one * (photoGround != null ? PhotoGroundTiles : 1f);
+            ConfigureFade(meadowMaterial, FadedTerrainQueue);
+            if (meadowMaterial.HasProperty("_NeutralVertex"))
+                meadowMaterial.SetFloat("_NeutralVertex", fadeToPhoto ? 1f : 0f);
+            foreach (Material material in grassMaterials)
+                ConfigureFade(material, FadedGrassQueue);
+            foreach (Renderer renderer in grassRenderers)
+                renderer.enabled = showGrass;
+            ApplyStoredPalette();
+        }
+
+        private void ConfigureFade(Material material, int fadedQueue)
+        {
+            if (!material.HasProperty("_GroundFade")) return;
+            material.SetFloat("_GroundFade", fadeToPhoto ? 1f : 0f);
+            material.SetFloat("_SrcBlend", (float)(fadeToPhoto ?
+                UnityEngine.Rendering.BlendMode.SrcAlpha : UnityEngine.Rendering.BlendMode.One));
+            material.SetFloat("_DstBlend", (float)(fadeToPhoto ?
+                UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha : UnityEngine.Rendering.BlendMode.Zero));
+            material.renderQueue = fadeToPhoto ? fadedQueue : -1;
+        }
+
         private void ApplyStoredPalette()
         {
             if (meadowMaterial != null && meadowMaterial.HasProperty("_Color"))
-                meadowMaterial.SetColor("_Color", appliedGroundTint);
+                meadowMaterial.SetColor("_Color",
+                    photoGround != null ? photoGroundTint : appliedGroundTint);
             if (bladesMaterial != null && bladesMaterial.HasProperty("_Color"))
-                bladesMaterial.SetColor("_Color", appliedGrassTint);
+                bladesMaterial.SetColor("_Color", photoGround != null
+                    ? appliedGrassTint * PhotoGrassShade * photoGrassLight : appliedGrassTint);
+            // Grass cards are drawn from art, so only their brightness follows the photo.
+            Color cardLight = new Color(photoGrassLight, photoGrassLight, photoGrassLight, 1f);
+            foreach (Material material in grassMaterials)
+                if (material != bladesMaterial && material.HasProperty("_Color"))
+                    material.SetColor("_Color", cardLight);
         }
 
         private void Awake()
@@ -47,6 +103,7 @@ namespace FruitTree
             Create("Meadow Terrain", CreateTerrainMesh(), material);
             Create("Merged Grass", CreateGrassMesh(), grassMaterial);
             CreateIllustratedGrass();
+            ApplyPhotoState();
         }
 
         // Art pack path: Assets/Art/Vegetation/Grass/grass_01.png ...
@@ -174,7 +231,7 @@ namespace FruitTree
                     z += 1.25f * Mathf.Sin(angle + 1.1f);
                 }
                 float heightVariation = (float)rng.NextDouble();
-                float scale = Mathf.Lerp(.12f, .32f, heightVariation);
+                float scale = Mathf.Lerp(.14f, .36f, heightVariation);
                 if (variant == 4 || variant == 6 || variant == 7 ||
                     variant == 8) scale *= .78f;
                 // Reserve a subtle open patch around the main trunk.
@@ -226,6 +283,11 @@ namespace FruitTree
             renderer.sharedMaterial = material;
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             renderer.receiveShadows = true;
+            if (material != meadowMaterial)
+            {
+                grassMaterials.Add(material);
+                grassRenderers.Add(renderer);
+            }
         }
 
         private void OnDestroy()
@@ -244,14 +306,24 @@ namespace FruitTree
         public static float OrchardContactShade(float x, float z)
         {
             float trunk = Mathf.Sqrt(x * x + z * z);
-            float core = 1f - Mathf.SmoothStep(.25f, 2.2f, trunk);
+            // Mathf.SmoothStep(a, b, t) interpolates a..b; it is not GLSL smoothstep.
+            float core = 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(.25f, 2.2f, trunk));
             // A faint offset penumbra suggests low-angle sun without a hard disk.
             float dx = (x + .65f) / 3.0f;
             float dz = (z - .42f) / 2.15f;
-            float canopy = 1f - Mathf.SmoothStep(.35f, 1.0f,
-                Mathf.Sqrt(dx * dx + dz * dz));
+            float canopy = 1f - Mathf.SmoothStep(0f, 1f,
+                Mathf.InverseLerp(.35f, 1.0f, Mathf.Sqrt(dx * dx + dz * dz)));
             float noise = Mathf.PerlinNoise(x * 1.6f + 13f, z * 1.6f + 19f);
             return Mathf.Clamp01(.17f * core + .075f * canopy * (.65f + .35f * noise));
+        }
+
+        /// <summary>Terrain height at a point, matching the generated ground mesh.</summary>
+        public static float HeightAt(float x, float z)
+        {
+            float distance = Mathf.Sqrt(x * x + z * z);
+            float outerBump = Mathf.Clamp01((distance - 1f) / 3f);
+            float noise = Mathf.PerlinNoise(x * .33f + 34f, z * .33f + 12f);
+            return -.055f + (noise - .5f) * .13f * outerBump;
         }
 
         public static Mesh CreateTerrainMesh()
@@ -276,18 +348,18 @@ namespace FruitTree
                     float shade = .82f + variation * .12f + fine * .06f;
                     // A soft built-in contact shade grounds the trunk even on
                     // Android tiers without real-time shadow mapping.
-                    float contact = 1f - Mathf.SmoothStep(.5f, 3.3f, distance);
+                    float contact = 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(.5f, 3.3f, distance));
                     shade *= 1f - OrchardContactShade(px, pz);
-                    float clearing = 1f - Mathf.SmoothStep(1.1f, 3.8f, distance);
+                    float clearing = 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(1.1f, 3.8f, distance));
                     // Broad warm/cool patches read as real turf instead of
                     // a perfectly uniform green floor. Vertex colors keep
                     // this texture-free and cost nothing per frame.
                     float earth = Mathf.PerlinNoise(px * .12f + 7f, pz * .12f + 51f);
-                    float dry = Mathf.SmoothStep(.48f, .84f, earth) * .24f;
+                    float dry = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(.48f, .84f, earth)) * .24f;
                     Color turf = Color.Lerp(
                         new Color(.38f, .58f, .30f),
                         new Color(.54f, .54f, .30f), dry);
-                    float edge = Mathf.SmoothStep(14f, 33f, distance);
+                    float edge = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(14f, 33f, distance));
                     Color farTurf = new Color(.55f, .65f, .49f);
                     Color groundColor = Color.Lerp(turf * shade,
                         farTurf * (.88f + variation * .10f), edge * .55f);

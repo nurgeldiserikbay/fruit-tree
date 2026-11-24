@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df5dd5a4a8199484e88e83a060c2ee4f, type: 3}
+  m_Name: MusicPlaylist
+  m_EditorClassIdentifier: FruitTree.Runtime::FruitTree.MusicPlaylist
+  tracks:
+  - {fileID: 8300000, guid: b3b741c47bd29ef49882343e20f4f2b9, type: 3}
+  - {fileID: 8300000, guid: d7cae69831024dc47ac56d349fe712fb, type: 3}
+  - {fileID: 8300000, guid: 8646043a2d6d9ee429cbf971bb03fc17, type: 3}
+  - {fileID: 8300000, guid: f24be992bc36fe14c886a883e59dfa5f, type: 3}
+  - {fileID: 8300000, guid: 33152b6e286b346469307dda0f25346b, type: 3}
+  - {fileID: 8300000, guid: ed4c53b0078824f4484727beaf17f721, type: 3}

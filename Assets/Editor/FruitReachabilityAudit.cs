@@ -91,7 +91,9 @@ namespace FruitTree.Editor
             // which are actually outside a narrow portrait screen.
             // Sample reachable orbit/zoom/focus states from the real camera.
             float[] pitches = { -20f, 13f, 38f, 58f };
-            float[] zooms = { 7f, 12f, 18f };
+            // Only distances the player can actually reach with pinch zoom.
+            float[] zooms = { OrbitPickingCamera.MinimumOrbitDistance, 4f, 5.5f,
+                OrbitPickingCamera.MaximumOrbitDistance };
             int totalViews = angleSteps * heightSteps * pitches.Length * zooms.Length;
             var samplePositions = new Vector3[totalViews];
             var sampleTargets = new Vector3[totalViews];
@@ -99,7 +101,8 @@ namespace FruitTree.Editor
             Vector3 pivot = tree.transform.position;
             for (int height = 0; height < heightSteps; height++)
             {
-                float focusHeight = Mathf.Lerp(1.4f, 4.1f,
+                float focusHeight = Mathf.Lerp(OrbitPickingCamera.MinimumFocusHeight,
+                    OrbitPickingCamera.MaximumFocusHeight,
                     heightSteps == 1 ? .5f : height / (float)(heightSteps - 1));
                 Vector3 focus = pivot + Vector3.up * focusHeight;
                 foreach (float pitch in pitches)
@@ -118,58 +121,91 @@ namespace FruitTree.Editor
                 }
             }
 
-            var inaccessible = new List<string>();
-            Physics.SyncTransforms();
+            // A picked fruit stops blocking the ones behind it, so harvest in
+            // passes: only fruit left after no further progress is truly stuck.
+            var remaining = new List<Apple>();
             foreach (var apple in tree.Apples)
+                if (apple != null && !apple.IsHarvested) remaining.Add(apple);
+            var disabledColliders = new List<Collider>();
+            try
             {
-                if (apple == null || apple.IsHarvested) continue;
-                Vector3 fruitPoint = apple.transform.position;
-                bool reachable = false;
-                for (int view = 0; view < totalViews; view++)
+                while (remaining.Count > 0)
                 {
-                    Vector3 camera = samplePositions[view];
-                    // Reject impossible views that would go through the ground:
-                    // gameplay now enforces this same physical height limit.
-                    if (camera.y < OrbitPickingCamera.MinimumCameraHeight)
-                        continue;
-                    // Audit against the narrower 9:20 portrait aspect and
-                    // the generated 47-degree camera FOV.
-                    if (!OrbitPickingCamera.IsInsidePortraitView(
-                            camera, sampleTargets[view], fruitPoint))
-                        continue;
-                    Vector3 difference = fruitPoint - camera;
-                    float distance = difference.magnitude;
-                    if (distance <= .001f || distance > 30f) continue;
-                    // Match actual tap selection: scan front-to-back, skip
-                    // transparent leaf texels, and stop on the first blocker.
-                    bool previousBackfaces = Physics.queriesHitBackfaces;
-                    try
+                    Physics.SyncTransforms();
+                    var reachableNow = new List<Apple>();
+                    foreach (var apple in remaining)
+                        if (IsReachable(apple, samplePositions, sampleTargets))
+                            reachableNow.Add(apple);
+                    if (reachableNow.Count == 0) break;
+                    foreach (var apple in reachableNow)
                     {
-                        Physics.queriesHitBackfaces = true;
-                        RaycastHit[] hits = Physics.RaycastAll(camera,
-                            difference / distance, distance + .25f,
-                            Physics.DefaultRaycastLayers,
-                            QueryTriggerInteraction.Ignore);
-                        Array.Sort(hits, (left, right) =>
-                            left.distance.CompareTo(right.distance));
-                        foreach (RaycastHit hit in hits)
-                        {
-                            if (OrbitPickingCamera.IsTransparentFoliageHit(hit))
-                                continue;
-                            reachable = hit.collider.GetComponentInParent<Apple>() == apple;
-                            break;
-                        }
+                        var fruitCollider = apple.GetComponent<Collider>();
+                        fruitCollider.enabled = false;
+                        disabledColliders.Add(fruitCollider);
+                        remaining.Remove(apple);
                     }
-                    finally
-                    {
-                        Physics.queriesHitBackfaces = previousBackfaces;
-                    }
-                    if (reachable) break;
                 }
-                if (!reachable)
-                    inaccessible.Add(apple.name + " [" + apple.StableFruitId + "]");
             }
+            finally
+            {
+                foreach (var fruitCollider in disabledColliders)
+                    if (fruitCollider != null) fruitCollider.enabled = true;
+                Physics.SyncTransforms();
+            }
+
+            var inaccessible = new List<string>();
+            foreach (var apple in remaining)
+                inaccessible.Add(apple.name + " [" + apple.StableFruitId + "]");
             return inaccessible;
+        }
+
+        private static bool IsReachable(Apple apple, Vector3[] samplePositions,
+            Vector3[] sampleTargets)
+        {
+            Vector3 fruitPoint = apple.transform.position;
+            for (int view = 0; view < samplePositions.Length; view++)
+            {
+                Vector3 camera = samplePositions[view];
+                // Reject impossible views that would go through the ground:
+                // gameplay now enforces this same physical height limit.
+                if (camera.y < OrbitPickingCamera.MinimumCameraHeight)
+                    continue;
+                // Audit against the narrower 9:20 portrait aspect and
+                // the generated 47-degree camera FOV.
+                if (!OrbitPickingCamera.IsInsidePortraitView(
+                        camera, sampleTargets[view], fruitPoint))
+                    continue;
+                Vector3 difference = fruitPoint - camera;
+                float distance = difference.magnitude;
+                // Gameplay only picks fruit within arm's reach of the camera.
+                if (distance <= .001f || distance > OrbitPickingCamera.MaximumPickDistance) continue;
+                // Match actual tap selection: scan front-to-back, skip
+                // transparent leaf texels, and stop on the first blocker.
+                bool previousBackfaces = Physics.queriesHitBackfaces;
+                try
+                {
+                    Physics.queriesHitBackfaces = true;
+                    RaycastHit[] hits = Physics.RaycastAll(camera,
+                        difference / distance, distance + .25f,
+                        Physics.DefaultRaycastLayers,
+                        QueryTriggerInteraction.Ignore);
+                    Array.Sort(hits, (left, right) =>
+                        left.distance.CompareTo(right.distance));
+                    foreach (RaycastHit hit in hits)
+                    {
+                        if (OrbitPickingCamera.IsTransparentFoliageHit(hit))
+                            continue;
+                        if (hit.collider.GetComponentInParent<Apple>() == apple)
+                            return true;
+                        break;
+                    }
+                }
+                finally
+                {
+                    Physics.queriesHitBackfaces = previousBackfaces;
+                }
+            }
+            return false;
         }
     }
 }

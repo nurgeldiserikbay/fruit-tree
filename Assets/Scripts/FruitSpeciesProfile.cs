@@ -154,6 +154,48 @@ namespace FruitTree
                     new Color(.76f,.17f,.21f),.65f,.76f,.29f) }
             };
 
+        /// <summary>Limbs in the photo-textured crown; each species keeps its own habit.</summary>
+        public int PhotoLimbs => Id == "pomegranate" ? 28 :
+            Id == "pear" || Id == "peach" || Id == "plum" ? 30 :
+            Id == "cherry" || Id == "orange" || Id == "mandarin" ? 33 : 32;
+
+        /// <summary>How far the crown dome rises above the highest limb origin.</summary>
+        public float PhotoCrownLift => Id == "pear" ? 2.4f : Id == "plum" ? 2.5f :
+            Id == "peach" ? 1.8f : Id == "cherry" ? 1.9f : Id == "pomegranate" ? 1.9f :
+            Id == "apricot" ? 2f : Id == "orange" ? 2.2f :
+            Id == "lemon" || Id == "mandarin" ? 2.1f : 2.3f;
+
+        /// <summary>Upper-limb climb: high for upright trees, low for spreading ones.</summary>
+        public float PhotoLimbRise => Id == "pear" ? 3f : Id == "plum" ? 2.7f :
+            Id == "peach" ? 1.7f : Id == "cherry" ? 1.9f : Id == "apricot" ? 2f :
+            Id == "pomegranate" ? 2.4f : Id == "orange" ? 2.3f :
+            Id == "lemon" || Id == "mandarin" ? 2.2f : 2.5f;
+
+        /// <summary>Fruit size relative to the old prototype, in scale with the larger crown.</summary>
+        public float PhotoFruitSize => Id == "cherry" ? .62f : Id == "apricot" ? .52f :
+            Id == "pear" ? .42f :
+            Id == "orange" || Id == "pomegranate" ? .46f :
+            Id == "lemon" || Id == "mandarin" ? .44f : .5f;
+
+        /// <summary>Tints the shared photo leaf toward this species' foliage colour.</summary>
+        public Color PhotoLeafTint
+        {
+            get
+            {
+                Color reference = All["apple"].LeafColor;
+                return new Color(
+                    Mathf.Clamp(LeafColor.r / reference.r, .75f, 1.25f),
+                    Mathf.Clamp(LeafColor.g / reference.g, .75f, 1.25f),
+                    // Never above 1: extra blue turns the warm photo leaf teal.
+                    Mathf.Clamp(LeafColor.b / reference.b, .75f, 1f));
+            }
+        }
+
+        /// <summary>Calms peel colours that look neon under the forest light.</summary>
+        public Color PhotoFruitTint => Id == "pear" ? new Color(.72f, .84f, 1.5f) :
+            Id == "plum" ? new Color(.72f, .62f, .72f) :
+            Id == "lemon" ? new Color(.93f, .90f, .75f) : Color.white;
+
         public static bool IsSupported(string id) =>
             id != null && All.ContainsKey(id);
 

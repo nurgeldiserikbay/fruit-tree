@@ -116,7 +116,7 @@ namespace FruitTree
         }
 
         public void Leaf(Vector3 center, Vector3 outward, float length, float width,
-            Color color, float ovalness = .5f)
+            Color color, float ovalness = .5f, Vector3? crownNormal = null)
         {
             // Pear: fuller oval leaves, Cherry: slimmer pointed leaves.
             // Eight vertices and six triangles remain fixed for mobile budgets.
@@ -162,6 +162,10 @@ namespace FruitTree
                 // one uniformly lit cardboard plane.
                 Vector3 shapedNormal = (normal + side * (i % 2 == 0 ? -.12f : .12f) +
                     axis * (i == 7 ? .08f : -.04f)).normalized;
+                // Normals bent away from the crown centre light the canopy as
+                // one soft volume instead of many separately lit flat cards.
+                if (crownNormal.HasValue)
+                    shapedNormal = Vector3.Lerp(shapedNormal, crownNormal.Value, .72f).normalized;
                 Vertex(positions[i], shapedNormal, tint, texcoords[i]);
             }
             Tri(first, first+1, first+2);
@@ -280,7 +284,9 @@ namespace FruitTree
                 float t = y / (float)latitude;
                 float radius = .16f * Mathf.Max(0f, Mathf.Sin(t * Mathf.PI));
                 float dimple = .014f * Mathf.Pow(t, 14f);
-                float height = -.15f + .30f * t - dimple;
+                // Cosine latitude gives a true round body; a linear height
+                // made every fruit built on this mesh a pointed spinning top.
+                float height = -.15f * Mathf.Cos(t * Mathf.PI) - dimple;
                 for (int x = 0; x <= longitude; x++)
                 {
                     float angle = x * Mathf.PI * 2f / longitude;
@@ -365,7 +371,7 @@ namespace FruitTree
             var vertices = mesh.vertices;
             for (int i = 0; i < vertices.Length; i++)
                 vertices[i] = new Vector3(vertices[i].x * .94f,
-                    vertices[i].y * .86f, vertices[i].z * .94f);
+                    vertices[i].y * 1.02f, vertices[i].z * .94f);
             mesh.vertices = vertices;
             mesh.RecalculateNormals();
             mesh.RecalculateBounds();

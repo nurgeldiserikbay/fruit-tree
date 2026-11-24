@@ -21,8 +21,64 @@ namespace FruitTree
             get
             {
                 int index = (int)activeTheme;
-                return themeMusic != null && index >= 0 &&
+                return HasPlaylist || themeMusic != null && index >= 0 &&
                     index < themeMusic.Length && themeMusic[index] != null;
+            }
+        }
+
+        // Shared playlist: keeps playing across tree and scenery changes.
+        private const float PlaylistFadeIn = 3f, PlaylistFadeOut = 5f;
+        private AudioClip[] playlist;
+        private int playlistIndex;
+        private bool playingPlaylist;
+        private bool HasPlaylist => playlist != null && playlist.Length > 0;
+        private float PlaylistVolume => IsQuietAudio ? .28f : .5f;
+
+        // Only the real game scene gets music, not bare test rigs.
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        private static void StartGameMusic()
+        {
+            var scenery = FindFirstObjectByType<EnvironmentController>();
+            if (scenery == null || scenery.skyRenderer == null) return;
+            var sound = FindFirstObjectByType<OrchardAudio>();
+            var tracks = Resources.Load<MusicPlaylist>("MusicPlaylist");
+            if (sound != null && tracks != null) sound.UsePlaylist(tracks.tracks);
+        }
+
+        /// <summary>Plays the tracks in a shuffled order, one after another.</summary>
+        public void UsePlaylist(AudioClip[] tracks)
+        {
+            playlist = tracks == null ? null : (AudioClip[])tracks.Clone();
+            if (HasPlaylist)
+            {
+                var random = new System.Random(Environment.TickCount);
+                for (int i = playlist.Length - 1; i > 0; i--)
+                {
+                    int j = random.Next(i + 1);
+                    AudioClip swap = playlist[i];
+                    playlist[i] = playlist[j];
+                    playlist[j] = swap;
+                }
+            }
+            playlistIndex = 0;
+            SelectMusic(activeTheme);
+        }
+
+        private void Update()
+        {
+            if (!playingPlaylist || music == null || music.clip == null) return;
+            if (music.isPlaying)
+            {
+                float fade = Mathf.Clamp01(Mathf.Min(music.time / PlaylistFadeIn,
+                    (music.clip.length - music.time) / PlaylistFadeOut));
+                music.volume = PlaylistVolume * fade;
+            }
+            else if (!muted && !musicMuted && !AudioListener.pause)
+            {
+                playlistIndex = (playlistIndex + 1) % playlist.Length;
+                music.clip = playlist[playlistIndex];
+                music.volume = 0f;
+                music.Play();
             }
         }
         public AudioClip pickRecording;
@@ -151,6 +207,10 @@ namespace FruitTree
             int index = (int)theme;
             AudioClip next = themeMusic != null && index >= 0 &&
                 index < themeMusic.Length ? themeMusic[index] : null;
+            // A track assigned to this scenery wins; otherwise the playlist continues.
+            playingPlaylist = next == null && HasPlaylist;
+            if (playingPlaylist) next = playlist[playlistIndex];
+            music.loop = !playingPlaylist;
             if (music.clip != next)
             {
                 music.Stop();
@@ -180,7 +240,7 @@ namespace FruitTree
             alternateAmbience.mute = muted;
             effects.mute = muted;
             music.mute = muted || musicMuted;
-            music.volume = IsQuietAudio ? .035f : .07f;
+            if (!playingPlaylist) music.volume = IsQuietAudio ? .035f : .07f;
             float target = IsQuietAudio ? .09f : .18f;
             if (fadingFrom != null && fadingTo != null)
             {

@@ -9,12 +9,17 @@ Shader "FruitTree/VertexLit"
         _AmbientLight ("Minimum Light", Range(0,1)) = 0.55
         _LeafTranslucency ("Leaf Backlight", Range(0,0.5)) = 0
         _AlphaCutoff ("Leaf Alpha Cutoff", Range(0,1)) = 0
+        _GroundFade ("Fade Ground Into Photo", Float) = 0
+        _NeutralVertex ("Ignore Vertex Hue", Float) = 0
+        [HideInInspector] _SrcBlend ("Source Blend", Float) = 1
+        [HideInInspector] _DstBlend ("Destination Blend", Float) = 0
     }
     SubShader
     {
         Tags { "RenderType"="Opaque" "Queue"="Geometry" }
         LOD 120
         Cull [_Cull]
+        Blend [_SrcBlend] [_DstBlend]
         Pass
         {
             Tags { "LightMode"="ForwardBase" }
@@ -29,7 +34,12 @@ Shader "FruitTree/VertexLit"
             float _AmbientLight;
             float _LeafTranslucency;
             float _AlphaCutoff;
+            float _GroundFade;
+            float _NeutralVertex;
+            // Global weather dimming; deliberately not a material property.
+            float3 _WeatherDim;
             sampler2D _MainTex;
+            float4 _MainTex_ST;
             struct appdata
             {
                 float4 vertex: POSITION;
@@ -44,6 +54,7 @@ Shader "FruitTree/VertexLit"
                 float3 normal: TEXCOORD0;
                 float2 uv: TEXCOORD1;
                 UNITY_FOG_COORDS(2)
+                float2 worldXZ: TEXCOORD3;
             };
             v2f vert(appdata v)
             {
@@ -55,8 +66,13 @@ Shader "FruitTree/VertexLit"
                 local.xz += gust * _Wind * saturate(v.uv.y);
                 o.pos = UnityObjectToClipPos(float4(local,1));
                 o.normal = UnityObjectToWorldNormal(v.normal);
-                o.color = v.color * _Color;
-                o.uv = v.uv;
+                // Photo ground keeps the baked light and shade but not the green hue.
+                float4 vertexColor = v.color;
+                if (_NeutralVertex > .5)
+                    vertexColor.rgb = dot(v.color.rgb, float3(.3, .59, .11)) / .47;
+                o.color = vertexColor * _Color;
+                o.worldXZ = mul(unity_ObjectToWorld, float4(local, 1)).xz;
+                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 UNITY_TRANSFER_FOG(o, o.pos);
                 return o;
             }
@@ -80,8 +96,11 @@ Shader "FruitTree/VertexLit"
                 // Optional cutout foliage texture; zero leaves all other
                 // opaque wood, grass and scenery materials unchanged.
                 clip(tex.a - _AlphaCutoff);
-                fixed4 pixel = fixed4(tex.rgb * i.color.rgb * light, 1);
+                fixed4 pixel = fixed4(tex.rgb * i.color.rgb * light * (1.0 - _WeatherDim), 1);
                 UNITY_APPLY_FOG(i.fogCoord, pixel);
+                // Beyond the player's orbit the ground melts into the 360 photo.
+                if (_GroundFade > .5)
+                    pixel.a = 1.0 - smoothstep(9.0, 22.0, length(i.worldXZ));
                 return pixel;
             }
             ENDCG

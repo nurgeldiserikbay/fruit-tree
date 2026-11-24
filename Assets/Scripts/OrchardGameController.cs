@@ -42,18 +42,25 @@ namespace FruitTree
         public bool HasPreviousSave { get; private set; }
         private int hintCursor = -1;
 
+        // Individual picks are batched: rewriting the JSON save on every tap
+        // (up to 220 per tree) causes avoidable I/O hitches on low-end phones.
+        // Tree clears, tree switches, rebloom, pause and quit still save at once.
+        public const float PickSaveDelaySeconds = 1.5f;
+        private bool saveDirty;
+        private float saveDueTime;
+
         private static readonly TreeLevelDefinition[] Catalog =
         {
-            new TreeLevelDefinition("tree_001", "apple", 120),
-            new TreeLevelDefinition("tree_002", "pear", 140),
-            new TreeLevelDefinition("tree_003", "cherry", 220),
-            new TreeLevelDefinition("tree_004", "peach", 130),
-            new TreeLevelDefinition("tree_005", "orange", 160),
-            new TreeLevelDefinition("tree_006", "apricot", 180),
-            new TreeLevelDefinition("tree_007", "plum", 160),
-            new TreeLevelDefinition("tree_008", "lemon", 140),
-            new TreeLevelDefinition("tree_009", "mandarin", 200),
-            new TreeLevelDefinition("tree_010", "pomegranate", 110)
+            new TreeLevelDefinition("tree_001", "apple", 150),
+            new TreeLevelDefinition("tree_002", "pear", 175),
+            new TreeLevelDefinition("tree_003", "cherry", 275),
+            new TreeLevelDefinition("tree_004", "peach", 165),
+            new TreeLevelDefinition("tree_005", "orange", 200),
+            new TreeLevelDefinition("tree_006", "apricot", 225),
+            new TreeLevelDefinition("tree_007", "plum", 200),
+            new TreeLevelDefinition("tree_008", "lemon", 175),
+            new TreeLevelDefinition("tree_009", "mandarin", 250),
+            new TreeLevelDefinition("tree_010", "pomegranate", 140)
         };
 
         // Single source of truth for the Editor's all-species reachability audit.
@@ -106,7 +113,18 @@ namespace FruitTree
             if (isPaused) SaveProgress();
         }
 
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            if (!hasFocus) SaveProgress();
+        }
+
         private void OnApplicationQuit() { SaveProgress(); }
+
+        private void Update()
+        {
+            // Unscaled time: a pending pick must still be written while paused.
+            if (saveDirty && Time.unscaledTime >= saveDueTime) SaveProgress();
+        }
 
         private void OnFruitPicked(Apple fruit)
         {
@@ -116,10 +134,20 @@ namespace FruitTree
                 Debug.LogWarning("Fruit Tree: ignored duplicate or unknown fruit ID.");
                 return;
             }
-            SaveProgress();
+            bool cleared = progress.GetTree(progress.ActiveTreeId).IsCleared;
+            if (cleared) SaveProgress(); // The unlock must never wait for a timer.
+            else ScheduleSave();
             RefreshCollectionUI();
-            if (progress.GetTree(progress.ActiveTreeId).IsCleared)
-                TreeCleared?.Invoke();
+            if (cleared) TreeCleared?.Invoke();
+        }
+
+        private void ScheduleSave()
+        {
+            // Trailing debounce from the first unsaved pick, so continuous
+            // picking still persists at least every PickSaveDelaySeconds.
+            if (saveDirty) return;
+            saveDirty = true;
+            saveDueTime = Time.unscaledTime + PickSaveDelaySeconds;
         }
 
         private void DisplayActiveTree()
@@ -303,9 +331,16 @@ namespace FruitTree
 
         private void SaveProgress()
         {
-            if (initialized && progress != null && saves != null &&
-                !saves.Save(progress.ToSave()))
-                Debug.LogWarning("Fruit Tree: orchard progress was not saved.");
+            if (!initialized || progress == null || saves == null) return;
+            if (saves.Save(progress.ToSave()))
+            {
+                saveDirty = false;
+                return;
+            }
+            Debug.LogWarning("Fruit Tree: orchard progress was not saved.");
+            // Retry later instead of hammering storage every frame.
+            saveDirty = true;
+            saveDueTime = Time.unscaledTime + PickSaveDelaySeconds * 4f;
         }
     }
 }

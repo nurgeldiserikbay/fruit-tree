@@ -86,6 +86,10 @@ namespace FruitTree
             {
                 skyMaterial = new Material(skyRenderer.sharedMaterial) { name = "Runtime Theme Sky" };
                 skyRenderer.sharedMaterial = skyMaterial;
+                if (skyMaterial.HasProperty("_PanoramaHorizonHeight"))
+                    defaultPanoramaHorizon = skyMaterial.GetFloat("_PanoramaHorizonHeight");
+                if (skyMaterial.HasProperty("_PanoramaGroundFade"))
+                    defaultPanoramaGroundFade = skyMaterial.GetFloat("_PanoramaGroundFade");
             }
             Shader shader = Shader.Find("FruitTree/VertexLit") ?? Shader.Find("Standard");
             sceneryMaterial = new Material(shader) { name = "Merged Background Landmarks" };
@@ -112,6 +116,48 @@ namespace FruitTree
         private void Start()
         {
             if (sceneryMesh == null) Apply();
+        }
+
+        // Current weather, layered over whichever theme palette is displayed.
+        private Color weatherTint = Color.white;
+        private float weatherSun = 1f, weatherFog = 1f, weatherFlash;
+        private static readonly Color LightningColor = new Color(1.25f, 1.28f, 1.4f);
+        public static readonly int WeatherDimId = Shader.PropertyToID("_WeatherDim");
+
+        /// <summary>Applies weather light over the theme without rebuilding anything.</summary>
+        public void SetWeatherLook(Color tint, float sunScale, float fogScale, float flash)
+        {
+            weatherTint = tint;
+            weatherSun = sunScale;
+            weatherFog = fogScale;
+            weatherFlash = Mathf.Clamp01(flash);
+            if (paletteInitialized) ApplyWeatherLighting(displayedPalette);
+        }
+
+        private void ApplyWeatherLighting(Palette palette)
+        {
+            Color light = Color.Lerp(weatherTint, LightningColor, weatherFlash);
+            light.a = 1f;
+            if (skyMaterial != null && skyMaterial.HasProperty("_WeatherTint"))
+                skyMaterial.SetColor("_WeatherTint", light);
+            // Trees and ground use an unlit-style shader that ignores the sun, so
+            // they get the weather as a global. Zero (the unset default) changes nothing.
+            Color surface = Color.Lerp(Color.white, light, .85f);
+            Shader.SetGlobalVector(WeatherDimId,
+                new Vector4(1f - surface.r, 1f - surface.g, 1f - surface.b, 0f));
+            if (sun != null)
+            {
+                sun.color = palette.sun;
+                sun.intensity = palette.sunIntensity * (weatherSun + weatherFlash * 1.2f);
+            }
+            // Photo themes: distance dissolves into a colour taken from the photo.
+            Color fog = (photoSceneActive ? photoScene.Fog : palette.horizon) * light;
+            fog.a = 1f;
+            RenderSettings.fogColor = fog;
+            ApplyFogRange();
+            Color ambient = palette.ambient * light;
+            ambient.a = palette.ambient.a;
+            RenderSettings.ambientLight = ambient;
         }
 
         public void UseForTree(int index)
@@ -241,15 +287,17 @@ namespace FruitTree
         {
             if (skyMaterial == null || !skyMaterial.HasProperty("_PanoramaBlend"))
                 return;
-            // A deliberately imported OrchardTest.png acts as an opt-in preview,
+            // A deliberately imported Meadow.png acts as an opt-in preview,
             // even for scenes serialized before usePhotoPanoramas existed.
             // Other themes remain off unless enabled explicitly.
+            // (OrchardTest.png from 1e666d6 was a corrupted 93-byte upload.)
             Texture2D meadowPreview = theme == EnvironmentTheme.Meadow
-                ? Resources.Load<Texture2D>("Panoramas/OrchardTest") : null;
+                ? Resources.Load<Texture2D>("Panoramas/Meadow") : null;
             if (!usePhotoPanoramas && meadowPreview == null)
             {
                 skyMaterial.SetTexture("_Panorama", Texture2D.whiteTexture);
                 skyMaterial.SetFloat("_PanoramaBlend", 0f);
+                ApplyPhotoScene(false, theme);
                 return;
             }
             int index = (int)theme;
@@ -291,10 +339,69 @@ namespace FruitTree
                 if (panorama.wrapModeV != TextureWrapMode.Clamp)
                     panorama.wrapModeV = TextureWrapMode.Clamp;
                 skyMaterial.SetTexture("_Panorama", panorama);
+                // A 4K panorama is large: keep only the one on screen in memory.
+                bool fromResources = panoramas == null || index >= panoramas.Length ||
+                    panoramas[index] != panorama;
+                if (loadedPanorama != null && loadedPanorama != panorama)
+                {
+                    Resources.UnloadAsset(loadedPanorama);
+                    Array.Clear(cachedPanoramas, 0, cachedPanoramas.Length);
+                    Array.Clear(panoramaLookedUp, 0, panoramaLookedUp.Length);
+                    cachedPanoramas[index] = panorama;
+                    panoramaLookedUp[index] = true;
+                }
+                loadedPanorama = fromResources ? panorama : null;
             }
             else
                 skyMaterial.SetTexture("_Panorama", Texture2D.whiteTexture);
             skyMaterial.SetFloat("_PanoramaBlend", panorama == null ? 0f : 1f);
+            ApplyPhotoScene(panorama != null, theme);
+        }
+
+        // Photo themes: a real horizon and ground replace the low-poly scenery.
+        private float defaultPanoramaHorizon = .12f;
+        private float defaultPanoramaGroundFade = 1f;
+        private Texture2D loadedPanorama;
+
+        private bool photoSceneActive;
+        private PhotoScene photoScene;
+        public bool PhotoSceneActive => photoSceneActive;
+        public PhotoScene CurrentPhotoScene => photoScene;
+
+        private void ApplyFogRange()
+        {
+            // Never past 33 m: the ground mesh edge must stay hidden in any weather.
+            RenderSettings.fogStartDistance = (photoSceneActive ? photoScene.FogStart : 16f) * weatherFog;
+            RenderSettings.fogEndDistance = Mathf.Min(33f,
+                (photoSceneActive ? photoScene.FogEnd : 33f) * weatherFog);
+        }
+
+        private void ApplyPhotoScene(bool enabled, EnvironmentTheme theme)
+        {
+            photoSceneActive = enabled;
+            photoScene = PhotoScene.For(theme);
+            ApplyFogRange();
+            if (skyMaterial.HasProperty("_PanoramaHorizonHeight"))
+                skyMaterial.SetFloat("_PanoramaHorizonHeight",
+                    enabled ? -.11f : defaultPanoramaHorizon);
+            // A narrow portrait camera magnifies the photo; keep its objects distant.
+            if (skyMaterial.HasProperty("_PanoramaScale"))
+                skyMaterial.SetFloat("_PanoramaScale", enabled ? 2f : 1f);
+            if (skyMaterial.HasProperty("_PanoramaSoftness"))
+                skyMaterial.SetFloat("_PanoramaSoftness", enabled ? photoScene.Softness : 0f);
+            if (skyMaterial.HasProperty("_PanoramaMist"))
+                skyMaterial.SetFloat("_PanoramaMist", enabled ? photoScene.Mist : 0f);
+            // The photo's own ground continues the terrain past its far edge.
+            if (skyMaterial.HasProperty("_PanoramaGroundFade"))
+                skyMaterial.SetFloat("_PanoramaGroundFade",
+                    enabled ? 0f : defaultPanoramaGroundFade);
+            if (ground != null)
+                ground.SetPhotoGround(
+                    enabled ? Resources.Load<Texture2D>("Ground/" + photoScene.Ground) : null,
+                    photoScene.GroundTint, photoScene.FadeGroundToPhoto, photoScene.ShowGrass,
+                    photoScene.GrassLight);
+            if (sceneryFilter != null)
+                sceneryFilter.GetComponent<MeshRenderer>().enabled = !enabled;
         }
 
         private void ApplyPalette(Palette palette)
@@ -311,13 +418,7 @@ namespace FruitTree
                 if (skyMaterial.HasProperty("_HazeStrength"))
                     skyMaterial.SetFloat("_HazeStrength", palette.hazeStrength);
             }
-            if (sun != null)
-            {
-                sun.color = palette.sun;
-                sun.intensity = palette.sunIntensity;
-            }
-            RenderSettings.fogColor = palette.horizon;
-            RenderSettings.ambientLight = palette.ambient;
+            ApplyWeatherLighting(palette);
         }
 
         public static Mesh CreateSceneryMesh(EnvironmentTheme theme)
@@ -404,8 +505,8 @@ namespace FruitTree
             MeadowShrubs(mesh);
             // Close-to-midground petals are visible in portrait framing.
             // Keep the trunk clearing open and all decor collider-free.
-            Wildflowers(mesh, 160, 171, 3.8f, 12f, new Color(.96f, .83f, .56f));
-            Wildflowers(mesh, 105, 208, 4.5f, 13f, new Color(.90f, .84f, .92f));
+            Wildflowers(mesh, 160, 171, 5.3f, 12f, new Color(.96f, .83f, .56f));
+            Wildflowers(mesh, 105, 208, 5.3f, 13f, new Color(.90f, .84f, .92f));
             Wildflowers(mesh, 65, 360, 5.4f, 15f, new Color(.91f, .92f, .73f));
             // The old nine isolated triangular 'trees' broke the illusion
             // of a natural horizon. Midground shrubs provide the vegetation

@@ -9,15 +9,38 @@ namespace FruitTree
         public Text countText;
         public Text messageText;
         public bool OrchardMode { get; set; }
+        public const string ReachHint = "Come closer to pick";
+        private OrbitPickingCamera orbit;
+        private Coroutine reachHint;
         private void Start()
         {
+            orbit = FindFirstObjectByType<OrbitPickingCamera>();
+            if (orbit != null) orbit.FruitOutOfReach += ShowReachHint;
             if (tree == null) return;
             tree.HarvestChanged += Refresh;
             Refresh(tree.HarvestedCount, tree.TotalApples);
         }
         private void OnDestroy()
         {
+            if (orbit != null) orbit.FruitOutOfReach -= ShowReachHint;
             if (tree != null) tree.HarvestChanged -= Refresh;
+        }
+
+        /// <summary>Briefly explains why a distant fruit did not come off.</summary>
+        public void ShowReachHint()
+        {
+            if (messageText == null || !isActiveAndEnabled) return;
+            if (reachHint != null) StopCoroutine(reachHint);
+            reachHint = StartCoroutine(ReachHintRoutine());
+        }
+
+        private System.Collections.IEnumerator ReachHintRoutine()
+        {
+            string previous = messageText.text == ReachHint ? "Look between the branches" : messageText.text;
+            messageText.text = ReachHint;
+            yield return new WaitForSecondsRealtime(2f);
+            if (messageText != null && messageText.text == ReachHint) messageText.text = previous;
+            reachHint = null;
         }
         public void Restart()
         {
