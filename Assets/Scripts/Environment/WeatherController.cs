@@ -47,7 +47,7 @@ namespace FruitTree
     /// </summary>
     public sealed class WeatherController : MonoBehaviour
     {
-        private const float MinimumDuration = 70f, MaximumDuration = 150f, BlendSeconds = 14f;
+        private const float MinimumDuration = 70f, MaximumDuration = 150f, BlendSeconds = 14f, NewTreeBlendSeconds = 4f;
         private const float RainVolume = .34f, ThunderVolume = .6f, BirdVolume = .16f;
         private const int RainDrops = 1100, BirdSongs = 5;
 
@@ -55,7 +55,8 @@ namespace FruitTree
         private OrchardAudio orchardAudio;
         private System.Random random;
         private WeatherLook fromLook, toLook;
-        private float blend = 1f, remaining, nextBird, nextLightning = -1f;
+        private float blend = 1f, blendSeconds = BlendSeconds, remaining, nextBird, nextLightning = -1f;
+        private OrchardGameController orchard;
         private float flashTime = -1f, thunderDelay = -1f;
         private bool lookDirty = true, flashWasVisible;
 
@@ -96,6 +97,23 @@ namespace FruitTree
             ForceWeather(PickInitial(random.NextDouble()));
             remaining = Between(MinimumDuration, MaximumDuration);
             nextBird = Between(1f, 3f);
+            // Every tree the player moves to brings its own weather.
+            orchard = FindFirstObjectByType<OrchardGameController>();
+            if (orchard != null) orchard.TreeDisplayed += OnTreeDisplayed;
+        }
+
+        private void OnTreeDisplayed()
+        {
+            if (random == null) return;
+            StartBlendTo(PickForNewTree(Current, random.NextDouble()), NewTreeBlendSeconds);
+        }
+
+        /// <summary>Random weather for a newly opened tree; always different from now.</summary>
+        public static WeatherKind PickForNewTree(WeatherKind current, double roll)
+        {
+            WeatherKind pick = roll < .34 ? WeatherKind.Clear : roll < .54 ? WeatherKind.Mist :
+                roll < .74 ? WeatherKind.Cloudy : roll < .92 ? WeatherKind.Rain : WeatherKind.Storm;
+            return pick != current ? pick : PickNext(current, roll);
         }
 
         private AudioSource NewSource(bool loop)
@@ -126,7 +144,7 @@ namespace FruitTree
 
             if (blend < 1f)
             {
-                blend = Mathf.Min(1f, blend + delta / BlendSeconds);
+                blend = Mathf.Min(1f, blend + delta / blendSeconds);
                 lookDirty = true;
             }
             WeatherLook look = blend >= 1f ? toLook : Mix(fromLook, toLook,
@@ -144,13 +162,19 @@ namespace FruitTree
 
         private void BeginNext()
         {
+            StartBlendTo(PickNext(Current, random.NextDouble()), BlendSeconds);
+        }
+
+        private void StartBlendTo(WeatherKind kind, float seconds)
+        {
             fromLook = blend >= 1f ? toLook : Mix(fromLook, toLook,
                 Mathf.SmoothStep(0f, 1f, blend));
-            Current = PickNext(Current, random.NextDouble());
+            Current = kind;
             toLook = WeatherLook.For(Current);
             blend = 0f;
+            blendSeconds = seconds;
             remaining = Between(MinimumDuration, MaximumDuration);
-            nextLightning = Current == WeatherKind.Storm ? BlendSeconds : -1f;
+            nextLightning = Current == WeatherKind.Storm ? seconds : -1f;
         }
 
         private float UpdateLightning(float delta)
@@ -189,7 +213,7 @@ namespace FruitTree
         private void UpdateAudio(WeatherLook look, float delta)
         {
             bool muted = orchardAudio != null && orchardAudio.IsMuted;
-            float quiet = orchardAudio != null && orchardAudio.IsQuietAudio ? .55f : 1f;
+            float quiet = AudioLevels.Gain(AudioChannel.Nature);
             rainSource.mute = thunderSource.mute = birdSource.mute = muted;
             thunderSource.volume = ThunderVolume * quiet;
             birdSource.volume = BirdVolume * quiet;
@@ -428,6 +452,7 @@ namespace FruitTree
 
         private void OnDestroy()
         {
+            if (orchard != null) orchard.TreeDisplayed -= OnTreeDisplayed;
             if (environment != null) environment.SetWeatherLook(Color.white, 1f, 1f, 0f);
             Shader.SetGlobalVector(EnvironmentController.WeatherDimId, Vector4.zero);
             if (rainMesh != null) Destroy(rainMesh);

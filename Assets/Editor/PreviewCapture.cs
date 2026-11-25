@@ -67,6 +67,14 @@ namespace FruitTree.Editor
                     SaveWithInterface(camera, "preview-trees.png");
                     orchard.CloseTreeMenu();
                 }
+                if (flow != null && flow.settingsPanel != null)
+                {
+                    flow.OpenSettingsFromHome();
+                    SoundLevelsPanel.Open(flow.settingsPanel.transform.parent, null);
+                    SaveWithInterface(camera, "preview-sound.png");
+                    SoundLevelsPanel.CloseIfOpen();
+                    flow.CloseSettings();
+                }
                 var hud = Object.FindFirstObjectByType<HarvestHUD>();
                 if (hud != null && flow != null)
                 {
