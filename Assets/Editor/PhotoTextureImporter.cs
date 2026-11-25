@@ -36,6 +36,16 @@ namespace FruitTree.Editor
                 importer.wrapMode = TextureWrapMode.Clamp;
                 importer.maxTextureSize = 2048;
             }
+            else if (assetPath.StartsWith("Assets/Resources/TreeThumbs/"))
+            {
+                // Small transparent tree pictures for the tree list.
+                importer.textureType = TextureImporterType.Default;
+                importer.alphaSource = TextureImporterAlphaSource.FromInput;
+                importer.alphaIsTransparency = true;
+                importer.mipmapEnabled = true;
+                importer.wrapMode = TextureWrapMode.Clamp;
+                importer.maxTextureSize = 256;
+            }
             else if (assetPath.StartsWith("Assets/Art/Icon/"))
             {
                 // Unity scales these to every launcher size; keep the source lossless.

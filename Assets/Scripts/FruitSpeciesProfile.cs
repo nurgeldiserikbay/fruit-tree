@@ -206,6 +206,27 @@ namespace FruitTree
         /// <summary>Separate stems from the ground: the pomegranate grows as a bush.</summary>
         public int PhotoStems => Id == "pomegranate" ? 3 : 1;
 
+        /// <summary>A short line about the tree for the tree list.</summary>
+        public string Description
+        {
+            get
+            {
+                switch (Id)
+                {
+                    case "pear": return "A tall, narrow tree reaching for the sky, hung with soft green-gold pears.";
+                    case "cherry": return "Wide, spreading branches heavy with small, shiny cherries.";
+                    case "peach": return "An open, vase-shaped crown with long leaves and velvety peaches.";
+                    case "orange": return "A dense evergreen ball of glossy leaves, bright with oranges.";
+                    case "apricot": return "Broad, rounded leaves and sunny golden apricots.";
+                    case "plum": return "An upright oval crown with deep purple plums.";
+                    case "lemon": return "Dark glossy leaves and fragrant yellow lemons.";
+                    case "mandarin": return "A low, compact citrus full of little mandarins.";
+                    case "pomegranate": return "A many-stemmed bush with slender leaves and ruby pomegranates.";
+                    default: return "Crisp red apples on a round, friendly crown. A gentle first tree.";
+                }
+            }
+        }
+
         /// <summary>Fruit colour for menus and lists.</summary>
         public Color DisplayColor => Id == "apple" ? new Color(.80f, .16f, .13f) :
             FruitColor * PhotoFruitTint;

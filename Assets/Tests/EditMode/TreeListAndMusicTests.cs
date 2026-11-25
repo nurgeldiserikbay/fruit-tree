@@ -11,11 +11,22 @@ namespace FruitTree.Tests
             var entry = new TreeCollectionScreen.Entry { Picked = 37, Total = 175, Unlocked = false };
             Assert.AreEqual("LOCKED", TreeCollectionScreen.StatusText(entry));
             entry.Unlocked = true;
-            Assert.AreEqual("37 / 175", TreeCollectionScreen.StatusText(entry));
+            Assert.AreEqual("37 / 175 picked", TreeCollectionScreen.StatusText(entry));
             entry.Active = true;
-            StringAssert.StartsWith("37 / 175", TreeCollectionScreen.StatusText(entry));
+            StringAssert.Contains("YOU ARE HERE", TreeCollectionScreen.StatusText(entry));
             entry.Cleared = true;
-            StringAssert.Contains("REGROW", TreeCollectionScreen.StatusText(entry));
+            StringAssert.Contains("regrow", TreeCollectionScreen.StatusText(entry));
+        }
+
+        [Test]
+        public void EveryTreeHasAPictureAndADescription()
+        {
+            foreach (var level in OrchardGameController.LevelDefinitions)
+            {
+                Assert.IsNotNull(Resources.Load<Texture2D>(TreeCollectionScreen.ThumbnailFolder + level.SpeciesId),
+                    level.SpeciesId + " needs a picture");
+                Assert.IsNotEmpty(FruitSpeciesProfile.Get(level.SpeciesId).Description);
+            }
         }
 
         [Test]

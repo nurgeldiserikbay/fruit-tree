@@ -238,6 +238,8 @@ namespace FruitTree
                 {
                     Id = Catalog[i].Id,
                     Title = titles[i],
+                    SpeciesId = Catalog[i].SpeciesId,
+                    Description = FruitSpeciesProfile.Get(Catalog[i].SpeciesId).Description,
                     Fruit = FruitSpeciesProfile.Get(Catalog[i].SpeciesId).DisplayColor,
                     Picked = state.PickedCount,
                     Total = Catalog[i].FruitCount,
