@@ -26,11 +26,13 @@ namespace FruitTree
             }
         }
 
-        // Shared playlist: keeps playing across tree and scenery changes.
-        private const float PlaylistFadeIn = 3f, PlaylistFadeOut = 5f;
+        // Playlist from Assets/Audio: each tree has its own track, which repeats
+        // with soft fades; changing tree cross-fades to that tree's track.
+        private const float PlaylistFadeIn = 3f, PlaylistFadeOut = 5f, TreeSwitchFade = 1.5f;
         private AudioClip[] playlist;
-        private int playlistIndex;
+        private int playlistIndex, treeIndex;
         private bool playingPlaylist;
+        private float switchFade = -1f;
         private bool HasPlaylist => playlist != null && playlist.Length > 0;
         private float PlaylistVolume => IsQuietAudio ? .28f : .5f;
 
@@ -45,28 +47,47 @@ namespace FruitTree
             if (sound != null && tracks != null) sound.UsePlaylist(tracks.tracks);
         }
 
-        /// <summary>Plays the tracks in a shuffled order, one after another.</summary>
+        /// <summary>Uses the tracks in file-name order; tree N plays track N (wrapping).</summary>
         public void UsePlaylist(AudioClip[] tracks)
         {
             playlist = tracks == null ? null : (AudioClip[])tracks.Clone();
-            if (HasPlaylist)
-            {
-                var random = new System.Random(Environment.TickCount);
-                for (int i = playlist.Length - 1; i > 0; i--)
-                {
-                    int j = random.Next(i + 1);
-                    AudioClip swap = playlist[i];
-                    playlist[i] = playlist[j];
-                    playlist[j] = swap;
-                }
-            }
-            playlistIndex = 0;
+            playlistIndex = TrackForTree(treeIndex, HasPlaylist ? playlist.Length : 0);
             SelectMusic(activeTheme);
+        }
+
+        public static int TrackForTree(int tree, int trackCount)
+        {
+            return trackCount <= 0 ? 0 : (Mathf.Max(0, tree) % trackCount);
+        }
+
+        /// <summary>Called whenever a tree is shown: fades over to that tree's track.</summary>
+        public void SelectTreeMusic(int tree)
+        {
+            treeIndex = Mathf.Max(0, tree);
+            if (!HasPlaylist) return;
+            int wanted = TrackForTree(treeIndex, playlist.Length);
+            if (wanted == playlistIndex) return;
+            playlistIndex = wanted;
+            if (playingPlaylist && music != null && music.isPlaying) switchFade = 0f;
+            else SelectMusic(activeTheme);
         }
 
         private void Update()
         {
             if (!playingPlaylist || music == null || music.clip == null) return;
+            if (switchFade >= 0f)
+            {
+                // Fade the old tree's track down, then start the new one.
+                switchFade += Time.unscaledDeltaTime / TreeSwitchFade;
+                music.volume = Mathf.Min(music.volume, PlaylistVolume * (1f - switchFade));
+                if (switchFade < 1f) return;
+                switchFade = -1f;
+                music.Stop();
+                music.clip = playlist[playlistIndex];
+                music.volume = 0f;
+                if (!muted && !musicMuted) music.Play();
+                return;
+            }
             if (music.isPlaying)
             {
                 float fade = Mathf.Clamp01(Mathf.Min(music.time / PlaylistFadeIn,
@@ -75,7 +96,7 @@ namespace FruitTree
             }
             else if (!muted && !musicMuted && !AudioListener.pause)
             {
-                playlistIndex = (playlistIndex + 1) % playlist.Length;
+                // The tree's track ended: play it again from a soft start.
                 music.clip = playlist[playlistIndex];
                 music.volume = 0f;
                 music.Play();

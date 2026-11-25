@@ -395,7 +395,7 @@ namespace FruitTree
         /// <summary>Fruit must be this close to the camera: zoom in to pick.</summary>
         public const float MaximumPickDistance = 4.5f;
         /// <summary>A visible fruit was tapped but is too far away to pick.</summary>
-        public event Action FruitOutOfReach;
+        public event Action<Vector2> FruitOutOfReach;
 
         private void TryPick(Vector2 point)
         {
@@ -417,7 +417,7 @@ namespace FruitTree
                     if (fruit != null)
                     {
                         if (hits[i].distance <= MaximumPickDistance) fruit.Pick();
-                        else FruitOutOfReach?.Invoke();
+                        else FruitOutOfReach?.Invoke(point);
                     }
                     return;
                 }

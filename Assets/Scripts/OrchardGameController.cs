@@ -39,6 +39,7 @@ namespace FruitTree
             "APRICOT TREE", "PLUM TREE", "LEMON TREE", "MANDARIN TREE", "POMEGRANATE TREE"
         };
         private bool initialized;
+        private OrchardAudio music;
         public bool HasPreviousSave { get; private set; }
         private int hintCursor = -1;
 
@@ -159,6 +160,9 @@ namespace FruitTree
                 122 + levelIndex * 197);
             tree.RestorePickedFruits(active.PickedFruitIds);
             if (environment != null) environment.UseForTree(levelIndex);
+            // Each tree has its own melody.
+            if (music == null) music = FindFirstObjectByType<OrchardAudio>();
+            if (music != null) music.SelectTreeMusic(levelIndex);
             hintCursor = -1;
             // Wait until deferred old objects have been destroyed before computing bounds.
             StartCoroutine(RefitCameraNextFrame());
@@ -193,16 +197,93 @@ namespace FruitTree
                 current.PickedCount + " / " + current.Definition.FruitCount + " FRUITS";
         }
 
+        private TreeCollectionScreen collectionScreen;
+        public bool IsTreeMenuOpen => collectionScreen != null && collectionScreen.IsOpen;
+
+        /// <summary>Shows the list of all trees. Falls back to the old pager without a canvas.</summary>
         public void OpenTreeMenu()
         {
-            if (!initialized || treeMenuPanel == null) return;
+            if (!initialized) return;
             RefreshCollectionUI();
-            treeMenuPanel.SetActive(true);
+            // The root canvas is always active, so the list opens from home and from pause.
+            Canvas canvas = treeMenuPanel != null ? treeMenuPanel.GetComponentInParent<Canvas>(true) :
+                hud.messageText != null ? hud.messageText.canvas : null;
+            Transform parent = canvas != null ? canvas.rootCanvas.transform : null;
+            if (parent == null)
+            {
+                if (treeMenuPanel != null) treeMenuPanel.SetActive(true);
+                return;
+            }
+            if (treeMenuPanel != null) treeMenuPanel.SetActive(false);
+            if (collectionScreen == null)
+                collectionScreen = TreeCollectionScreen.Create(parent,
+                    hud.messageText != null ? hud.messageText.font : null, Catalog.Length,
+                    OpenTree, CloseTreeMenu);
+            collectionScreen.Show(CollectionEntries());
         }
 
         public void CloseTreeMenu()
         {
             if (treeMenuPanel != null) treeMenuPanel.SetActive(false);
+            if (collectionScreen != null) collectionScreen.Hide();
+        }
+
+        public List<TreeCollectionScreen.Entry> CollectionEntries()
+        {
+            var entries = new List<TreeCollectionScreen.Entry>(Catalog.Length);
+            for (int i = 0; i < Catalog.Length; i++)
+            {
+                TreeRoundState state = progress.GetTree(Catalog[i].Id);
+                entries.Add(new TreeCollectionScreen.Entry
+                {
+                    Id = Catalog[i].Id,
+                    Title = titles[i],
+                    Fruit = FruitSpeciesProfile.Get(Catalog[i].SpeciesId).DisplayColor,
+                    Picked = state.PickedCount,
+                    Total = Catalog[i].FruitCount,
+                    Unlocked = progress.IsUnlocked(Catalog[i].Id),
+                    Cleared = state.IsCleared,
+                    Active = Catalog[i].Id == progress.ActiveTreeId
+                });
+            }
+            return entries;
+        }
+
+        /// <summary>
+        /// Goes to an open tree. A fully picked tree regrows its fruit straight away,
+        /// so returning to it always has something to pick.
+        /// </summary>
+        public void OpenTree(string id)
+        {
+            if (!initialized || !progress.IsUnlocked(id)) return;
+            bool changedTree = id != progress.ActiveTreeId;
+            if (changedTree)
+            {
+                if (!progress.SelectTree(id)) return;
+                DisplayActiveTree();
+            }
+            if (progress.GetTree(id).IsCleared && progress.TryRebloomActive())
+            {
+                if (remainingFruitGuide != null) remainingFruitGuide.Hide();
+                tree.ResetHarvestAnimated();
+                hintCursor = -1;
+                RefreshCollectionUI();
+            }
+            SaveProgress();
+            CloseTreeMenu();
+            if (pauseController != null) pauseController.Resume();
+            if (changedTree) ShowTreeChangeAdIfDue();
+        }
+
+        /// <summary>Every few tree changes, a full-screen ad while the new tree appears.</summary>
+        private void ShowTreeChangeAdIfDue()
+        {
+            if (!AdPacing.RegisterTreeChange()) return;
+            var policy = FindFirstObjectByType<AdsAccessPolicy>();
+            var ads = FindFirstObjectByType<AdMobInterstitialProvider>();
+            // Not ready, offline or ad-free: the count stays, so the next change tries again.
+            if (policy == null || ads == null || !policy.CanRequestAds) return;
+            if (ads.TryShow(null)) AdPacing.MarkShown();
         }
 
         public void PreviousTree()
@@ -223,11 +304,7 @@ namespace FruitTree
 
         private void SwitchTo(string id)
         {
-            if (!progress.SelectTree(id)) return;
-            SaveProgress();
-            DisplayActiveTree();
-            CloseTreeMenu();
-            if (pauseController != null) pauseController.Resume();
+            OpenTree(id);
         }
 
         public bool CanRebloomActive()

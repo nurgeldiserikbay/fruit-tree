@@ -379,11 +379,9 @@ namespace FruitTree.Tests
                 policy.AttachProvider(provider);
                 Assert.IsFalse(policy.CanRequestAds);
                 policy.SetStoreEntitlement(false);
-                // English-only first release includes no advertising or billing.
-                Assert.IsFalse(FruitTreeReleaseConfig.AdvertisingEnabled);
-                Assert.IsFalse(FruitTreeReleaseConfig.PurchasesEnabled);
-                Assert.IsFalse(policy.CanRequestAds);
-                Assert.IsFalse(provider.LastEnabled);
+                // Ads only after Google Play confirmed this player has not bought Remove Ads.
+                Assert.IsTrue(policy.CanRequestAds);
+                Assert.IsTrue(provider.LastEnabled);
                 policy.SetStoreEntitlement(true);
                 Assert.IsFalse(policy.CanRequestAds);
                 Assert.IsFalse(provider.LastEnabled);

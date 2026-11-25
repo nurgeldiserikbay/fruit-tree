@@ -59,6 +59,22 @@ namespace FruitTree.Editor
             {
                 Camera camera = Camera.main;
                 SaveWithInterface(camera, "preview-home.png");
+                var orchard = Object.FindFirstObjectByType<OrchardGameController>();
+                var flow = Object.FindFirstObjectByType<FruitTreeScreenFlow>();
+                if (orchard != null)
+                {
+                    orchard.OpenTreeMenu();
+                    SaveWithInterface(camera, "preview-trees.png");
+                    orchard.CloseTreeMenu();
+                }
+                var hud = Object.FindFirstObjectByType<HarvestHUD>();
+                if (hud != null && flow != null)
+                {
+                    flow.Play();
+                    hud.ShowReachHint(new Vector2(Screen.width * .5f, Screen.height * .5f));
+                    SaveWithInterface(camera, "preview-reach.png");
+                    flow.ReturnHome();
+                }
                 Save(camera, "preview-meadow.png");
                 Vector3 startPosition = camera.transform.position;
                 Quaternion startRotation = camera.transform.rotation;

@@ -45,6 +45,18 @@ If Google Play is unreachable, the ownership state is `Unknown` and **ads are su
 
 No Unity Editor or Play Console runtime tests were run in this coding environment. Written EditMode tests verify ad gating with a fake provider. They do not exercise Google Play Billing. Manual Play internal-testing verification is mandatory before release.
 
+## AdMob interstitials and Remove Ads (2026-11-25)
+
+The 2026-10-12 ad-free override below is superseded: `FruitTreeReleaseConfig` now sets `AdvertisingEnabled = true` and `PurchasesEnabled = true`.
+
+- **Ad SDK:** Google Mobile Ads Unity plugin `com.google.ads.mobile` 11.6.0 from OpenUPM. AdMob is on Google Play's Families self-certified ads SDK list; recheck the current list before each release.
+- **Format and pacing:** one interstitial for every `TreeChangesPerAd` (3) changes to another tree, shown as the new tree appears. Never during picking, never on returning to the same tree. A missed ad (not loaded, offline) is tried again on the next tree change.
+- **Families settings:** every request is tagged child-directed and under the age of consent with a G content rating, so ads are non-personalised. Set the Play Console target audience and the AdMob app settings to match.
+- **Gate:** `AdMobInterstitialProvider` is attached at runtime to `AdsAccessPolicy`; it initialises and loads only while `CanRequestAds` is true: after Google Play confirmed this player does not own `remove_ads`.
+- **Remove Ads:** the existing backend-free `RemoveAdsPurchaser` (Unity IAP, Google Play Billing on the device, no server) is enabled at runtime and the parent-gated entry is shown.
+- **IDs:** `AdMobAndroidAppId` and `InterstitialAdUnitId` are Google's public test IDs and only show test ads. Replace them with the app's own AdMob IDs before publishing. `AdMobSetup.Apply()` writes the app ID into the plugin settings before every Android build.
+- **Testing:** purchases only work for builds installed from a Play Console testing track by license testers, not for a sideloaded APK.
+
 ## First-release override (2026-10-12)
 
 `FruitTreeReleaseConfig` sets `AdvertisingEnabled = false` and `PurchasesEnabled = false`. The generated Unity scene disables `RemoveAdsPurchaser` and hides the parent purchase entry, so offline users are not sent to Play Billing just to play. `AdsAccessPolicy.CanRequestAds` also enforces the global feature flag. Preserve these values until an audited ad SDK, real ads, applicable store item and internal-track billing tests actually exist.
