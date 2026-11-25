@@ -81,6 +81,8 @@ namespace FruitTree
             progress = new OrchardProgressionService(Catalog, loadedSave);
             hud.OrchardMode = true;
             tree.FruitPicked += OnFruitPicked;
+            TreeGenerator.LeafDensity = GraphicsQuality.LeafDensity;
+            GraphicsQuality.Changed += OnGraphicsChanged;
             initialized = true;
             DisplayActiveTree();
         }
@@ -106,6 +108,7 @@ namespace FruitTree
         private void OnDestroy()
         {
             if (tree != null) tree.FruitPicked -= OnFruitPicked;
+            GraphicsQuality.Changed -= OnGraphicsChanged;
             SaveProgress();
         }
 
@@ -168,6 +171,17 @@ namespace FruitTree
             StartCoroutine(RefitCameraNextFrame());
             RefreshCollectionUI();
             TreeDisplayed?.Invoke();
+        }
+
+        /// <summary>GRAPHICS changed: regrow the same tree with the new leaf density, picks kept.</summary>
+        private void OnGraphicsChanged()
+        {
+            TreeGenerator.LeafDensity = GraphicsQuality.LeafDensity;
+            if (!initialized) return;
+            TreeRoundState active = progress.GetTree(progress.ActiveTreeId);
+            tree.Configure(active.Definition.SpeciesId, active.Definition.FruitCount, 122 + LevelIndex() * 197);
+            tree.RestorePickedFruits(active.PickedFruitIds);
+            CrownShadow.RebuildSoon();
         }
 
         private IEnumerator RefitCameraNextFrame()

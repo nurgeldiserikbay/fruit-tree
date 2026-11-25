@@ -129,12 +129,25 @@ namespace FruitTree
 
         private void Update()
         {
+            if (!GraphicsQuality.High)
+            {
+                HideAll();
+                return;
+            }
             float delta = Time.deltaTime;
             WeatherKind kind = CurrentWeather();
             bool dry = kind != WeatherKind.Rain && kind != WeatherKind.Storm;
             UpdateFlock(delta, dry);
             UpdateButterflies(delta, kind == WeatherKind.Clear || kind == WeatherKind.Cloudy);
             UpdateSparrows(delta, dry);
+        }
+
+        private void HideAll()
+        {
+            foreach (Transform[] group in new[] { birds, butterflies, sparrows })
+                foreach (Transform animal in group)
+                    if (animal.gameObject.activeSelf) animal.gameObject.SetActive(false);
+            flockTime = -1f;
         }
 
         private void UpdateFlock(float delta, bool dry)

@@ -27,8 +27,9 @@ namespace FruitTree
         {
             level = Mathf.Clamp01(level);
             if (Mathf.Approximately(level, Get(channel))) return;
+            // No PlayerPrefs.Save() here: a slider drag calls this every frame.
+            // The sound window saves once when it closes; Unity also saves on quit.
             PlayerPrefs.SetFloat(Key(channel), level);
-            PlayerPrefs.Save();
             Changed?.Invoke();
         }
 

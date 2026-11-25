@@ -56,6 +56,12 @@ namespace FruitTree
             return true;
         }
 
+        // Dragging changes the level every frame; write to disk once, when done.
+        private void OnDisable()
+        {
+            PlayerPrefs.Save();
+        }
+
         private static SoundLevelsPanel Build(Transform parent, Font font)
         {
             var root = Panel("Sound Levels Screen", parent, Vector2.zero, Vector2.one, Veil, 0f);
@@ -70,10 +76,14 @@ namespace FruitTree
             panel.Row(root, "EFFECTS  -  picking, leaves", AudioChannel.Effects, .33f);
 
             var back = Panel("Back", root, new Vector2(.27f, .23f), new Vector2(.73f, .3f), Ivory, 44f);
+            var backFace = back.GetComponent<RoundedPanel>();
+            // Panel() makes decorative, untappable shapes; a button face must catch taps.
+            backFace.raycastTarget = true;
             var backButton = back.gameObject.AddComponent<Button>();
-            backButton.targetGraphic = back.GetComponent<RoundedPanel>();
+            backButton.targetGraphic = backFace;
             panel.Label("Back Label", back, "BACK", 44, Ink, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one);
             backButton.onClick.AddListener(() => CloseIfOpen());
+            UiPolish.Apply(root.gameObject);
             root.gameObject.SetActive(false);
             return panel;
         }
@@ -108,6 +118,8 @@ namespace FruitTree
             handleArea.offsetMax = new Vector2(-24f, 0f);
             var handle = Panel("Handle", handleArea, Vector2.zero, new Vector2(0f, 1f), Ivory, 40f);
             handle.sizeDelta = new Vector2(48f, 0f);
+            // The handle can be grabbed directly, not only the track.
+            handle.GetComponent<RoundedPanel>().raycastTarget = true;
             var slider = body.GetComponent<Slider>();
             slider.fillRect = fill;
             slider.handleRect = handle;

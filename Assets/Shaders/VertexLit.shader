@@ -36,6 +36,8 @@ Shader "FruitTree/VertexLit"
             float _AlphaCutoff;
             float _GroundFade;
             float _NeutralVertex;
+            // Global from the weather: 0 calm, up to ~3 in a storm. Unset = calm.
+            float _WindGust;
             // Global weather dimming; deliberately not a material property.
             float3 _WeatherDim;
             sampler2D _MainTex;
@@ -63,7 +65,7 @@ Shader "FruitTree/VertexLit"
                 float gust = sin(_Time.y * 1.1 + local.x * 3.7 + local.z * 2.6) * 0.6 +
                              sin(_Time.y * 1.9 + local.y * 3.3) * 0.4;
                 // Hold stems still while leaf tips gently bend in the breeze.
-                local.xz += gust * _Wind * saturate(v.uv.y);
+                local.xz += gust * _Wind * (1.0 + _WindGust) * saturate(v.uv.y);
                 o.pos = UnityObjectToClipPos(float4(local,1));
                 o.normal = UnityObjectToWorldNormal(v.normal);
                 // Photo ground keeps the baked light and shade but not the green hue.

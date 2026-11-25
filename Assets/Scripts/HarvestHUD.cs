@@ -60,8 +60,9 @@ namespace FruitTree
         {
             Canvas canvas = messageText.canvas != null ? messageText.canvas.rootCanvas : null;
             if (canvas == null) return;
-            var bubble = new GameObject("Reach Hint Bubble", typeof(RectTransform), typeof(CanvasRenderer),
-                typeof(RoundedPanel), typeof(CanvasGroup));
+            // Its own canvas: the fading, rising bubble redraws alone, not the whole HUD.
+            var bubble = new GameObject("Reach Hint Bubble", typeof(RectTransform), typeof(Canvas),
+                typeof(CanvasRenderer), typeof(RoundedPanel), typeof(CanvasGroup));
             reachBubble = bubble.GetComponent<RectTransform>();
             reachBubble.SetParent(canvas.transform, false);
             reachBubble.anchorMin = reachBubble.anchorMax = new Vector2(.5f, .5f);
@@ -81,7 +82,7 @@ namespace FruitTree
             labelRect.offsetMin = new Vector2(24f, 8f);
             labelRect.offsetMax = new Vector2(-24f, -8f);
             var text = label.GetComponent<Text>();
-            text.font = messageText.font;
+            text.font = UiPolish.Font != null ? UiPolish.Font : messageText.font;
             text.fontSize = 40;
             text.resizeTextForBestFit = true;
             text.resizeTextMinSize = 20;

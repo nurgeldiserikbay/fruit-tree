@@ -68,6 +68,7 @@ namespace FruitTree
         private readonly AudioClip[] birds = new AudioClip[BirdSongs];
 
         public WeatherKind Current { get; private set; }
+        public static readonly int WindGustId = Shader.PropertyToID("_WindGust");
 
         public void Initialize(EnvironmentController owner)
         {
@@ -207,6 +208,8 @@ namespace FruitTree
             if (environment != null)
                 environment.SetWeatherLook(look.Tint, look.SunScale, look.FogScale, flash);
             if (rainMaterial != null) rainMaterial.SetFloat("_Intensity", look.Rain);
+            // Leaves move more in wind and rain; falling leaves come more often.
+            Shader.SetGlobalFloat(WindGustId, look.Rain * 2f + Mathf.Clamp01(1f - look.SunScale) * .8f);
             if (rainRenderer != null) rainRenderer.enabled = look.Rain > .01f;
         }
 
@@ -453,6 +456,7 @@ namespace FruitTree
         private void OnDestroy()
         {
             if (orchard != null) orchard.TreeDisplayed -= OnTreeDisplayed;
+            Shader.SetGlobalFloat(WindGustId, 0f);
             if (environment != null) environment.SetWeatherLook(Color.white, 1f, 1f, 0f);
             Shader.SetGlobalVector(EnvironmentController.WeatherDimId, Vector4.zero);
             if (rainMesh != null) Destroy(rainMesh);

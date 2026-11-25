@@ -31,6 +31,8 @@ namespace FruitTree
         public event Action<Apple> FruitPicked;
         public int HarvestedCount { get; private set; }
         public int TotalApples => appleCount;
+        /// <summary>1 = full crown; GRAPHICS: LOW grows fewer leaves per cluster.</summary>
+        public static float LeafDensity = 1f;
         private System.Random random;
         private readonly List<UnityEngine.Object> runtimeResources = new List<UnityEngine.Object>();
         private Coroutine rebloomAnimation;
@@ -221,7 +223,8 @@ namespace FruitTree
             if (photoTree)
             {
                 majorBranches = profile.PhotoLimbs;
-                appleLeafCount = Mathf.Min(appleLeafCount, profile.PhotoLeafCount);
+                appleLeafCount = Mathf.Max(6, Mathf.RoundToInt(
+                    Mathf.Min(appleLeafCount, profile.PhotoLeafCount) * LeafDensity));
             }
             for (int i = 0; i < majorBranches; i++)
             {

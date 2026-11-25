@@ -72,6 +72,7 @@ namespace FruitTree
             screen.Label("Back Label", back.transform, "BACK", 44, Ink, TextAnchor.MiddleCenter,
                 Vector2.zero, Vector2.one);
             back.onClick.AddListener(() => close?.Invoke());
+            UiPolish.Apply(root);
             root.SetActive(false);
             return screen;
         }
@@ -79,8 +80,10 @@ namespace FruitTree
         private void BuildList(RectTransform parent, int treeCount)
         {
             // Viewport: clips the cards and catches drags anywhere in the list.
-            var viewport = new GameObject("Tree List", typeof(RectTransform), typeof(CanvasRenderer),
-                typeof(RoundedPanel), typeof(RectMask2D), typeof(ScrollRect));
+            // Its own canvas (with its own raycaster for taps): scrolling redraws only the list.
+            var viewport = new GameObject("Tree List", typeof(RectTransform), typeof(Canvas),
+                typeof(GraphicRaycaster), typeof(CanvasRenderer), typeof(RoundedPanel),
+                typeof(RectMask2D), typeof(ScrollRect));
             var viewRect = viewport.GetComponent<RectTransform>();
             viewRect.SetParent(parent, false);
             Stretch(viewRect, new Vector2(.04f, .125f), new Vector2(.96f, .865f));
