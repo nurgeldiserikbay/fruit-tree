@@ -81,5 +81,5 @@ Email: [SUPPORT EMAIL]
 2. Замените `[DEVELOPER NAME]` и `[SUPPORT EMAIL]` (по два раза) на имя разработчика из Play Console и рабочий email поддержки.
 3. **Файл → Поделиться → Опубликовать в интернете → Опубликовать.** Ссылка вида `https://docs.google.com/document/d/e/.../pub`. Проверьте её в режиме инкогнито.
 4. Ссылку вставить в `Assets/Scripts/FruitTreePrivacyConfig.cs` (`PublishedPolicyUrl`) и в Play Console → App content → Privacy policy.
-5. Data safety в Play Console должна совпадать с разделом 3: собираются «Device or other IDs» и «App interactions» (для рекламы и аналитики рекламы, не продаются, шифруются при передаче), а также история покупок через Google Play.
+5. Data safety в Play Console должна совпадать с разделом «Advertising»: по раскрытию Google для Mobile Ads SDK отмечаются Approximate location (по IP), App interactions, Diagnostics и Device or other IDs (App Set ID). Цели: реклама, аналитика, защита от мошенничества. Данные шифруются при передаче и не продаются. Плюс история покупок через Google Play.
 6. Если поменяются SDK, частота рекламы или появится персонализированная реклама, обновите политику до выпуска сборки.
