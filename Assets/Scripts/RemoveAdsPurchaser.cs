@@ -208,6 +208,13 @@ namespace FruitTree
             if (shuttingDown) return;
             // Fail closed: games remains playable without ads if Play is offline.
             adsPolicy.MarkEntitlementUnknown();
+#if FRUITTREE_TEST_ADS
+            // Test builds carry only Google's sample ad unit, so they may show it
+            // even when Play cannot confirm "remove_ads" (a sideloaded APK, or an
+            // app or product not yet in Play Console). A purchase already seen
+            // this session still keeps them ad-free.
+            if (!adsPolicy.OwnsRemoveAds) adsPolicy.SetStoreEntitlement(false);
+#endif
             connected = false;
             inventoryFetched = false;
             transactionActive = false;
