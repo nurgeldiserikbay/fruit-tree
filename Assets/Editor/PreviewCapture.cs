@@ -59,6 +59,68 @@ namespace FruitTree.Editor
             {
                 Camera camera = Camera.main;
                 SaveWithInterface(camera, "preview-home.png");
+                var orchard = Object.FindFirstObjectByType<OrchardGameController>();
+                var flow = Object.FindFirstObjectByType<FruitTreeScreenFlow>();
+                if (orchard != null)
+                {
+                    orchard.OpenTreeMenu();
+                    SaveWithInterface(camera, "preview-trees.png");
+                    orchard.CloseTreeMenu();
+                }
+                // Each screen is opened the way a player opens it, then drawn once,
+                // because Unity ignores taps on UI that has never been rendered.
+                if (flow != null && flow.settingsPanel != null)
+                {
+                    flow.OpenSettingsFromHome();
+                    CheckScreen(camera, flow.settingsPanel, "Settings (from home)");
+                    SaveWithInterface(camera, "preview-settings.png");
+                    SoundLevelsPanel.Open(flow.settingsPanel.transform.parent, null);
+                    SaveWithInterface(camera, "preview-sound.png");
+                    TapCheck(FindRoot("Sound Levels Screen"), "Sound levels");
+                    // The real BACK button must close the window.
+                    var soundBack = FindRoot("Sound Levels Screen")?.transform.Find("Back")?.GetComponent<UnityEngine.UI.Button>();
+                    if (soundBack != null) soundBack.onClick.Invoke();
+                    tapReport.AppendLine(SoundLevelsPanel.IsOpen ? "FAIL Sound levels BACK left the window open" :
+                        "OK   Sound levels BACK closes the window");
+                    SoundLevelsPanel.CloseIfOpen();
+                    flow.CloseSettings();
+                }
+                if (flow != null && flow.homePanel != null) CheckScreen(camera, flow.homePanel, "Home");
+                var pause = Object.FindFirstObjectByType<PauseController>();
+                if (flow != null && orchard != null)
+                {
+                    flow.OpenCollectionFromHome(); // MY TREES on the home screen
+                    CheckScreen(camera, FindRoot("Tree Collection Screen"), "Tree list (from home)");
+                    orchard.CloseTreeMenu();
+                    flow.ReturnHome();
+                }
+                if (flow != null)
+                {
+                    flow.Play();
+                    if (flow.gameplayControls != null) CheckScreen(camera, flow.gameplayControls, "Game");
+                    if (pause != null && pause.panel != null)
+                    {
+                        pause.Toggle();
+                        CheckScreen(camera, pause.panel, "Pause");
+                        flow.OpenSettingsFromPause();
+                        CheckScreen(camera, flow.settingsPanel, "Settings (from pause)");
+                        flow.CloseSettings();
+                        orchard?.OpenTreeMenu();
+                        CheckScreen(camera, FindRoot("Tree Collection Screen"), "Tree list (from pause)");
+                        orchard?.CloseTreeMenu();
+                        pause.Resume();
+                    }
+                    flow.ReturnHome();
+                }
+                File.WriteAllText(Path.Combine("Builds", "ui-tap-check.txt"), tapReport.ToString());
+                var hud = Object.FindFirstObjectByType<HarvestHUD>();
+                if (hud != null && flow != null)
+                {
+                    flow.Play();
+                    hud.ShowReachHint(new Vector2(Screen.width * .5f, Screen.height * .5f));
+                    SaveWithInterface(camera, "preview-reach.png");
+                    flow.ReturnHome();
+                }
                 Save(camera, "preview-meadow.png");
                 Vector3 startPosition = camera.transform.position;
                 Quaternion startRotation = camera.transform.rotation;
@@ -82,13 +144,37 @@ namespace FruitTree.Editor
                 {
                     camera.transform.position = new Vector3(2.4f, 2.1f, -8.6f);
                     camera.transform.LookAt(new Vector3(0f, 3.2f, 0f));
+                    Vector3 overview = camera.transform.position;
+                    Quaternion overviewRotation = camera.transform.rotation;
                     foreach (var level in OrchardGameController.LevelDefinitions)
                     {
                         speciesTree.Configure(level.SpeciesId, level.FruitCount, 122);
+                        CrownShadow.RebuildNow();
+                        camera.transform.SetPositionAndRotation(overview, overviewRotation);
                         Save(camera, "preview-species-" + level.SpeciesId + ".png");
+                        // Close-up of one outer fruit, to judge the peel.
+                        Apple close = null;
+                        float best = -1f;
+                        foreach (Apple fruit in speciesTree.Apples)
+                        {
+                            if (fruit == null) continue;
+                            Vector3 p = fruit.transform.position;
+                            float score = new Vector2(p.x, p.z).magnitude - Mathf.Abs(p.y - 2.6f) * .5f - Mathf.Abs(p.x) * .3f + (p.z < 0f ? 1f : 0f);
+                            if (score > best) { best = score; close = fruit; }
+                        }
+                        if (close != null)
+                        {
+                            Vector3 fruitPoint = close.transform.position;
+                            Vector3 outward = new Vector3(fruitPoint.x, 0f, fruitPoint.z).normalized;
+                            camera.transform.position = fruitPoint + outward * .55f + Vector3.up * .08f;
+                            camera.transform.LookAt(fruitPoint);
+                            Save(camera, "preview-fruit-" + level.SpeciesId + ".png");
+                        }
                     }
+                    camera.transform.SetPositionAndRotation(overview, overviewRotation);
                     var firstLevel = OrchardGameController.LevelDefinitions[0];
                     speciesTree.Configure(firstLevel.SpeciesId, firstLevel.FruitCount, 122);
+                    CrownShadow.RebuildNow();
                 }
                 var scenery = Object.FindFirstObjectByType<EnvironmentController>();
                 if (scenery != null)
@@ -127,6 +213,56 @@ namespace FruitTree.Editor
                 exitCode = 1;
             }
             EditorApplication.Exit(exitCode);
+        }
+
+        private static readonly System.Text.StringBuilder tapReport = new System.Text.StringBuilder();
+
+        private static void CheckScreen(Camera camera, GameObject root, string label)
+        {
+            SaveWithInterface(camera, "tap-check-frame.png");
+            TapCheck(root, label);
+        }
+
+        private static GameObject FindRoot(string name)
+        {
+            foreach (var rect in Object.FindObjectsByType<RectTransform>(FindObjectsSortMode.None))
+                if (rect.name == name) return rect.gameObject;
+            return null;
+        }
+
+        /// <summary>
+        /// A real tap test: for every visible, enabled button and slider, ask the
+        /// EventSystem what a finger at its centre would hit. Anything else on top,
+        /// or nothing at all, means the control cannot be pressed there.
+        /// </summary>
+        private static void TapCheck(GameObject root, string label)
+        {
+            if (root == null) { tapReport.AppendLine("FAIL " + label + ": screen not found"); return; }
+            Canvas.ForceUpdateCanvases();
+            var events = UnityEngine.EventSystems.EventSystem.current;
+            if (events == null) { tapReport.AppendLine("FAIL no EventSystem"); return; }
+            var results = new System.Collections.Generic.List<UnityEngine.EventSystems.RaycastResult>();
+            foreach (var control in root.GetComponentsInChildren<UnityEngine.UI.Selectable>())
+            {
+                if (!control.IsInteractable() || !control.isActiveAndEnabled) continue;
+                var rect = (RectTransform)control.transform;
+                Canvas canvas = control.GetComponentInParent<Canvas>().rootCanvas;
+                Camera eye = canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera;
+                Vector3 centre = rect.TransformPoint(rect.rect.center);
+                Vector2 screen = RectTransformUtility.WorldToScreenPoint(eye, centre);
+                // Off-screen parts of a scrolling list are not tappable by design.
+                if (screen.x < 0 || screen.y < 0 || screen.x > Screen.width || screen.y > Screen.height) continue;
+                results.Clear();
+                events.RaycastAll(new UnityEngine.EventSystems.PointerEventData(events) { position = screen }, results);
+                string name = label + " / " + control.name +
+                    (control.GetComponentInChildren<UnityEngine.UI.Text>() is UnityEngine.UI.Text t && t.text.Length > 0 ? " \"" + t.text + "\"" : "");
+                if (results.Count == 0) { tapReport.AppendLine("FAIL " + name + ": nothing receives the tap"); continue; }
+                var hit = results[0].gameObject;
+                bool reaches = hit.transform.IsChildOf(control.transform) ||
+                    hit.GetComponentInParent<UnityEngine.UI.Selectable>() == control;
+                tapReport.AppendLine((reaches ? "OK   " : "FAIL ") + name +
+                    (reaches ? "" : ": blocked by " + hit.name));
+            }
         }
 
         /// <summary>Overlay canvases skip Camera.Render, so route them through the camera once.</summary>

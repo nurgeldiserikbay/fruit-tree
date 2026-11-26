@@ -28,6 +28,7 @@ namespace FruitTree.Editor
 
             MusicPlaylistBuilder.Rebuild();
             AppBranding.Apply();
+            AdMobSetup.Apply();
             // Do not quietly produce an APK from a broken or incompletely imported scene.
             ValidateProject.Run();
 

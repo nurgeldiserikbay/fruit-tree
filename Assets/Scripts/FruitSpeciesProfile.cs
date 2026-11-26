@@ -154,22 +154,82 @@ namespace FruitTree
                     new Color(.76f,.17f,.21f),.65f,.76f,.29f) }
             };
 
-        /// <summary>Limbs in the photo-textured crown; each species keeps its own habit.</summary>
-        public int PhotoLimbs => Id == "pomegranate" ? 28 :
-            Id == "pear" || Id == "peach" || Id == "plum" ? 30 :
-            Id == "cherry" || Id == "orange" || Id == "mandarin" ? 33 : 32;
+        // Growth habit of the photoreal crown. Each species gets a recognisable
+        // silhouette: narrow upright pear, wide layered cherry, open vase-shaped
+        // peach, low dense citrus balls and a many-stemmed pomegranate bush.
+        private bool IsCitrus => Id == "orange" || Id == "lemon" || Id == "mandarin";
+
+        /// <summary>Limbs in the photo-textured crown.</summary>
+        public int PhotoLimbs => Id == "peach" ? 26 : Id == "pomegranate" ? 28 :
+            Id == "cherry" ? 33 : Id == "pear" || Id == "plum" || IsCitrus ? 30 : 32;
 
         /// <summary>How far the crown dome rises above the highest limb origin.</summary>
-        public float PhotoCrownLift => Id == "pear" ? 2.4f : Id == "plum" ? 2.5f :
-            Id == "peach" ? 1.8f : Id == "cherry" ? 1.9f : Id == "pomegranate" ? 1.9f :
-            Id == "apricot" ? 2f : Id == "orange" ? 2.2f :
-            Id == "lemon" || Id == "mandarin" ? 2.1f : 2.3f;
+        public float PhotoCrownLift => Id == "pear" ? 3f : Id == "plum" ? 2.6f :
+            Id == "cherry" ? 1.5f : Id == "peach" ? 1.7f : Id == "apricot" ? 2f :
+            Id == "mandarin" ? 1.8f : IsCitrus || Id == "pomegranate" ? 1.95f : 2.3f;
 
-        /// <summary>Upper-limb climb: high for upright trees, low for spreading ones.</summary>
-        public float PhotoLimbRise => Id == "pear" ? 3f : Id == "plum" ? 2.7f :
-            Id == "peach" ? 1.7f : Id == "cherry" ? 1.9f : Id == "apricot" ? 2f :
-            Id == "pomegranate" ? 2.4f : Id == "orange" ? 2.3f :
-            Id == "lemon" || Id == "mandarin" ? 2.2f : 2.5f;
+        /// <summary>Climb of the highest limbs: high for upright trees, low for spreading ones.</summary>
+        public float PhotoLimbRise => Id == "pear" ? 3.4f : Id == "plum" ? 3f :
+            Id == "cherry" ? 1.4f : Id == "peach" || Id == "apricot" || Id == "mandarin" ? 2f :
+            Id == "orange" ? 2.1f : Id == "lemon" ? 2.3f : Id == "pomegranate" ? 2.4f : 2.5f;
+
+        /// <summary>Climb of the lowest limbs: a vase or upright tree lifts even those.</summary>
+        public float PhotoLowRise => Id == "peach" ? 1f : Id == "pear" ? .9f :
+            Id == "pomegranate" ? .6f : Id == "plum" ? .5f : Id == "cherry" ? .05f : .15f;
+
+        /// <summary>Limb length relative to the apple: crown width.</summary>
+        public float PhotoReach => Id == "cherry" ? 1.22f : Id == "peach" ? 1.15f :
+            Id == "apricot" ? 1.08f : Id == "pomegranate" ? .9f : Id == "lemon" ? .88f :
+            Id == "plum" ? .86f : Id == "orange" ? .84f : Id == "mandarin" ? .86f :
+            Id == "pear" ? .74f : 1f;
+
+        /// <summary>Height of the lowest limbs above the profile's crown base.</summary>
+        public float PhotoCrownBase => Id == "pear" ? .85f : Id == "plum" ? .75f :
+            Id == "cherry" ? .45f : Id == "apricot" ? .35f : Id == "peach" ? .05f :
+            Id == "pomegranate" ? -.05f : Id == "lemon" ? -.1f : Id == "orange" ? -.25f :
+            Id == "mandarin" ? -.1f : .55f;
+
+        /// <summary>Leaf size: long peach leaves, small pomegranate and mandarin leaves.</summary>
+        public float PhotoLeafScale => Id == "peach" ? 1.15f : Id == "apricot" ? 1.05f :
+            Id == "pomegranate" ? .72f : Id == "mandarin" ? .85f :
+            Id == "cherry" || Id == "plum" ? .9f : IsCitrus || Id == "pear" ? .95f : 1f;
+
+        /// <summary>Leaves per cluster: evergreen citrus and pomegranate are denser.</summary>
+        public int PhotoLeafCount => Id == "mandarin" ? 13 :
+            IsCitrus || Id == "peach" || Id == "pomegranate" ? 15 : 14;
+
+        /// <summary>Bark colour: red-brown cherry, grey smooth citrus.</summary>
+        public Color PhotoBarkTint => Id == "cherry" ? new Color(1f, .8f, .76f) :
+            Id == "peach" ? new Color(.95f, .86f, .82f) : IsCitrus ? new Color(.86f, .86f, .8f) :
+            Id == "pomegranate" ? new Color(.82f, .8f, .76f) : Color.white;
+
+        /// <summary>Separate stems from the ground: the pomegranate grows as a bush.</summary>
+        public int PhotoStems => Id == "pomegranate" ? 3 : 1;
+
+        /// <summary>A short line about the tree for the tree list.</summary>
+        public string Description
+        {
+            get
+            {
+                switch (Id)
+                {
+                    case "pear": return "A tall, narrow tree reaching for the sky, hung with soft green-gold pears.";
+                    case "cherry": return "Wide, spreading branches heavy with small, shiny cherries.";
+                    case "peach": return "An open, vase-shaped crown with long leaves and velvety peaches.";
+                    case "orange": return "A dense evergreen ball of glossy leaves, bright with oranges.";
+                    case "apricot": return "Broad, rounded leaves and sunny golden apricots.";
+                    case "plum": return "An upright oval crown with deep purple plums.";
+                    case "lemon": return "Dark glossy leaves and fragrant yellow lemons.";
+                    case "mandarin": return "A low, compact citrus full of little mandarins.";
+                    case "pomegranate": return "A many-stemmed bush with slender leaves and ruby pomegranates.";
+                    default: return "Crisp red apples on a round, friendly crown. A gentle first tree.";
+                }
+            }
+        }
+
+        /// <summary>Fruit colour for menus and lists.</summary>
+        public Color DisplayColor => Id == "apple" ? new Color(.80f, .16f, .13f) :
+            FruitColor * PhotoFruitTint;
 
         /// <summary>Fruit size relative to the old prototype, in scale with the larger crown.</summary>
         public float PhotoFruitSize => Id == "cherry" ? .62f : Id == "apricot" ? .52f :

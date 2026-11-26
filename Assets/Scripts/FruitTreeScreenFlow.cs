@@ -205,6 +205,8 @@ namespace FruitTree
             if (privacyPanel != null && privacyPanel.activeSelf) { ClosePrivacy(); return; }
             if (helpPanel != null && helpPanel.activeSelf) { CloseHelp(); return; }
             if (settingsPanel != null && settingsPanel.activeSelf) { CloseSettings(); return; }
+            if (SoundLevelsPanel.CloseIfOpen()) return;
+            if (orchard != null && orchard.IsTreeMenuOpen) { orchard.CloseTreeMenu(); return; }
             if (pause != null && pause.parentPanel != null && pause.parentPanel.activeSelf)
             {
                 pause.parentPanel.SetActive(false);

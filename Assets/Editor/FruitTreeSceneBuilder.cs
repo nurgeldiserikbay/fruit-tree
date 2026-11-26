@@ -419,8 +419,8 @@ namespace FruitTree.Editor
             parentPanel.SetActive(false);
             // Hide the entire parent-store entry for this ad-free release.
             // Leave references in the scene for a future audited integration.
-            parentButton.gameObject.SetActive(
-                FruitTreeReleaseConfig.CanOfferRemoveAds(false));
+            // AdMobInterstitialProvider shows it at runtime once AdMob is attached.
+            parentButton.gameObject.SetActive(false);
 
             // A dedicated collection overlay keeps the ordinary pause menu small.
             var collection = new GameObject("Tree Collection", typeof(RectTransform),

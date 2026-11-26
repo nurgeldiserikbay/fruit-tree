@@ -141,13 +141,14 @@ namespace FruitTree.Tests
         }
 
         [Test]
-        public void FirstPlayStoreEditionIsEnglishOnlyAndCannotSellAdRemoval()
+        public void PlayStoreEditionIsEnglishOnlyAndSellsAdRemovalOnlyWithRealAds()
         {
             Assert.AreEqual("en", FruitTreeReleaseConfig.LanguageCode);
-            Assert.IsFalse(FruitTreeReleaseConfig.AdvertisingEnabled);
-            Assert.IsFalse(FruitTreeReleaseConfig.PurchasesEnabled);
+            Assert.IsTrue(FruitTreeReleaseConfig.AdvertisingEnabled);
+            Assert.IsTrue(FruitTreeReleaseConfig.PurchasesEnabled);
+            // Never charge for removing ads when no ad provider is attached.
             Assert.IsFalse(FruitTreeReleaseConfig.CanOfferRemoveAds(false));
-            Assert.IsFalse(FruitTreeReleaseConfig.CanOfferRemoveAds(true));
+            Assert.IsTrue(FruitTreeReleaseConfig.CanOfferRemoveAds(true));
         }
 
         [Test]

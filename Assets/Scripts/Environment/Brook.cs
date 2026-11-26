@@ -97,7 +97,7 @@ namespace FruitTree
         {
             if (sound == null) return;
             bool muted = orchardAudio != null && orchardAudio.IsMuted;
-            float quiet = orchardAudio != null && orchardAudio.IsQuietAudio ? .55f : 1f;
+            float quiet = AudioLevels.Gain(AudioChannel.Nature);
             sound.mute = muted;
             sound.volume = Volume * quiet;
         }

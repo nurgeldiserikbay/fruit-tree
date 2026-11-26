@@ -31,6 +31,8 @@ namespace FruitTree
         public event Action<Apple> FruitPicked;
         public int HarvestedCount { get; private set; }
         public int TotalApples => appleCount;
+        /// <summary>1 = full crown; GRAPHICS: LOW grows fewer leaves per cluster.</summary>
+        public static float LeafDensity = 1f;
         private System.Random random;
         private readonly List<UnityEngine.Object> runtimeResources = new List<UnityEngine.Object>();
         private Coroutine rebloomAnimation;
@@ -160,8 +162,8 @@ namespace FruitTree
             // Photographic bark already contains its colour; the darker
             // procedural tint would multiply it into a near-black trunk.
             bool photoBark = Resources.Load<Texture2D>("TreeTextures/Bark") != null;
-            Color brown = photoBark ? new Color(.96f, .92f, .88f) : profile.TrunkColor;
-            Color branchColor = photoBark ? new Color(.90f, .86f, .80f) : profile.BranchColor;
+            Color brown = photoBark ? new Color(.96f, .92f, .88f) * profile.PhotoBarkTint : profile.TrunkColor;
+            Color branchColor = photoBark ? new Color(.90f, .86f, .80f) * profile.PhotoBarkTint : profile.BranchColor;
             // A slight bend in the trunk and irregularly-spaced limbs avoid the
             // artificial radial symmetry of the first prototype.
             const float goldenRootAngle = 2.39996323f;
@@ -172,6 +174,18 @@ namespace FruitTree
             wood.BranchCurve(
                 new[] { trunkBase, trunkLow, trunkMid, trunkTop },
                 new[] { .33f, .27f, .19f, .035f }, brown);
+            // A bush-like species sends up extra stems that lean out into the crown.
+            for (int stem = 1; stem < profile.PhotoStems && texturedLeaves; stem++)
+            {
+                float a = stem * 2.1f + .7f;
+                Vector3 lean = new Vector3(Mathf.Cos(a), 0f, Mathf.Sin(a));
+                wood.BranchCurve(new[] {
+                        lean * .12f,
+                        lean * .3f + Vector3.up * (profile.CrownHeightLow * .5f),
+                        lean * .75f + Vector3.up * (profile.CrownHeightLow + .4f),
+                        lean * 1.05f + Vector3.up * (profile.CrownHeightLow + 1.3f) },
+                    new[] { .17f, .13f, .09f, .03f }, brown);
+            }
             // Subtle roots merge the trunk into the soil without an oversized base.
             // One merged wood mesh; no physics objects or extra draw calls.
             for (int root = 0; root < 5; root++)
@@ -209,7 +223,8 @@ namespace FruitTree
             if (photoTree)
             {
                 majorBranches = profile.PhotoLimbs;
-                appleLeafCount = Mathf.Min(appleLeafCount, 14);
+                appleLeafCount = Mathf.Max(6, Mathf.RoundToInt(
+                    Mathf.Min(appleLeafCount, profile.PhotoLeafCount) * LeafDensity));
             }
             for (int i = 0; i < majorBranches; i++)
             {
@@ -218,7 +233,7 @@ namespace FruitTree
                 // than one flat disc. Introduce broad vertical variation,
                 // without changing branch/fruit counts or stable IDs.
                 float crownWave = Mathf.Sin(goldenAngle * i * 2f + .4f) * .28f;
-                float height = Mathf.Lerp(profile.CrownHeightLow + (photoTree ? .55f : 0f),
+                float height = Mathf.Lerp(profile.CrownHeightLow + (photoTree ? profile.PhotoCrownBase : 0f),
                     profile.CrownHeightHigh, elevation) +
                     crownWave + Between(-.19f, .19f);
                 float angle = goldenAngle * i + Between(-.18f, .18f);
@@ -228,11 +243,11 @@ namespace FruitTree
                 // broad lobes, while preserving stable fruit IDs and counts.
                 float canopyLobes = 1f + .12f * Mathf.Sin(angle * 3f + .8f) +
                     .055f * Mathf.Sin(angle * 5f - .6f);
-                float length = (photoTree ? Mathf.Lerp(2.7f, 1.25f, Mathf.Pow(elevation, 1.4f)) :
+                float length = (photoTree ? Mathf.Lerp(2.7f, 1.25f, Mathf.Pow(elevation, 1.4f)) * profile.PhotoReach :
                     2.65f - elevation * 1.2f) * crownSpread *
                     canopyLobes * Between(.84f, 1.10f);
                 // Low limbs reach outward, high limbs climb steeply: a rounded dome.
-                float limbRise = photoTree ? Mathf.Lerp(.15f, profile.PhotoLimbRise, elevation * elevation) :
+                float limbRise = photoTree ? Mathf.Lerp(profile.PhotoLowRise, profile.PhotoLimbRise, elevation * elevation) :
                     profile.BranchRise;
                 Vector3 origin = new Vector3(Between(-.065f,.065f), height, Between(-.065f,.065f));
 
@@ -316,7 +331,7 @@ namespace FruitTree
                             // Photo leaves need a wider tone range and a smaller
                             // size, or the crown reads as flat overlapping cards.
                             float tint = Between(-.065f,.065f) * (texturedLeaves ? 2.6f : 1f);
-                            float photoScale = photoTree ? Between(.62f, .95f) :
+                            float photoScale = photoTree ? Between(.62f, .95f) * profile.PhotoLeafScale :
                                 texturedLeaves ? .72f : 1f;
                             Color leafColor = (texturedLeaves
                                 ? photoLeafColor : profile.LeafColor) +
