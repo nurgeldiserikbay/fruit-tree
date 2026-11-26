@@ -8,7 +8,8 @@ namespace FruitTree
     /// </summary>
     public static class FruitTreePrivacyConfig
     {
-        public const string PublishedPolicyUrl = "";
+        public const string PublishedPolicyUrl =
+            "https://docs.google.com/document/d/e/2PACX-1vSbaN-x4nfp2DgDITNpbkl17oiKkbPX0VMRy0mjApYHSoc1EjCBBO3O8mFG7Qo5gRuCyv5gwLidJ9xV/pub";
 
         public static bool IsPublishedUrlValid(string value)
         {

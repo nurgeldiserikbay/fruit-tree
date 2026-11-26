@@ -1,4 +1,4 @@
-Published source: https://docs.google.com/document/d/1Nzpt4AQguh7-qSnbeaTSeHP92ibIUDCAlaDE_JB_tAo/edit (keep this file and the Google Doc identical).
+Google Doc (edit): https://docs.google.com/document/d/1Nzpt4AQguh7-qSnbeaTSeHP92ibIUDCAlaDE_JB_tAo/edit — published policy (use this URL in the game and Play Console): https://docs.google.com/document/d/e/2PACX-1vSbaN-x4nfp2DgDITNpbkl17oiKkbPX0VMRy0mjApYHSoc1EjCBBO3O8mFG7Qo5gRuCyv5gwLidJ9xV/pub . Keep this file and the Google Doc identical; the published page updates automatically after edits.
 
 # Fruit Tree Privacy Policy
 Effective date and last updated: 26 November 2026
@@ -88,7 +88,7 @@ Email: nurikserikbay1995@gmail.com
 
 1. Документ уже создан и заполнен (ссылка в начале файла). При правках меняйте и документ, и этот файл.
 2. Имя разработчика (TheLightCome) и email поддержки уже вписаны. Если в Play Console имя другое, поменяйте его в обоих местах.
-3. **Файл → Поделиться → Опубликовать в интернете → Опубликовать.** Ссылка вида `https://docs.google.com/document/d/e/.../pub`. Проверьте её в режиме инкогнито.
-4. Ссылку вставить в `Assets/Scripts/FruitTreePrivacyConfig.cs` (`PublishedPolicyUrl`) и в Play Console → App content → Privacy policy.
+3. Опубликовано 26.11.2026: https://docs.google.com/document/d/e/2PACX-1vSbaN-x4nfp2DgDITNpbkl17oiKkbPX0VMRy0mjApYHSoc1EjCBBO3O8mFG7Qo5gRuCyv5gwLidJ9xV/pub (проверено без входа).
+4. Ссылка вставлена в `FruitTreePrivacyConfig.PublishedPolicyUrl`. Её же указать в Play Console → App content → Privacy policy.
 5. Data safety в Play Console должна совпадать с разделом «Advertising»: по раскрытию Google для Mobile Ads SDK отмечаются Approximate location (по IP), App interactions, Diagnostics и Device or other IDs (App Set ID). Цели: реклама, аналитика, защита от мошенничества. Данные шифруются при передаче и не продаются. Плюс история покупок через Google Play.
 6. Если поменяются SDK, частота рекламы или появится персонализированная реклама, обновите политику до выпуска сборки.

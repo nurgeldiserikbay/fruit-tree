@@ -47,7 +47,7 @@
 ## Play Console and privacy
 
 - [ ] Decide the exact developer/publisher display name and functioning support email.
-- [ ] Publish the final Privacy Policy as a **public read-only webpage** (Google Docs → Publish to web is an option), then put the exact URL in `FruitTreePrivacyConfig.PublishedPolicyUrl` and Play Console.
+- [x] Privacy Policy published (Google Docs, Publish to web) and its URL is in `FruitTreePrivacyConfig.PublishedPolicyUrl`; enter the same URL in Play Console.
 - [ ] Confirm that the in-game Settings → Privacy link opens the published policy; add Play Console Privacy Policy URL.
 - [ ] Audit all SDKs, Android permissions, collected/shared data and complete the **Data safety** declaration truthfully.
 - [ ] Review **Google Play Families**/target audience content, ad SDK certification, purchase gates and suitability.

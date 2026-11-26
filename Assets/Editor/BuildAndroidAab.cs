@@ -14,8 +14,15 @@ namespace FruitTree.Editor
     /// </summary>
     public static class BuildAndroidAab
     {
-        [MenuItem("Fruit Tree/Build Signed Android AAB")]
-        public static void Run()
+        /// <summary>For Play closed or internal testing: only Google test ads.</summary>
+        [MenuItem("Fruit Tree/Build Signed AAB - Testing (test ads)")]
+        public static void RunTesting() => Build(testAds: true);
+
+        /// <summary>For the production release: Fruit Tree's real AdMob ads.</summary>
+        [MenuItem("Fruit Tree/Build Signed AAB - Production (real ads)")]
+        public static void RunProduction() => Build(testAds: false);
+
+        private static void Build(bool testAds)
         {
             const string scene = "Assets/Scenes/Main.unity";
             if (EditorUserBuildSettings.activeBuildTarget != BuildTarget.Android)
@@ -26,6 +33,15 @@ namespace FruitTree.Editor
                 throw new InvalidOperationException(
                     "Publish the real public Google Docs Privacy Policy, then configure " +
                     "FruitTreePrivacyConfig.PublishedPolicyUrl before release.");
+            // The AdMob app ID is always Fruit Tree's own; only the ad unit
+            // switches. A production bundle must never carry the test define.
+            if (FruitTreeReleaseConfig.UsesGoogleTestAds)
+                throw new InvalidOperationException(
+                    "Put Fruit Tree's own AdMob app ID in FruitTreeReleaseConfig.");
+            if (!testAds && PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.Android)
+                    .Contains("FRUITTREE_TEST_ADS"))
+                throw new InvalidOperationException(
+                    "Remove FRUITTREE_TEST_ADS from Player Settings before a production bundle.");
             if (AssetDatabase.LoadAssetAtPath<SceneAsset>(scene) == null)
                 throw new FileNotFoundException(
                     "Generate the Unity scene before creating a Play Store bundle.", scene);
@@ -53,7 +69,8 @@ namespace FruitTree.Editor
                     "in Unity Player Settings. Do not commit keystores or secrets.");
 
             string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
-            string path = Path.Combine(projectRoot, "Builds", "FruitTree-release.aab");
+            string path = Path.Combine(projectRoot, "Builds",
+                testAds ? "FruitTree-testing.aab" : "FruitTree-release.aab");
             Directory.CreateDirectory(Path.GetDirectoryName(path));
             ValidateProject.Run();
             // A game requiring 100% fruit collection must not ship with an
@@ -69,7 +86,9 @@ namespace FruitTree.Editor
                     scenes = new[] { scene },
                     locationPathName = path,
                     target = BuildTarget.Android,
-                    options = BuildOptions.None
+                    options = BuildOptions.None,
+                    extraScriptingDefines = testAds
+                        ? new[] { "FRUITTREE_TEST_ADS" } : Array.Empty<string>()
                 };
                 BuildReport report = BuildPipeline.BuildPlayer(options);
                 if (report == null || report.summary.result != BuildResult.Succeeded ||
@@ -77,7 +96,8 @@ namespace FruitTree.Editor
                     throw new InvalidOperationException(
                         "Signed Android App Bundle build did not finish successfully.");
                 Debug.Log("Fruit Tree signed Android App Bundle generated at: " + path +
-                    ". Upload to the Play Console INTERNAL test track first.");
+                    (testAds ? ". TEST ADS ONLY: upload to internal or closed testing."
+                             : ". REAL ADS: upload to production only after testing."));
             }
             finally
             {

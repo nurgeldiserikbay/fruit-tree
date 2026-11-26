@@ -11,10 +11,19 @@ namespace FruitTree
         public const bool AdvertisingEnabled = true;
         public const bool PurchasesEnabled = true;
 
-        // Google's public sample IDs: they only ever show test ads. Replace both
-        // with the app's own AdMob IDs before publishing to Google Play.
-        public const string AdMobAndroidAppId = "ca-app-pub-3940256099942544~3347511713";
+        // Fruit Tree's own AdMob app and "Tree change" interstitial unit.
+        public const string AdMobAndroidAppId = "ca-app-pub-9702825788968948~3234977815";
+        // The phone APK and the testing AAB define FRUITTREE_TEST_ADS and carry
+        // only Google's sample interstitial, which never shows real ads, so taps
+        // while testing cannot count as invalid clicks. Only the production AAB
+        // contains Fruit Tree's real "Tree change" unit.
+#if FRUITTREE_TEST_ADS
+        public const bool UsesTestAdUnit = true;
         public const string InterstitialAdUnitId = "ca-app-pub-3940256099942544/1033173712";
+#else
+        public const bool UsesTestAdUnit = false;
+        public const string InterstitialAdUnitId = "ca-app-pub-9702825788968948/3419965593";
+#endif
         public static bool UsesGoogleTestAds => AdMobAndroidAppId.StartsWith("ca-app-pub-3940256099942544");
 
         /// <summary>One interstitial for every this many changes to another tree.</summary>

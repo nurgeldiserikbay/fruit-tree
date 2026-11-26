@@ -213,7 +213,7 @@ See [ENVIRONMENT_SYSTEM.md](ENVIRONMENT_SYSTEM.md).
 - [x] Draft Google Docs Privacy Policy, Play listing text and release-readiness checklist.
 - [x] EditMode tests for navigation and Privacy URL validation (not yet executed).
 - [ ] User Unity 6000.6.5f1 compilation and portrait visual tests of new screens, Zen Mode, hint, settings and menu switching — deferred to final acceptance as requested.
-- [ ] Publish real privacy policy, replace contact placeholders, complete SDK data audit, add verified public URL.
+- [x] Privacy policy published as a Google Doc (2026-11-26), contacts filled, AdMob/Play/Unity disclosures checked against Google docs, public URL in FruitTreePrivacyConfig.
 - [ ] Actual signed Android release AAB, real device tests, store images and end-to-end ten-tree acceptance. Language is English only.
 
 

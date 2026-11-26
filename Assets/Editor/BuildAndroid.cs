@@ -46,7 +46,9 @@ namespace FruitTree.Editor
                     scenes = new[] { scene },
                     locationPathName = Path.Combine(outputDirectory, "FruitTree.apk"),
                     target = BuildTarget.Android,
-                    options = BuildOptions.None
+                    options = BuildOptions.None,
+                    // Test ads only: this APK is for the developer's own phones.
+                    extraScriptingDefines = new[] { "FRUITTREE_TEST_ADS" }
                 };
                 BuildReport report = BuildPipeline.BuildPlayer(options);
                 if (report == null || report.summary.result != BuildResult.Succeeded)
