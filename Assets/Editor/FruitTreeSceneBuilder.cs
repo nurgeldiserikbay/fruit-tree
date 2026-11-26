@@ -630,10 +630,10 @@ namespace FruitTree.Editor
             MakeLabel("Privacy Heading", privacy.transform, "PRIVACY POLICY", 68, white,
                 new Vector2(.09f, .78f), new Vector2(.91f, .88f));
             MakeLabel("Privacy Summary", privacy.transform,
-                "Fruit Tree stores your game progress locally on your device.\n\n" +
-                "The game has no account registration. Google Play may process purchases.\n\n" +
-                "No advertising SDK is enabled in this build.\n\n" +
-                "Read the full published policy for contact and retention details.",
+                "Fruit Tree saves your game progress only on your device. No account, name or location is needed.\n\n" +
+                "Ads are shown by Google AdMob, set up for children: not personalised and family-friendly only.\n\n" +
+                "The Remove Ads purchase is handled by Google Play.\n\n" +
+                "Read the full online policy for details and contact.",
                 39, white, new Vector2(.09f, .37f), new Vector2(.91f, .75f));
             flow.privacyStatusLabel = MakeLabel("Privacy Status", privacy.transform,
                 "Online policy will be available before release.", 30, white,

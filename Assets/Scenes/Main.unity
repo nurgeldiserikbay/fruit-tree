@@ -5146,16 +5146,18 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Fruit Tree stores your game progress locally on your device.
+  m_Text: 'Fruit Tree saves your game progress only on your device. No account,
+    name or location is needed.
 
 
-    The game has no account registration. Google Play may process purchases.
+    Ads are shown by Google AdMob, set up for children: not personalised and
+    family-friendly only.
 
 
-    No advertising SDK is enabled in this build.
+    The Remove Ads purchase is handled by Google Play.
 
 
-    Read the full published policy for contact and retention details.'
+    Read the full online policy for details and contact.'
 --- !u!222 &820873668
 CanvasRenderer:
   m_ObjectHideFlags: 0
