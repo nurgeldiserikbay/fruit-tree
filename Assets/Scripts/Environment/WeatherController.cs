@@ -57,14 +57,23 @@ namespace FruitTree
         private WeatherLook fromLook, toLook;
         private float blend = 1f, blendSeconds = BlendSeconds, remaining, nextBird, nextLightning = -1f;
         private OrchardGameController orchard;
-        private float flashTime = -1f, thunderDelay = -1f;
+        private float flashTime = -1f, flashStrength = 1f, thunderDelay = -1f, thunderLoudness = 1f;
+        private int thunderVariant, lastThunder = -1;
         private bool lookDirty = true, flashWasVisible;
 
         private Mesh rainMesh;
         private Material rainMaterial;
         private MeshRenderer rainRenderer;
         private AudioSource rainSource, thunderSource, birdSource;
-        private AudioClip rainClip, thunderClip;
+        private AudioClip rainClip;
+        private readonly AudioClip[] thunders = new AudioClip[ThunderVariants];
+
+        /// <summary>
+        /// 0-2 are distant rolls heard in any rain; 3-4 are close claps that only
+        /// come with a storm, right after a lightning flash.
+        /// </summary>
+        public const int ThunderVariants = 5, FirstNearThunder = 3;
+        private const float BrownDepth = .06f;
         private readonly AudioClip[] birds = new AudioClip[BirdSongs];
 
         public WeatherKind Current { get; private set; }
@@ -133,7 +142,7 @@ namespace FruitTree
             fromLook = toLook = WeatherLook.For(kind);
             blend = 1f;
             lookDirty = true;
-            nextLightning = kind == WeatherKind.Storm ? 4f : -1f;
+            nextLightning = FirstStrikeDelay(kind, 4f);
             ApplyLook(toLook, 0f);
         }
 
@@ -175,7 +184,14 @@ namespace FruitTree
             blend = 0f;
             blendSeconds = seconds;
             remaining = Between(MinimumDuration, MaximumDuration);
-            nextLightning = Current == WeatherKind.Storm ? seconds : -1f;
+            nextLightning = FirstStrikeDelay(Current, seconds);
+        }
+
+        /// <summary>Storms open with lightning; plain rain rumbles a little later.</summary>
+        private float FirstStrikeDelay(WeatherKind kind, float stormDelay)
+        {
+            if (kind == WeatherKind.Storm) return stormDelay;
+            return kind == WeatherKind.Rain ? stormDelay + Between(6f, 16f) : -1f;
         }
 
         private float UpdateLightning(float delta)
@@ -183,13 +199,7 @@ namespace FruitTree
             if (nextLightning >= 0f)
             {
                 nextLightning -= delta;
-                if (nextLightning < 0f)
-                {
-                    // Reduced motion keeps the thunder but never flashes the screen.
-                    if (PlayerPrefs.GetInt("FruitTree.ReducedMotion", 0) != 1) flashTime = 0f;
-                    thunderDelay = Between(.4f, 2.5f);
-                    nextLightning = Between(9f, 22f);
-                }
+                if (nextLightning < 0f) Strike();
             }
             if (thunderDelay >= 0f)
             {
@@ -198,9 +208,49 @@ namespace FruitTree
             }
             if (flashTime < 0f) return 0f;
             flashTime += delta;
-            float flash = FlashAt(flashTime);
+            float flash = FlashAt(flashTime) * flashStrength;
             if (flashTime > FlashSeconds) flashTime = -1f;
             return flash;
+        }
+
+        /// <summary>
+        /// One thunder. A storm brings close claps (bright flash, sound almost at
+        /// once) and farther rolls (dim flash, longer wait). Plain rain only has
+        /// far-off rumbles with no visible flash.
+        /// </summary>
+        private void Strike()
+        {
+            bool storm = Current == WeatherKind.Storm;
+            bool near = storm && random.NextDouble() < .45;
+            thunderVariant = PickThunder(near, lastThunder, random.NextDouble());
+            lastThunder = thunderVariant;
+            if (storm)
+            {
+                flashStrength = near ? 1f : .5f;
+                // Reduced motion keeps the thunder but never flashes the screen.
+                if (PlayerPrefs.GetInt("FruitTree.ReducedMotion", 0) != 1) flashTime = 0f;
+                thunderDelay = near ? Between(.15f, .6f) : Between(1.4f, 3.2f);
+                thunderLoudness = near ? 1f : .75f;
+                nextLightning = Between(9f, 22f);
+            }
+            else
+            {
+                thunderDelay = 0f;
+                thunderLoudness = Between(.4f, .6f);
+                nextLightning = Between(20f, 45f);
+            }
+        }
+
+        /// <summary>A thunder of the right distance, never the same one twice in a row.</summary>
+        public static int PickThunder(bool near, int previous, double roll)
+        {
+            int first = near ? FirstNearThunder : 0;
+            int count = near ? ThunderVariants - FirstNearThunder : FirstNearThunder;
+            bool skip = previous >= first && previous < first + count;
+            int choices = skip ? count - 1 : count;
+            int pick = first + Mathf.Min(choices - 1, (int)(roll * choices));
+            if (skip && pick >= previous) pick++;
+            return pick;
         }
 
         private void ApplyLook(WeatherLook look, float flash)
@@ -243,13 +293,17 @@ namespace FruitTree
 
         private void PlayThunder()
         {
-            if (thunderClip == null) thunderClip = CreateThunder();
-            thunderSource.pitch = Between(.75f, 1.1f);
-            thunderSource.PlayOneShot(thunderClip);
+            AudioClip clip = thunders[thunderVariant];
+            if (clip == null) clip = thunders[thunderVariant] = CreateThunder(thunderVariant);
+            thunderSource.pitch = Between(.85f, 1.08f);
+            thunderSource.panStereo = Between(-.45f, .45f);
+            thunderSource.PlayOneShot(clip, thunderLoudness);
         }
 
         private float Between(float low, float high)
         {
+            // Editor previews may force a weather before Start has run.
+            if (random == null) random = new System.Random(System.Environment.TickCount);
             return low + (float)random.NextDouble() * (high - low);
         }
 
@@ -385,32 +439,129 @@ namespace FruitTree
             return MakeClip("Forest rain", rate, loop);
         }
 
-        private static AudioClip CreateThunder()
+        /// <summary>
+        /// One of <see cref="ThunderVariants"/> thunders. Each is a low rolling
+        /// rumble built from a few swells; the close ones also open with a sharp
+        /// crack. Peaks stay soft enough for a children's game.
+        /// </summary>
+        public static AudioClip CreateThunder(int variant)
         {
-            const int rate = 11025;
-            int count = rate * 6;
-            var rng = new System.Random(4173);
-            var data = new float[count];
-            float brown = 0f, deep = 0f;
-            float[] starts = { .05f, .55f, 1.3f, 2.4f };
-            float[] sizes = { 1f, .72f, .55f, .3f };
+            // Per swell: start (s), size, attack rate, decay rate.
+            float seconds, cutoff, peak;
+            float[] swells, cracks;
+            string title;
+            switch (variant)
+            {
+                case 0:
+                    title = "Far grumble"; seconds = 7f; cutoff = .05f; peak = .5f;
+                    swells = new[] { 0f, .6f, 1.4f, .9f, 1.1f, 1f, 1.1f, .75f, 2.9f, .5f, 1.3f, .9f };
+                    cracks = new float[0];
+                    break;
+                case 1:
+                    title = "Rolling thunder"; seconds = 7.5f; cutoff = .07f; peak = .62f;
+                    swells = new[] { .1f, .8f, 6f, 1.4f, .9f, 1f, 4f, 1.1f, 2f, .7f, 4f, 1f,
+                        3.3f, .5f, 3f, .9f, 4.6f, .3f, 3f, 1f };
+                    cracks = new float[0];
+                    break;
+                case 2:
+                    title = "Low boom"; seconds = 6f; cutoff = .06f; peak = .66f;
+                    swells = new[] { .05f, 1f, 22f, 1.3f, .8f, .5f, 5f, 1f, 2.2f, .3f, 3f, 1f };
+                    cracks = new float[0];
+                    break;
+                case 3:
+                    title = "Near clap"; seconds = 6.5f; cutoff = .11f; peak = .8f;
+                    swells = new[] { .04f, 1f, 30f, 1.6f, .6f, .7f, 6f, 1.2f, 1.6f, .5f, 4f, 1f,
+                        3f, .3f, 3f, 1f };
+                    cracks = new[] { .02f };
+                    break;
+                default:
+                    title = "Double clap"; seconds = 7f; cutoff = .1f; peak = .8f;
+                    swells = new[] { .04f, .8f, 30f, 1.8f, .36f, 1f, 25f, 1.4f, 1.4f, .55f, 4f, 1f,
+                        2.9f, .3f, 3f, .9f };
+                    cracks = new[] { .02f, .34f };
+                    break;
+            }
+
+            const int rate = 22050;
+            int count = (int)(rate * seconds);
+            var rng = new System.Random(4173 + variant * 977);
+            var rumble = new float[count];
+            var crack = new float[count];
+            float brown = 0f, low1 = 0f, low2 = 0f, hissLow = 0f, midLow = 0f;
+            float flutterFrom = 1f, flutterTo = 1f;
+            int flutterAt = 0, flutterLength = 1;
+            float tear = 1f;
+            float rumblePeak = 1e-6f, crackPeak = 1e-6f;
             for (int i = 0; i < count; i++)
             {
                 float t = i / (float)rate;
                 float white = (float)rng.NextDouble() * 2f - 1f;
-                brown = Mathf.Clamp(brown + white * .05f, -1f, 1f) * .996f;
-                deep += .05f * (brown - deep);
-                float envelope = 0f;
-                for (int b = 0; b < starts.Length; b++)
+
+                // Rumble: mostly 100-400 Hz so phone speakers can play it, with
+                // a little brown noise underneath for depth on headphones.
+                brown = Mathf.Clamp(brown * .998f + white * .04f, -1f, 1f);
+                low1 += cutoff * (white + brown * BrownDepth - low1);
+                low2 += cutoff * (low1 - low2);
+                // The sky "rolls": loudness wanders every 90-220 ms.
+                if (i - flutterAt >= flutterLength)
                 {
-                    float tau = t - starts[b];
-                    if (tau > 0f)
-                        envelope += sizes[b] * Mathf.Min(1f, tau * 18f) * Mathf.Exp(-tau * 1.5f);
+                    flutterAt = i;
+                    flutterLength = (int)(rate * (.09f + .13f * (float)rng.NextDouble()));
+                    flutterFrom = flutterTo;
+                    flutterTo = .45f + .55f * (float)rng.NextDouble();
                 }
-                float fade = Mathf.Clamp01((6f - t) * 2f);
-                data[i] = Mathf.Clamp(deep * envelope * 2.6f * fade, -.9f, .9f);
+                float flutter = Mathf.Lerp(flutterFrom, flutterTo,
+                    Mathf.SmoothStep(0f, 1f, (i - flutterAt) / (float)flutterLength));
+                float envelope = 0f;
+                for (int s = 0; s + 3 < swells.Length; s += 4)
+                {
+                    float tau = t - swells[s];
+                    if (tau > 0f)
+                        envelope += swells[s + 1] * (1f - Mathf.Exp(-tau * swells[s + 2])) *
+                            Mathf.Exp(-tau * swells[s + 3]);
+                }
+                rumble[i] = low2 * envelope * flutter;
+                rumblePeak = Mathf.Max(rumblePeak, Mathf.Abs(rumble[i]));
+
+                // Crack: bright, torn noise that dies away within half a second.
+                hissLow += .3f * (white - hissLow);
+                midLow += .06f * (white - midLow);
+                float crackEnvelope = 0f;
+                foreach (float start in cracks)
+                {
+                    float tau = t - start;
+                    if (tau > 0f && tau < .6f)
+                        crackEnvelope += (1f - Mathf.Exp(-tau * 500f)) * Mathf.Exp(-tau * 11f);
+                }
+                if (crackEnvelope > 0f)
+                {
+                    if (rng.NextDouble() < .004) tear = .25f + .75f * (float)rng.NextDouble();
+                    crack[i] = ((white - hissLow) * .45f + (hissLow - midLow) * .9f) *
+                        crackEnvelope * tear;
+                    crackPeak = Mathf.Max(crackPeak, Mathf.Abs(crack[i]));
+                }
             }
-            return MakeClip("Distant thunder", rate, data);
+
+            var data = new float[count];
+            float drive = Tanh(1.6f), mixPeak = 1e-6f;
+            for (int i = 0; i < count; i++)
+            {
+                float t = i / (float)rate;
+                float sample = rumble[i] / rumblePeak + .75f * crack[i] / crackPeak;
+                // Soft saturation keeps the boom round instead of clipped.
+                sample = Tanh(1.6f * sample / 1.75f) / drive;
+                sample *= Mathf.Clamp01(t / .004f) * Mathf.Clamp01((seconds - t) / .8f);
+                data[i] = sample;
+                mixPeak = Mathf.Max(mixPeak, Mathf.Abs(sample));
+            }
+            for (int i = 0; i < count; i++) data[i] *= peak / mixPeak;
+            return MakeClip(title, rate, data);
+        }
+
+        private static float Tanh(float x)
+        {
+            float e = Mathf.Exp(2f * x);
+            return (e - 1f) / (e + 1f);
         }
 
         /// <summary>Short whistled phrases; each index is a different little song.</summary>
@@ -462,7 +613,8 @@ namespace FruitTree
             if (rainMesh != null) Destroy(rainMesh);
             if (rainMaterial != null) Destroy(rainMaterial);
             if (rainClip != null) Destroy(rainClip);
-            if (thunderClip != null) Destroy(thunderClip);
+            foreach (AudioClip thunder in thunders)
+                if (thunder != null) Destroy(thunder);
             foreach (AudioClip bird in birds)
                 if (bird != null) Destroy(bird);
         }

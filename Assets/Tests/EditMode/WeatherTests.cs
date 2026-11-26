@@ -48,6 +48,48 @@ namespace FruitTree.Tests
         }
 
         [Test]
+        public void ThundersDifferAndStaySoft()
+        {
+            float[] previous = null;
+            for (int variant = 0; variant < WeatherController.ThunderVariants; variant++)
+            {
+                AudioClip clip = WeatherController.CreateThunder(variant);
+                try
+                {
+                    var samples = new float[clip.samples];
+                    clip.GetData(samples, 0);
+                    float peak = 0f;
+                    foreach (float sample in samples) peak = Mathf.Max(peak, Mathf.Abs(sample));
+                    Assert.That(peak, Is.InRange(.4f, .85f), clip.name);
+                    Assert.Greater(clip.length, 4f, clip.name);
+                    Assert.Less(Mathf.Abs(samples[samples.Length - 1]), .01f, "Ends silently.");
+                    if (previous != null) CollectionAssert.AreNotEqual(previous, samples);
+                    previous = samples;
+                }
+                finally { Object.DestroyImmediate(clip); }
+            }
+        }
+
+        [Test]
+        public void ThunderMatchesDistanceAndNeverRepeatsAtOnce()
+        {
+            for (int previous = -1; previous < WeatherController.ThunderVariants; previous++)
+            {
+                for (int step = 0; step < 100; step++)
+                {
+                    double roll = step / 100.0;
+                    int far = WeatherController.PickThunder(false, previous, roll);
+                    int near = WeatherController.PickThunder(true, previous, roll);
+                    Assert.That(far, Is.InRange(0, WeatherController.FirstNearThunder - 1));
+                    Assert.That(near, Is.InRange(WeatherController.FirstNearThunder,
+                        WeatherController.ThunderVariants - 1));
+                    Assert.AreNotEqual(previous, far);
+                    Assert.AreNotEqual(previous, near);
+                }
+            }
+        }
+
+        [Test]
         public void RainMeshStaysSmallForPhones()
         {
             Mesh mesh = WeatherController.BuildRainMesh(800, 1);
