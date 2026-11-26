@@ -10,7 +10,7 @@ The non-consumable entitlement is retrieved from Google Play on launch with `Fet
 
 ## What requires Play Console before a real purchase
 
-1. Create/activate Google Play Console app with application ID `com.nurgeldiserikbay.fruittree` (confirm your actual publisher naming first).
+1. Create/activate Google Play Console app with application ID `com.thelightcome.fruittree`.
 2. Add a one-time in-app product with product ID exactly `remove_ads` (lowercase, no spaces). Set its price and activate it. There is **no hard-coded price** in the app; `Product.metadata.localizedPriceString` comes from the store.
 3. Upload a signed AAB to an internal testing track and configure tester accounts and country availability; test only with Play-installed builds and license testers.
 4. Install Android Build Support in Unity Hub and complete Play Console setup. Do not publish until the app passes purchase tests.

@@ -12,7 +12,7 @@ PlayerSettings:
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
-  companyName: Fruit Tree Studio
+  companyName: TheLightCome
   productName: Fruit Tree
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
@@ -172,7 +172,7 @@ PlayerSettings:
   androidMaxAspectRatio: 2.4
   androidMinAspectRatio: 1
   applicationIdentifier:
-    Android: com.nurgeldiserikbay.fruittree
+    Android: com.thelightcome.fruittree
   buildNumber:
     Standalone: 0
     VisionOS: 0

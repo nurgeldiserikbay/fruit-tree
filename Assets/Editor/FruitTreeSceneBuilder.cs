@@ -121,8 +121,8 @@ namespace FruitTree.Editor
             CreateInterface(root.GetComponent<TreeGenerator>(), sound, purchasing, orchard);
             PlayerSettings.defaultInterfaceOrientation = UIOrientation.Portrait;
             PlayerSettings.productName = "Fruit Tree";
-            PlayerSettings.companyName = "Fruit Tree Studio";
-            PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, "com.nurgeldiserikbay.fruittree");
+            PlayerSettings.companyName = "TheLightCome";
+            PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, "com.thelightcome.fruittree");
             // Default Android texture compression is selected from Build Profiles.
             System.IO.Directory.CreateDirectory("Assets/Scenes");
             EditorSceneManager.SaveScene(scene, "Assets/Scenes/Main.unity");

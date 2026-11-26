@@ -1,10 +1,10 @@
 Published source: https://docs.google.com/document/d/1Nzpt4AQguh7-qSnbeaTSeHP92ibIUDCAlaDE_JB_tAo/edit (keep this file and the Google Doc identical).
 
 # Fruit Tree Privacy Policy
-Last updated: 26 November 2026
-App: Fruit Tree (Android, package com.nurgeldiserikbay.fruittree)  
-Developer: [DEVELOPER NAME]  
-Contact: [SUPPORT EMAIL]
+Effective date and last updated: 26 November 2026
+App: Fruit Tree (Android, package com.thelightcome.fruittree)  
+Developer: TheLightCome  
+Contact: nurikserikbay1995@gmail.com
 
 ## Summary
 
@@ -47,38 +47,47 @@ Fruit Tree is built with the Unity engine. Unity may collect limited technical i
 
 ## Children
 
-Fruit Tree is suitable for children and follows the Google Play Families Policy. We do not knowingly collect personal information from children. The game has no accounts, chat, social features or links that let children share personal information. The only third-party services that receive data are Google AdMob, configured for child-directed treatment as described above, and Google Play for the optional purchase.
+Fruit Tree is suitable for children and follows the Google Play Families Policy. We treat every player as possibly a child (under 13, or under the age of digital consent in your country, such as 16 in parts of the European Union). For that reason the game never asks for an account, a name or any other personal details, and it has no chat, social features or links that let children share personal information. We do not knowingly collect personal information from children. The third-party services that receive data are Google AdMob, configured for child-directed treatment as described above, Google Play for the optional purchase, and Unity for limited technical information.
 
-If you are a parent or guardian and believe your child's information was collected, please contact us at the email below, and we will help.
+Parents and guardians can ask us at any time to review or delete information about their child, or to stop further collection, by writing to the email below. We do not keep such information on our own servers, so we will explain what is stored on the device and help you contact Google where needed. Uninstalling the game removes all of its local data.
 
 ## Sharing and selling
 
 We do not sell personal information. We do not share information with anyone except Google (AdMob and Google Play) and Unity, as described above, to make the game, its ads and its purchase work.
 
+## Legal basis (EEA and UK)
+
+Where the GDPR or UK GDPR applies, the limited data described in this policy is processed on these grounds: our legitimate interest in showing non-personalised, family-friendly ads that keep the game free; performance of a contract when you buy Remove Ads; and our legitimate interest in keeping the game working and secure.
+
+## International transfers
+
+Google and Unity may process data in countries other than your own, including the United States. They state that they protect such transfers with recognised safeguards, such as the European Commission's Standard Contractual Clauses.
+
 ## Security and retention
 
-Game progress stays in the game's private storage on your device until you delete it. Information processed by Google or Unity is kept according to their own retention rules.
+We do not run servers and keep no copy of your data. Game progress stays in the game's private storage on your device until you delete it. Information processed by Google or Unity is kept according to their own retention rules.
 
-## Your choices
+## Your rights and choices
 
 - **Remove ads:** buy Remove Ads in the game's settings.
 - **Delete your data:** uninstall the game or open Android Settings, then Apps, Fruit Tree, Storage, Clear data.
-- **Questions:** write to us at the email below.
+- **Your rights:** depending on where you live, you can ask to access, correct or delete your data, restrict or object to its processing, and complain to your local data protection authority.
+- **Questions:** write to us at the email below. We aim to reply within 30 days.
 
 ## Changes to this policy
 
 If the game's features or the services it uses change, we will update this policy and the "Last updated" date above. The current version is always available at the same address.
 
 ## Contact
-[DEVELOPER NAME]  
-Email: [SUPPORT EMAIL]
+TheLightCome  
+Email: nurikserikbay1995@gmail.com
 
 ---
 
 ## Как опубликовать (эта часть в Google Doc не копируется)
 
 1. Документ уже создан и заполнен (ссылка в начале файла). При правках меняйте и документ, и этот файл.
-2. Замените `[DEVELOPER NAME]` и `[SUPPORT EMAIL]` (по два раза) на имя разработчика из Play Console и рабочий email поддержки.
+2. Имя разработчика (TheLightCome) и email поддержки уже вписаны. Если в Play Console имя другое, поменяйте его в обоих местах.
 3. **Файл → Поделиться → Опубликовать в интернете → Опубликовать.** Ссылка вида `https://docs.google.com/document/d/e/.../pub`. Проверьте её в режиме инкогнито.
 4. Ссылку вставить в `Assets/Scripts/FruitTreePrivacyConfig.cs` (`PublishedPolicyUrl`) и в Play Console → App content → Privacy policy.
 5. Data safety в Play Console должна совпадать с разделом «Advertising»: по раскрытию Google для Mobile Ads SDK отмечаются Approximate location (по IP), App interactions, Diagnostics и Device or other IDs (App Set ID). Цели: реклама, аналитика, защита от мошенничества. Данные шифруются при передаче и не продаются. Плюс история покупок через Google Play.
