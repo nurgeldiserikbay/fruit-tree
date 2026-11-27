@@ -1,5 +1,7 @@
 # Fruit Tree — Google Play listing copy (draft)
 
+> **Current listing text, graphics and Play Console answers:** see [PLAY_CONSOLE_STEPS.md](PLAY_CONSOLE_STEPS.md). This file is the older draft.
+
 **App name:** Fruit Tree
 **Short description (EN):** Relax, explore beautiful fruit trees, and collect every last fruit.
 
