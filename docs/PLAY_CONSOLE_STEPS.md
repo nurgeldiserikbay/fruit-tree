@@ -20,6 +20,7 @@ All apps → Create app:
 - Default language: **English (United States) – en-US**
 - App or game: **Game**; Free or paid: **Free**
 - Отметить согласия (Developer Program Policies, US export laws).
+- Имя пакета: **`com.thelightcome.fruittree`**. Отдельного поля для него нет: Play берёт его из первого загруженного AAB, и после этого его нельзя поменять.
 
 ## 2. Store listing (Grow → Store presence → Main store listing)
 
