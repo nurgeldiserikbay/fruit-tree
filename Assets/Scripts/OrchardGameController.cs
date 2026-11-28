@@ -130,9 +130,40 @@ namespace FruitTree
             if (saveDirty && Time.unscaledTime >= saveDueTime) SaveProgress();
         }
 
+        /// <summary>
+        /// While the player is in their garden the shared tree shows a garden
+        /// tree; its picks belong to the garden, never to orchard progress.
+        /// </summary>
+        public bool HarvestSuspended { get; set; }
+
+        public bool IsReady => initialized;
+
+        /// <summary>Species of every orchard tree that has been fully picked at least once.</summary>
+        public List<string> ClearedSpecies()
+        {
+            var list = new List<string>();
+            if (!initialized) return list;
+            foreach (TreeLevelDefinition level in Catalog)
+            {
+                TreeRoundState state = progress.GetTree(level.Id);
+                if (state != null && (state.CompletedOnce || state.TimesCleared > 0 || state.IsCleared))
+                    list.Add(level.SpeciesId);
+            }
+            return list;
+        }
+
+        public string ActiveSpeciesId => initialized
+            ? progress.GetTree(progress.ActiveTreeId).Definition.SpeciesId : "apple";
+
+        /// <summary>Shows the current orchard tree again, e.g. when leaving the garden.</summary>
+        public void RedisplayActiveTree()
+        {
+            if (initialized) DisplayActiveTree();
+        }
+
         private void OnFruitPicked(Apple fruit)
         {
-            if (!initialized || fruit == null) return;
+            if (!initialized || fruit == null || HarvestSuspended) return;
             if (!progress.TryPickActive(fruit.StableFruitId))
             {
                 Debug.LogWarning("Fruit Tree: ignored duplicate or unknown fruit ID.");

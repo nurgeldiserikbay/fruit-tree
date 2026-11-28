@@ -202,6 +202,7 @@ namespace FruitTree
 
         public void HandleBackButton()
         {
+            if (Garden.GardenController.HandleBack()) return;
             if (privacyPanel != null && privacyPanel.activeSelf) { ClosePrivacy(); return; }
             if (helpPanel != null && helpPanel.activeSelf) { CloseHelp(); return; }
             if (settingsPanel != null && settingsPanel.activeSelf) { CloseSettings(); return; }

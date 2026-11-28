@@ -1,5 +1,12 @@
 # Fruit Tree development state
 
+## My Garden prototype (2026-11-28)
+
+- [x] **Code:** `Assets/Scripts/Garden/`: `GardenState` (pure rules), `GardenSaveRepository` (`fruit-tree-garden.json`), `GardenScreen` (overlay built in code), `GardenController` (adds MY GARDEN to the home screen at runtime, no scene regeneration).
+- [x] **Rules (calm by design):** every fully picked orchard tree gives one seed of its species (plus a welcome apple seed and one per tree already cleared). 6 beds. A planted seed grows by itself in 36 h real time (sprout, sapling, young tree, blossom, fruit) and never wilts, even after weeks away; a clock set back never shrinks it. Watering is optional: +3 h growth, then the soil stays moist for 1 h. A ripe tree has 60 fruit; once all are picked it rests 20 h and fruits again. No ads in the garden; garden picks never touch orchard progress.
+- [x] **Verified:** EditMode 164/164 (8 garden tests); play-mode screenshots of home, six beds and the seed list.
+- [ ] Try on a phone: tapping garden fruit, watering animation and sound, Android Back.
+
 ## Save batching, verification script and cleanup (2026-11-20)
 
 - [x] **Code:** `OrchardGameController` no longer rewrites the JSON save on every fruit tap. Picks are batched and written at most 1.5 s after the first unsaved pick (unscaled time, so it still saves while paused). A tree clear, tree switch, rebloom, app pause, focus loss, quit and destroy still save immediately. A failed write is retried after 6 s instead of every frame.
